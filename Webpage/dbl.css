@@ -1,0 +1,65 @@
+body {
+	background-color: gray;
+}
+
+.sidebar {
+	height: 100%;
+	width: 50px;
+	transition: 0.5s;
+	background-color: black;
+	top: 0;
+	left: 0;
+	overflow-x: hidden;
+	position: absolute; 
+	 z-index: 1;
+} 
+
+.sidebar.expanded {
+	width: 200px;
+}
+
+.sidebar a {
+  padding: 32px 8px 8px 8px;
+  text-decoration: none;
+  font-size: 25px;
+  color: gray;
+  display: block;
+  overflow: hidden;
+  transition: 0.3s;
+  margin-right: -200px;
+}
+
+a:hover {
+	background-color: white;
+}
+
+.pageContent {
+	width:100%;
+	height: 100%;
+	margin-left: 50px;
+	transition: 0.5s;
+}
+
+.pageContent.expanded {
+	margin-left: 200px;
+}
+
+.sideText {
+	width: 200px;
+	font-size: 25px;
+
+}
+
+.sideToggleButton {
+	left: 0;	
+	top: 0;
+	font-size: 25px;
+	padding: 8px 8px 8px 16px;
+	color: gray;
+}
+
+.sideToggleButton:hover {
+	background-color: white;
+}
+}
+

@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="utf-8" />
+		<meta name="viewpoint" content="width=device-width, initial-scale=1.0" />
+		<link rel="stylesheet" type="text/css" href="dbl.css" />
+		<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+		<title> dbl/home </title> 
+		
+	</head>
+	<body>	
+		
+	
+		<div id="sidebar", class="sidebar">
+			<div class="sideToggleButton" onclick="toggleSidebar()"> ☰ </div>
+			<a href="dbl_home.html" class="fa fa-home" style="font-size:36px"> <span class="sideText" id="sideTextHome" style="visibility:hidden;"> Home </span> </a>
+			<a href="dbl_vis.html" class="fa fa-gear" style="font-size:36px;"> <span class="sideText" id="sideTextVis" style="visibility:hidden;"> Visualisation </span> </a>
+			<a href="dbl_about.html" class="fa fa-info-circle" style="font-size:36px"> <span class="sideText" id="sideTextAbout" style="visibility:hidden;"> About </span> </a>
+		</div>
+		
+		<div id="pageContent" class="pageContent">
+		Homepage
+		</div>
+		
+		<script>
+		function toggleSidebar(){
+			var sideHome = document.getElementById("sideTextHome");
+			var visHome = sideHome.style.visibility;
+			var sideVis = document.getElementById("sideTextVis");
+			var visVis = sideVis.style.visibility;
+			var sideAbout = document.getElementById("sideTextAbout");
+			var visAbout = sideAbout.style.visibility;
+		
+			document.getElementById("sidebar").classList.toggle('expanded');
+			document.getElementById("pageContent").classList.toggle('expanded');
+			
+			if(visHome == 'visible'){
+				sideHome.style.visibility = 'hidden';
+				sideVis.style.visibility = 'hidden';
+				sideAbout.style.visibility = 'hidden';
+			} else {
+				sideHome.style.visibility = 'visible';
+				sideVis.style.visibility = 'visible';
+				sideAbout.style.visibility = 'visible';
+			}
+		}
+		</script>
+	</body>
+</html>
