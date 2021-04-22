@@ -5,13 +5,13 @@ body {
 .sidebar {
 	height: 100%;
 	width: 50px;
-	transition: 0.5s;
+	transition: 0.3s;
 	background-color: black;
 	top: 0;
 	left: 0;
 	overflow-x: hidden;
 	position: absolute; 
-	 z-index: 1;
+	z-index: 1;
 } 
 
 .sidebar.expanded {
@@ -37,7 +37,7 @@ a:hover {
 	width:100%;
 	height: 100%;
 	margin-left: 50px;
-	transition: 0.5s;
+	transition: 0.3s;
 }
 
 .pageContent.expanded {
@@ -61,5 +61,5 @@ a:hover {
 .sideToggleButton:hover {
 	background-color: white;
 }
-}
+
 
