@@ -16,7 +16,8 @@ function LogData(dataPath) {
       });
 }
 
-//Function is not documented. Please add documentation -Daan <3. 
+//A function that toggles specific classes and the visibility of the text elements in the sidebar.
+//Parameter: none
 function toggleSidebar() {
     var sideHome = document.getElementById("sideTextHome");
     var visHome = sideHome.style.visibility;
