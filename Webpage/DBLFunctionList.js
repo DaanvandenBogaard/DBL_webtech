@@ -27,6 +27,7 @@ function toggleSidebar() {
 
     document.getElementById("sidebar").classList.toggle('expanded');
     document.getElementById("pageContent").classList.toggle('expanded');
+    document.getElementById("line").classList.toggle('expanded');
     
     if (visHome == 'visible') {
         sideHome.style.visibility = 'hidden';
