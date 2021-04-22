@@ -1,10 +1,11 @@
 //A simple test function, hence, no documentation.
 //Simply for the sake of playing around with D3 and JS.
-function myfunction() {
-    console.log("Executed");
-    var SVG1 = d3.select('SVG1');
-    SVG1.innerHTML = "test";
-    LogData('Dataset.csv');
+function tempfunction() {
+    LogData("Dataset.csv");
+
+    d3.select("svg").append("rect").attr("x",150).attr("y", 200).attr("width", 50).attr("height", 140).attr('stroke', 'black')
+        .attr('fill', '#69a3b2');
+    
 }
 
 //A function which logs the first entry of a CSV dataset into the console. 
