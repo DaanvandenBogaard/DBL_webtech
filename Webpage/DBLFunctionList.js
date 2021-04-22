@@ -23,9 +23,7 @@ function toggleSidebar() {
     var sideHome = document.getElementById("sideTextHome");
     var visHome = sideHome.style.visibility;
     var sideVis = document.getElementById("sideTextVis");
-    var visVis = sideVis.style.visibility;
     var sideAbout = document.getElementById("sideTextAbout");
-    var visAbout = sideAbout.style.visibility;
 
     document.getElementById("sidebar").classList.toggle('expanded');
     document.getElementById("pageContent").classList.toggle('expanded');
