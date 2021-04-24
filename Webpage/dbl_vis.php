@@ -14,8 +14,8 @@
 	
     <?php 
     #Load localstorage:
-    $filename = $_GET["DataSet"];
-    if (isset($filename)){
+    if (isset($_GET["DataSet"])){
+		$filename = $_GET["DataSet"];
         #Set file name into local storage (needs to happen in JS):
         echo "<script type='text/javascript'>  
         localStorage.setItem('DataSet', '".$filename."'); 
@@ -47,13 +47,16 @@
 			<button id="submit_file" type="submit" name="submit"> Submit </button>
 		</form>
 
+
+		<!--Visualisation-->
+		<!--Load dataset into D3:-->
+		<script src="D3Functions.js"></script>
+		<script>
+			LoadDataSet(localStorage.getItem('DataSet'));
+		</script>
+
 		<svg id="SVG1" height="400px" , width="800px"></svg>
 		
 		</div>
-
-		<script>
-			
-			</script>
-
 	</body>
 </html>
