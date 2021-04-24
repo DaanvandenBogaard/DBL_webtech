@@ -49,10 +49,9 @@
 
 
 		<!--Visualisation-->
-		<!--Load dataset into D3:-->
 		<script src="D3Functions.js"></script>
 		<script>
-			LoadDataSet(localStorage.getItem('DataSet'));
+
 		</script>
 
 		<svg id="SVG1" height="400px" , width="800px"></svg>

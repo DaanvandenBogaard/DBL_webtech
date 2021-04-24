@@ -1,3 +1,0 @@
-function LoadDataSet(var path) {
-
-}
