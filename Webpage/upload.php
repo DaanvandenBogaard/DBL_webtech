@@ -1,4 +1,3 @@
-<!DOCTYPE html>
 <?php 
 
 #we will check wether it has even been submitted: 
@@ -34,7 +33,7 @@ if (isset($_POST['submit'])) {
             header("location: dbl_vis.html");
 
         } else {
-            echo "There was an error uploading your file";
+            echo "There was an error uploading your file: ".$fileError;
         }
 
     } else { 
