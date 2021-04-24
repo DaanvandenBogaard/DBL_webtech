@@ -12,11 +12,22 @@
 	</head>
 	<body>	
 	
+    <?php 
+    #Load localstorage:
+    $filename = $_GET["DataSet"];
+    if (isset($filename)){
+        #Set file name into local storage (needs to happen in JS):
+        echo "<script type='text/javascript'>  
+        localStorage.setItem('DataSet', '".$filename."'); 
+        </script>";
+    }
+    ?>
+
 		<div id="sidebar", class="sidebar">
 			<div class="fa fa-bars" id=toggle style="font-size: 36px;" onclick="toggleSidebar()">  </div>
 			<hr class="line" id="line">
 			<a href="dbl_home.html" class="fa fa-home" style="font-size:36px;"> <span class="sideText" id="sideTextHome" style="visibility:hidden;"> Home </span> </a>
-			<a href="dbl_vis.html" class="fa fa-pie-chart" id="selected" style="font-size:36px;"> <span class="sideText" id="sideTextVis" style="visibility:hidden;"> Visualisation </span> </a>
+			<a href="dbl_vis.php" class="fa fa-pie-chart" id="selected" style="font-size:36px;"> <span class="sideText" id="sideTextVis" style="visibility:hidden;"> Visualisation </span> </a>
 			<a href="dbl_about.html" class="fa fa-info-circle" style="font-size:36px;"> <span class="sideText" id="sideTextAbout" style="visibility:hidden;"> About </span> </a>
 		</div>
 		

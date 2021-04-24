@@ -21,15 +21,19 @@ if (isset($_POST['submit'])) {
     if (in_array($fileExt, $allowed)) {
         #check for general error:
         if($fileError === 0) { #"===" needed because it must also be of integer type
+
+            #Generate new personal ID for user, which will be the same as the name of this database. 
+            $uniqueName = uniqid('DataSet_');
+    
             #Upload the file to the "upload" folder:
-            $newFileName = "dataset.".$fileExt;
+            $newFileName = $uniqueName.".".$fileExt;
             $newFilePath = "upload/".$newFileName;
 
             #move the file:
             move_uploaded_file($fileTmpName , $newFilePath);
 
             #return to html page:
-            header("location: dbl_vis.html?NewData");
+            header("location: dbl_vis.php?DataSet=".$newFilePath);
 
         } else if ($fileError === 1){
             #File size error (from php.ini)
