@@ -9,6 +9,7 @@ function toggleSidebar() {
     document.getElementById("sidebar").classList.toggle('expanded');
     //document.getElementById("pageContent").classList.toggle('expanded');
     document.getElementById("line").classList.toggle('expanded');
+    document.getElementById("toolbar").classList.toggle('expanded');
 
     if (visHome == 'visible') {
         sideHome.style.visibility = 'hidden';
@@ -18,6 +19,24 @@ function toggleSidebar() {
         sideHome.style.visibility = 'visible';
         sideVis.style.visibility = 'visible';
         sideAbout.style.visibility = 'visible';
+    }
+}
+
+//A function that toggles the toolbar between active and non-active (Will add documentation once I have confirmed the way the toolbar should be hidden)
+//Parameter: none
+function toggleToolbar() {
+    var toolbar = document.getElementById("toolbar");
+    var visToolbar = toolbar.style.visibility;
+
+    document.getElementById("tooltoggle").classList.toggle('toolsActive');
+    document.getElementById("toolbar").classList.toggle('toolsActive');
+    document.getElementById("tooltoggle").classList.toggle('fa-angle-double-down');
+    document.getElementById("tooltoggle").classList.toggle('fa-angle-double-up');
+
+    if (visToolbar == 'visible') {
+        toolbar.style.visibility = 'hidden';
+    } else {
+        toolbar.style.visibility = 'visible';
     }
 }
 

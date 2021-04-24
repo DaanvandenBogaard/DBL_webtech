@@ -23,6 +23,7 @@
     }
     ?>
 
+		<!--Sidebar-->
 		<div id="sidebar", class="sidebar">
 			<div class="fa fa-bars" id=toggle style="font-size: 36px;" onclick="toggleSidebar()">  </div>
 			<hr class="line" id="line">
@@ -30,32 +31,40 @@
 			<a href="dbl_vis.php" class="fa fa-pie-chart" id="selected" style="font-size:36px;"> <span class="sideText" id="sideTextVis" style="visibility:hidden;"> Visualisation </span> </a>
 			<a href="dbl_about.html" class="fa fa-info-circle" style="font-size:36px;"> <span class="sideText" id="sideTextAbout" style="visibility:hidden;"> About </span> </a>
 		</div>
+
+		<!--Toolbox-->
+		<div id="toolbar" class="toolbar">
+			<button> test </button>
+		</div>
+		<div class="fa fa-angle-double-down" id="tooltoggle" onclick="toggleToolbar()"> </div>	
 		
-		<div id="pageContent" class="pageContent">
+		<!--pagecontent-->
+		<div id="pageContent" class="pageContent" style="margin-top:100px;">
 
-		<p class="title">Visualisation</p>
-		<p>Upload a dataset to start the visualisation</p>
+			<!--temp text-->
+			<p class="title">Visualisation</p>
+			<p>Upload a dataset to start the visualisation</p>
 
-		<!--Upload/replace dataset: -->
-		<form action="upload.php" method="POST" enctype="multipart/form-data" >
-			<input id="file_input" type="file" name="dataset" accept=".csv" onchange="changeLabel()">
-			<label id="upload_button" for="file_input">
-				<i class="fa fa-upload" id="upload_icon" style="font-size: 20px;"></i>
-				Upload dataset
-			</label>
-			<span id="file_chosen"> Choose a file (.csv) </span>
-			<button id="submit_file" type="submit" name="submit"> Submit </button>
-		</form>
+			<!--Upload/replace dataset: -->
+			<form action="upload.php" method="POST" enctype="multipart/form-data" >
+				<input id="file_input" type="file" name="dataset" accept=".csv" onchange="changeLabel()">
+				<label id="upload_button" for="file_input">
+					<i class="fa fa-upload" id="upload_icon" style="font-size: 20px;"></i>
+					Upload dataset
+				</label>
+				<span id="file_chosen"> Choose a file (.csv) </span>
+				<button id="submit_file" type="submit" name="submit"> Submit </button>
+			</form>
 
 
-		<!--Visualisation-->
-		<script src="D3Functions.js"></script>
-		<script>
+			<!--Visualisation-->
+			<script src="D3Functions.js"></script>
+			<script>
 
-		</script>
+			</script>
 
-		<svg id="SVG1" height="400px" , width="800px"></svg>
-		
+			<svg id="SVG1" height="400px" , width="800px"></svg>
+			
 		</div>
 	</body>
 </html>
