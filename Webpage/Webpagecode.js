@@ -7,9 +7,9 @@ function toggleSidebar() {
     var sideAbout = document.getElementById("sideTextAbout");
 
     document.getElementById("sidebar").classList.toggle('expanded');
-    document.getElementById("pageContent").classList.toggle('expanded');
+    //document.getElementById("pageContent").classList.toggle('expanded');
     document.getElementById("line").classList.toggle('expanded');
-    
+
     if (visHome == 'visible') {
         sideHome.style.visibility = 'hidden';
         sideVis.style.visibility = 'hidden';
@@ -20,3 +20,21 @@ function toggleSidebar() {
         sideAbout.style.visibility = 'visible';
     }
 }
+
+//fileInput.addEventListener("change", changeLabel); 
+
+function changeLabel() {
+    var fileInput = document.getElementById("file_input");
+    var fileChosen = document.getElementById("file_chosen");
+    //var submitFile = document.getElementById("submit_file");
+
+    if (fileInput.value) {
+        fileChosen.innerHTML = fileInput.value.replace(/^C:\\fakepath\\/, "");
+    } else {
+        fileChosen.innerHTML = "Choose a file (.csv)";
+    }
+
+    //File chosen refreshed after submit, commented out until change
+    //submitFile.click()
+}
+

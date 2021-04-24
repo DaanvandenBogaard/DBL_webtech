@@ -21,18 +21,28 @@
 		</div>
 		
 		<div id="pageContent" class="pageContent">
-		<p>Visualisation page</p>
+
+		<p class="title">Visualisation</p>
+		<p>Upload a dataset to start the visualisation</p>
 
 		<!--Upload/replace dataset: -->
-		<form action= "upload.php" method = "POST" enctype = "multipart/form-data" >
-			<input type = "file" name = "dataset" accept = ".csv">
-			<button type = "submit" name = "submit"> Upload dataset </button>
+		<form action="upload.php" method="POST" enctype="multipart/form-data" >
+			<input id="file_input" type="file" name="dataset" accept=".csv" onchange="changeLabel()">
+			<label id="upload_button" for="file_input">
+				<i class="fa fa-upload" id="upload_icon" style="font-size: 20px;"></i>
+				Upload dataset
+			</label>
+			<span id="file_chosen"> Choose a file (.csv) </span>
+			<button id="submit_file" type="submit" name="submit"> Submit </button>
 		</form>
 
-		<svg id = "SVG1" height = "400px" , width = "800px"></svg>
+		<svg id="SVG1" height="400px" , width="800px"></svg>
 		
 		</div>
 
+		<script>
+			
+			</script>
 
 	</body>
 </html>

@@ -1,12 +1,23 @@
+:root {
+	--white: #ffffff;
+	--grey: #1a1a1a;
+	--accent: #4b00bf;
+	--active: #7d43ea;
+	--hover: #4d4d4d;
+	--font: trebuchet ms;
+	--transition: 0.5s;
+	--short_transition: 0.3s;
+}
+
 body {
-	font-family: bahnschrift;
+	font-family: var(--font);
 }
 
 .sidebar {
 	height: 100%;
 	width: 50px;
-	transition: 0.5s;
-	background-color: #1a1a1a;
+	transition: var(--transition);
+	background-color: var(--grey);
 	top: 0;
 	left: 0;
 	overflow-x: hidden;
@@ -22,22 +33,24 @@ body {
   padding: 20px 8px 20px 8px;
   text-decoration: none;
   font-size: 25px;
-  color: #ffffff;
+  color: var(--white);
   display: block;
   overflow: hidden;
-  transition: 0.3s;
+  transition: var(--short_transition);
   margin-right: -200px;
 }
 
 a:hover {
-	background-color: #4d4d4d;
+	background-color: var(--hover);
 }
 
 .pageContent {
-	width:100%;
+	width:70%;
 	height: 100%;
-	margin-left: 50px;
-	transition: 0.5s;
+	margin-left: 15%;
+	margin-top: 30px;
+	transition: var(--transition);
+	text-align: center;
 }
 
 .pageContent.expanded {
@@ -47,8 +60,8 @@ a:hover {
 .sideText {
 	width: 200px;
 	font-size: 25px;
-	font-family: bahnschrift;
-	transition: 0.5s;
+	font-family: var(--font);
+	transition: var(--transition);
 }
 
 .sideToggleButton {
@@ -56,35 +69,72 @@ a:hover {
 	top: 0;
 	font-size: 25px;
 	padding: 8px 8px 8px 16px;
-	color: gray;
 }
 
 .sideToggleButton:hover {
-	background-color: #4d4d4d;
+	background-color: var(--hover);
 }
 
 .line{
 	margin-left: 5px;
 	width: 40px;
 	height: 1px;
-	background-color: #ffffff;
+	background-color: var(--white);
 	border-width: 0;
-	transition: 0.5s;
+	transition: var(--transition);
 }
 
 .line.expanded {
 	width: 200px;
 }
 
-#toggle {
-	padding: 15px 8px 4px 8px;
-	color: #ffffff;
+.title {
+	font-size: 25pt;
+	margin-bottom: 0;
 }
 
-#toggle:hover {
+#upload_button {
+	height: 45px;
+	width: 150px;
+	background-color: var(--accent);
+	color: var(--white);
+	border-radius: 5px;
+	border: none;
+	display: inline-flex;
+	justify-content: center;
+	align-items: center;
+	outline: none;
+	cursor: pointer;
+}
+
+#upload_button:active {
+	background-color: var(--active);
+}
+
+#file_chosen {
+	max-width: 250px;
+	font-size: 10pt;
+	color: gray;
+}
+
+#toggle {
+	padding: 15px 8px 4px 8px;
+	color: var(--white);
 	cursor: pointer;
 }
 
 #selected { 
-	background-color: #4b00bf;
+	background-color: var(--accent);
+}
+
+#upload_icon {
+	margin-right: 5px;
+}
+
+input#file_input {
+	display: none;
+}
+
+button#submit_file {
+	display: none;
 }
