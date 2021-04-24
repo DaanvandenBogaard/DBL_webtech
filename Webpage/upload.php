@@ -15,6 +15,8 @@ if (isset($_POST['submit'])) {
     $fileExtRaw = explode("." , $fileName);
     $fileExt = strtolower(end($fileExtRaw));
 
+    $allowed = array("csv");
+
     #Execute the check:
     if (in_array($fileExt, $allowed)) {
         #check for general error:
@@ -27,7 +29,7 @@ if (isset($_POST['submit'])) {
             move_uploaded_file($fileTmpName , $newFilePath);
 
             #return to html page:
-            header("location: dbl_vis.html");
+            header("location: dbl_vis.html?NewData");
 
         } else if ($fileError === 1){
             #File size error (from php.ini)

@@ -26,7 +26,7 @@ function toggleSidebar() {
 function changeLabel() {
     var fileInput = document.getElementById("file_input");
     var fileChosen = document.getElementById("file_chosen");
-    //var submitFile = document.getElementById("submit_file");
+    var submitFile = document.getElementById("submit_file");
 
     if (fileInput.value) {
         fileChosen.innerHTML = fileInput.value.replace(/^C:\\fakepath\\/, "");
@@ -35,6 +35,6 @@ function changeLabel() {
     }
 
     //File chosen refreshed after submit, commented out until change
-    //submitFile.click()
+    submitFile.click()
 }
 
