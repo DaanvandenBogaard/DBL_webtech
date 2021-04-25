@@ -88,6 +88,14 @@ a:hover {
 	cursor: pointer;
 }
 
+#sideTextHome {
+	margin-left: 2px;
+}
+
+#sideTextAbout {
+	margin-left: 6px;
+}
+
 /* Toolbar */
 
 .toolbar { 
