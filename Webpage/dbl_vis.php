@@ -31,15 +31,15 @@
 			<a href="dbl_vis.php" class="fa fa-pie-chart" id="selected" style="font-size:36px;"> <span class="sideText" id="sideTextVis" style="visibility:hidden;"> Visualisation </span> </a>
 			<a href="dbl_about.html" class="fa fa-info-circle" style="font-size:36px;"> <span class="sideText" id="sideTextAbout" style="visibility:hidden;"> About </span> </a>
 		</div>
-
+		
 		<!--Toolbox-->
 		<div id="toolbar" class="toolbar">
 			<button> test </button>
 		</div>
-		<div class="fa fa-angle-double-down" id="tooltoggle" onclick="toggleToolbar()"> </div>	
-		
+		<div class="fa fa-angle-down" id="tooltoggle" onclick="toggleToolbar()"> <span class="tooltext"> Toolbar </span> </div>	
+
 		<!--pagecontent-->
-		<div id="pageContent" class="pageContent" style="margin-top:100px;">
+		<div id="pageContent" class="pageContent">
 
 			<!--temp text-->
 			<p class="title">Visualisation</p>
@@ -55,7 +55,15 @@
 				<span id="file_chosen"> Choose a file (.csv) </span>
 				<button id="submit_file" type="submit" name="submit"> Submit </button>
 			</form>
+			<hr class="pageDivider">
 
+			<!-- Method 1 -->
+			<div class="methodDiv">
+				<p class="methodName"> Method 1 </p>
+				<div class="methodDesc"> 
+					Short description of the used method.
+				</div>
+			</div>
 
 			<!--Visualisation-->
 			<script src="D3Functions.js"></script>

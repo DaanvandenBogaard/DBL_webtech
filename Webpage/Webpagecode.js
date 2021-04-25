@@ -7,7 +7,6 @@ function toggleSidebar() {
     var sideAbout = document.getElementById("sideTextAbout");
 
     document.getElementById("sidebar").classList.toggle('expanded');
-    //document.getElementById("pageContent").classList.toggle('expanded');
     document.getElementById("line").classList.toggle('expanded');
     document.getElementById("toolbar").classList.toggle('expanded');
 
@@ -30,8 +29,9 @@ function toggleToolbar() {
 
     document.getElementById("tooltoggle").classList.toggle('toolsActive');
     document.getElementById("toolbar").classList.toggle('toolsActive');
-    document.getElementById("tooltoggle").classList.toggle('fa-angle-double-down');
-    document.getElementById("tooltoggle").classList.toggle('fa-angle-double-up');
+    document.getElementById("tooltoggle").classList.toggle('fa-angle-down');
+    document.getElementById("tooltoggle").classList.toggle('fa-angle-up');
+    document.getElementById("pageContent").classList.toggle('expanded');
 
     if (visToolbar == 'visible') {
         toolbar.style.visibility = 'hidden';
@@ -39,8 +39,6 @@ function toggleToolbar() {
         toolbar.style.visibility = 'visible';
     }
 }
-
-//fileInput.addEventListener("change", changeLabel); 
 
 function changeLabel() {
     var fileInput = document.getElementById("file_input");
@@ -53,7 +51,6 @@ function changeLabel() {
         fileChosen.innerHTML = "Choose a file (.csv)";
     }
 
-    //File chosen refreshed after submit, commented out until change
     submitFile.click()
 }
 
