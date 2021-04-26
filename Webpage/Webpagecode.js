@@ -1,18 +1,19 @@
 //A function that toggles specific classes and the visibility of the text elements in the sidebar.
 //Parameter: none
 function toggleSidebar() {
-    /*  Disabled for functionality
     var sideHome = document.getElementById("sideTextHome");
     var visHome = sideHome.style.visibility;
     var sideVis = document.getElementById("sideTextVis");
     var sideAbout = document.getElementById("sideTextAbout");
-    */
+    
 
     document.getElementById("sidebar").classList.toggle('expanded');
     document.getElementById("line").classList.toggle('expanded');
-    document.getElementById("toolbar").classList.toggle('expanded');
 
-    /*  Disabled for functionality
+    if(document.title == "vis_dbl.php") { 
+        document.getElementById("toolbar").classList.toggle('expanded');
+    }
+
     if (visHome == 'visible') {
         sideHome.style.visibility = 'hidden';
         sideVis.style.visibility = 'hidden';
@@ -22,10 +23,10 @@ function toggleSidebar() {
         sideVis.style.visibility = 'visible';
         sideAbout.style.visibility = 'visible';
     }
-    */
+   
 }
 
-//A function that toggles the toolbar between active and non-active (Will add documentation once I have confirmed the way the toolbar should be hidden)
+//A function that toggles the toolbar between active and non-active
 //Parameter: none
 function toggleToolbar() {
     var toolbar = document.getElementById("toolbar");
