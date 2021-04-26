@@ -55,7 +55,6 @@
 				<span id="file_chosen"> Choose a file (.csv) </span>
 				<button id="submit_file" type="submit" name="submit"> Submit </button>
 			</form>
-			<hr class="pageDivider">
 
 			<!--Visualisation-->
 			<script src="D3Functions.js"></script>
