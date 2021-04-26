@@ -57,14 +57,6 @@
 			</form>
 			<hr class="pageDivider">
 
-			<!-- Method 1 -->
-			<div class="methodDiv">
-				<p class="methodName"> Method 1 </p>
-				<div class="methodDesc"> 
-					Short description of the used method.
-				</div>
-			</div>
-
 			<!--Visualisation-->
 			<script src="D3Functions.js"></script>
 			<script>
