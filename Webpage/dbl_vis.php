@@ -58,11 +58,7 @@
 
 			<!--Visualisation-->
 			<script src="D3Functions.js"></script>
-			<script>
 
-			</script>
-
-			<svg height="400px" , width="800px"></svg>
 			
 		</div>
 	</body>
