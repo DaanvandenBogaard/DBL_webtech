@@ -62,7 +62,7 @@
 
 			</script>
 
-			<svg id="SVG1" height="400px" , width="800px"></svg>
+			<svg height="400px" , width="800px"></svg>
 			
 		</div>
 	</body>
