@@ -20,7 +20,7 @@
         echo "<script type='text/javascript'>  
         localStorage.setItem('DataSet', '".$filename."'); 
         </script>";
-    }
+    } 
     ?>
 
 		<!--Sidebar-->
@@ -79,7 +79,9 @@
 			}
 			</style>
 			<script> 
-			makeSankey(localStorage.getItem('DataSet'));
+			if (localStorage.getItem('DataSet') != null) {
+				makeSankey(localStorage.getItem('DataSet'));
+			}
 			</script>			
 			
 		</div>

@@ -17,7 +17,7 @@ function makeSankey(dataPath) {
                .append("g")
                .attr("transform" , "translate(" + margin.left  + "," + margin.top +")");
   //Import sankey package as variable:
-  var sankeyVis = d3.sankey()
+  var sankey = d3.sankey()
                .nodeWidth(40)
                .nodePadding(300)
                .size([width,height]);
@@ -32,11 +32,12 @@ function makeSankey(dataPath) {
 
     //convert to numbers:
     data.forEach(function(d) {
-      d.fromId = +d.fromId; 
+      //d.fromId = +d.fromId; 
       d.sentiment = +d.sentiment;
-      d.toId = +d.toId; 
+      //d.toId = +d.toId; 
     });
 
+    /*
     //Construct the nodes:
     let fromIDs = data.map(function(d) {
      return  d.fromId
@@ -49,7 +50,7 @@ function makeSankey(dataPath) {
     let IDs = fromIDs.concat(toIDs);
     let nodesRaw = IDs.filter(unique); //List of unique IDs   
     let nodes = nodesRaw.map(function(d){
-      return {node : d , name: "node" + d}
+      return {node : d , name: d}
     });
 
     //Construct the links:
@@ -60,12 +61,27 @@ function makeSankey(dataPath) {
         value  : 2
       }
     });
+    */
+    dataTemp = 
+    {
+      "nodes":[
+      {"name":"Barry"},
+      {"name":"Frodo"},
+      {"name":"Elvis"},
+      {"name":"Sarah"},
+      {"name":"Alice"}
+      ],
+      "links":[
+      {"source":0,"target":2,"value":2},
+      {"source":1,"target":2,"value":2},
+      {"source":1,"target":3,"value":2},
+      {"source":0,"target":4,"value":2},
+      {"source":2,"target":3,"value":2},
+      {"source":2,"target":4,"value":2},
+      {"source":3,"target":4,"value":4}
+      ]};
 
-    //Add nodes and links to sankey:
-    sankeyVis
-      .nodes(nodes)
-      .links(links)
-      .iterations(1);
+    console.log(sankey(dataTemp));
       
   }); 
 }
