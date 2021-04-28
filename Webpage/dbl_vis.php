@@ -67,6 +67,17 @@
 			<script src="https://unpkg.com/d3-sankey@0"></script>
 			<script src= "SankeyDiagram.js"></script>
 
+			<!--We must define the following style: (may be moved to general CSS file)-->		
+			<style>
+			.link {
+  				fill: none;
+  				stroke: #000;
+  				stroke-opacity: .2;
+			}
+			.link:hover {
+				stroke-opacity: .5;
+			}
+			</style>
 			<script> 
 			makeSankey(localStorage.getItem('DataSet'));
 			</script>			
