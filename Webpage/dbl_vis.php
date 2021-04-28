@@ -8,7 +8,7 @@
 		<script src="https://d3js.org/d3.v6.min.js"></script>
 		<script src="Webpagecode.js"></script>
 		<title> dbl/visualisation </title> 
-		
+		<script src="D3Functions.js"></script>
 	</head>
 	<body>	
 	
@@ -56,9 +56,20 @@
 				<button id="submit_file" type="submit" name="submit"> Submit </button>
 			</form>
 
+			<span id = "sankeyID" height = "800" style = "display: inline-block;"></span>
+
 			<!--Visualisation-->
-			
-			<script src="D3Functions.js"></script>
+			<!-- Imports Sankey -->
+			<script src="https://unpkg.com/d3-array@1"></script>
+			<script src="https://unpkg.com/d3-collection@1"></script>
+			<script src="https://unpkg.com/d3-path@1"></script>
+			<script src="https://unpkg.com/d3-shape@1"></script>
+			<script src="https://unpkg.com/d3-sankey@0"></script>
+			<script src= "SankeyDiagram.js"></script>
+
+			<script> 
+			makeSankey(localStorage.getItem('DataSet'));
+			</script>			
 			
 		</div>
 	</body>
