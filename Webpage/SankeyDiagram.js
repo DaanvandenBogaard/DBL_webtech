@@ -10,8 +10,8 @@ function makeSankey(dataPath) {
   let margin = {top : 15, right : 10, bottom: 15, left: 10} //For now, hardcoded margins 
   let width = 1500; //for now, hardcoded width
   let height = 800; //for now, hardcoded height
+  let textpadding = 10;
   var nodeWidthSankey = 80;
-  var nodeHeightSankey = 100;
   let div = d3.select("#sankeyID")
               .attr("width" , width)
               .attr("height" , height);
@@ -26,10 +26,10 @@ function makeSankey(dataPath) {
   //Import sankey package as variable:
   var sankey = d3.sankey()
                .nodeWidth(nodeWidthSankey)
-               .nodePadding(50)
+               .nodePadding(25)
                .nodeAlign(d3.sankeyCenter)
                .nodeSort(null)
-               //.nodeId(d => d.name)
+               .nodeId(d => d.name)
                .size([width,height])
                .extent([[1, 5], [width - 1, height - 5]])
                .iterations(50);
@@ -44,46 +44,54 @@ function makeSankey(dataPath) {
 
     //convert to numbers:
     data.forEach(function(d) {
-      //d.fromId = +d.fromId; 
+      d.fromId = +d.fromId; 
       d.sentiment = +d.sentiment;
-      //d.toId = +d.toId; 
+      d.toId = +d.toId; 
     });
 
-    /*
-    //Construct the nodes:
-    let fromIDs = data.map(function(d) {
-     return  d.fromId
+    //For now, we will hardcode the ID number who's contact we want to see.
+    let idNums = [64,9];
+
+    let linksDataRaw = data.filter( function(el) {
+      return idNums.includes(el.fromId);
     });
 
-    let toIDs = data.map(function(d) {
-      return  d.toId
-     });
-    
-    let IDs = fromIDs.concat(toIDs);
-    let nodesRaw = IDs.filter(unique); //List of unique IDs   
-    let nodes = nodesRaw.map(function(d){
-      return {node : d , name: d}
-    });
-
-    //Construct the links:
-    let links = data.map(function(d){
-      return{
-        source : d.fromId,
-        target : d.toId,
-        value  : 2
+    let linksData = linksDataRaw.map(function(d){
+      return {
+        source:d.fromId,
+        target:d.toJobtitle,
+        value:1
       }
     });
-    */
+    console.log(data);
+    //TEMP: we'll take a small slice of the LINKSDATA
+    //linksData = linksData.slice(10,100);
 
-    //TODO define dataset for sankey
-    dataTemp = 
+    //We have to add all the toJobtitles as nodes as well.
+    let extraNodesRaw = linksData.map(function(d) {
+      return d.target
+    });
+
+    let extraNodesDisctinct = [... new Set(extraNodesRaw)];
+    extraNodesDisctinct = extraNodesDisctinct.concat(idNums);
+
+    let nodesData = extraNodesDisctinct.map(function(d){
+      return {"name" : d}
+    });
+    
+
+    //Debug dataset:
+    
+    /*
+    dataSet = 
     {
       "nodes":[
       {"name":"Barry"},
       {"name":"Frodo"},
       {"name":"Elvis"},
       {"name":"Sarah"},
-      {"name":"Alice"}
+      {"name":"Alice"},
+      {"name":"Paulus de boskabouter"}
       ],
       "links":[
       {"source":0,"target":2,"value":2},
@@ -92,12 +100,16 @@ function makeSankey(dataPath) {
       {"source":0,"target":4,"value":2},
       {"source":2,"target":3,"value":2},
       {"source":2,"target":4,"value":2},
-      {"source":3,"target":4,"value":4}
+      {"source":3,"target":4,"value":4},
+      {"source":0,"target":5,"value":4},
+      {"source":4,"target":5,"value":4}
       ]};
+    */
      
+    dataSet = {"nodes" : nodesData , "links" : linksData};
+    console.log(dataSet);
     //Define sankey data by sankey.js
-    let {nodes, links} = sankey(dataTemp);
-
+    let {nodes, links} = sankey(dataSet);
 
     //Append a new group for the nodes and set it's attributes:
     //TODO: fix colors and possible names
@@ -135,12 +147,9 @@ function makeSankey(dataPath) {
        .data(nodes)
        .join("text")
        .attr("y", d => (d.y1 + d.y0) / 2) //set x coordinate
-       .attr("x", d => d.x0 < width / 2 ? d.x1 + 6 : d.x0 - 6) //set y coordinate based on the location of the node.
+       .attr("x", d => d.x0 < width / 2 ? d.x1 + textpadding : d.x0 - textpadding) //set y coordinate based on the location of the node.
        .attr("text-anchor", d => d.x0 < width / 2 ? "start" : "end")
        .text(d => d.name) //set the text value
-
-
-
   }); 
 }
 
@@ -148,4 +157,5 @@ function makeSankey(dataPath) {
 const unique = (value, index, self) => {
   return self.indexOf(value) === index
 }
+
 
