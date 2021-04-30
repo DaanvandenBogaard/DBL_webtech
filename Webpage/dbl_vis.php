@@ -56,7 +56,7 @@
 				<button id="submit_file" type="submit" name="submit"> Submit </button>
 			</form>
 
-			<svg id = "sankeyID" height = "800" style = "display: inline-block;"></svg>
+			<div id = "sankeyID" height = "800" style = "display: inline-block;"></div>
 
 			<!--Visualisation-->
 			<!-- Imports Sankey -->
