@@ -56,11 +56,16 @@
 				<button id="submit_file" type="submit" name="submit"> Submit </button>
 			</form>
 
+            <div id = "MSVID" height = "800" style = "display: inline-block;"></div>
+
 			<!--Visualisation-->
 			<script src="D3Functions.js"></script>
-			<script>
-
-			</script>
+			<script src="MSV.js"></script>
+			<script> 
+			if (localStorage.getItem('DataSet') != null) {
+				makeMSV(localStorage.getItem('DataSet'));
+			}
+			</script>	
 			
 		</div>
 	</body>
