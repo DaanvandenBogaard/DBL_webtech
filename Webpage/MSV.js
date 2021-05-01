@@ -140,3 +140,97 @@ function parseDate(x){
     let year = (x - (month*100) - day)/10000;
     return [day, month, year];
 }
+
+
+/*getEdges: Creates edge array with all edges (stored as an edge class)
+*Parameters:
+*   Data object with the comlumns fromID and toId
+*Returns:
+*   The edges that we have in this initial situation
+*/
+// Note: Currently the edges are being stored as an edge class, I did this in case we need the nodes of an edge, if thiss is not needed then I can easily rework it.
+function getEdges(data) {
+    //create empty array
+    var edges = []; 
+
+    //calculate length for each edge and store them as edge element
+    for (let i = 0; i < data.length; i++){
+        edgeLenght = Math.abs(data.fromId[i] - data.fromId[i]) / (data.length - 1) * 100;
+        edges[i] = new Edge(data[i].fromId, data[i].toId, length);
+    }
+
+    return edges;
+}
+
+/*meanEdgeLength: Computes the mean of the edge length
+*Parameters:
+*   Array of edges
+*Returns:
+*   Mean of the edge length
+*/
+function meanEdgeLength(edges){
+    var edgeSum = 0;
+
+    edges.forEach(edge => {
+        edgeSum += edge.length;
+    });
+
+    return edgeSum / edges.length;
+}
+
+/*stdevEdgeLength: Computes the standard deviation of the edge length
+*Parameters:
+*   Array of edges
+*Returns:
+*   Standard deviation of the edge length
+*/
+function stdevEdgeLength(edges){
+    var stdevSum = 0;
+    var meanEdgeLength = meanEdgeLength(edges);
+
+    edges.forEach(edge => {
+        stdevSum += (edge.length - meanEdgeLength)^2;
+    });
+
+    return Math.sqrt((1 / (edges.length - 1)) * stdevSum);
+}
+
+/*Simulated annealing: Simulated annealing alogrithm to approximate the minimal edge length
+*Parameters:
+*   Nothing
+*Returns:
+*   Standard deviation of the edge length
+*/
+// Note: It is not finished, as there  are some things I'd like to discuss before continuing.
+function simulatedAnnealing(){
+    var T = 100; // I have no idea yet what to pick as starting Temprature, many get it by trial and error, tho there is a 17 page long paper just on finding the right starting temprature
+    var Tmin = .001; //Same with the T0, I don't know what a good value is, will do this later by trial and error or do some research on a method to find a good value.
+    var numOfIterations = 100; //Again a random number
+
+    //For the initial solution we take the edges as they are before any reordering
+    startEdges = getEdges(data);
+    var currentSolution = new Solution(startEdges, stdevEdgeLength(startEdges));
+
+    //Loop until temprature reaches minimal tempreature
+    while(T > Tmin) {
+
+        //Iterate until we decrease temprature
+        for(let i = 0; i < numOfIterations; i++){
+
+            // **generate newSolution here**
+
+            // If cost of new solution < cost of current solution
+            if( /* newSolution.cost must replace the 1*/ 1 < currentSolution.cost){
+                currentSolution = 1 /* newSolution */;
+            }
+            // Calculate probability
+            else if(Math.pow(Math.E, (/* newSolution.cost */ - currentSolution.cost) / T) > Math.random())  {
+                currentSolution = 1 /* newSolution */;
+            }
+        }
+
+        T *= 0.1; //I have absolute no idea what I'm doing (yet), We can go for Geometric reduction T = T*a (like it is now) or linear reduction T = T - a
+    }
+
+    return currentSolution;
+}
