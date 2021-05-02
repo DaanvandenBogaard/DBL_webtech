@@ -60,8 +60,7 @@
 
 			<!--Visualisation-->
 			<script src="D3Functions.js"></script>
-			<!--Make sure MSV classes is called before any script that use the classes!-->
-			<script scr="MSV_classes.js"></script> 
+            <script src="SimulatedAnnealing.js"></script>
 			<script src="MSV.js"></script>
 			<script> 
 			if (localStorage.getItem('DataSet') != null) {
