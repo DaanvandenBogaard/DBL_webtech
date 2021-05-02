@@ -6,6 +6,7 @@
 		<link rel="stylesheet" type="text/css" href="dbl.css" />
 		<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
 		<script src="https://d3js.org/d3.v6.min.js"></script>
+		<script src="https://d3js.org/d3-collection.v1.min.js"></script>
 		<script src="Webpagecode.js"></script>
 		<title> dbl/visualisation </title> 
 		
@@ -59,7 +60,10 @@
 			<!--Visualisation-->
 			<script src="D3Functions.js"></script>
 
-			
+			<!-- HEB -->
+			<script src="HEB.js"></script>
+			<button id="startHEB" type="button" name="HEB" onclick="makeHEB(localStorage.getItem('DataSet'))"> Start </button>
+			<div id="HEBFigure"> </div>
 		</div>
 	</body>
 </html>

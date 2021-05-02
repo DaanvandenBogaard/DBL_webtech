@@ -56,6 +56,6 @@ function changeLabel() {
         fileChosen.innerHTML = "Choose a file (.csv)";
     }
 
-    submitFile.click()
+    submitFile.click();
 }
 

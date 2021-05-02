@@ -258,3 +258,8 @@ button#submit_file {
 .methodDesc {
 	color: var(--smallText);
 }
+
+#HEBFigure {
+	font-family: var(--font);
+	font-size: 10pt;
+}
