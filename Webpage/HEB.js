@@ -117,15 +117,18 @@ function makeHEB(dataPath) {
             .attr("text-anchor", "middle")
             .text(function (d, i) { return d.id; })
         //Creates all edges (mail-traffic)
+
         var edges = g.append("path")
             .attr('d', function (d, i) {
                 var mail_line = []
-                for (k = 0; k < d.mails.length; k++) {
-                    var g_i = d.mails[k]
-                    mail_line[k] = d3.line()([[320 + 300 * (Math.sin(((2 * Math.PI) / 149) * i)), 500 + 300 * (Math.cos(((2 * Math.PI) / 149) * i))],
-                    [320 + 300 * (Math.sin(((2 * Math.PI) / 149) * g_i)), 500 + 300 * (Math.cos(((2 * Math.PI) / 149) * g_i))]]);
+                for (k = 0; k < 1; k++) {
+                    var goto_id = d.mails[0];
+                    var goto_index = unique_ids.indexOf(goto_id);
+                    mail_line = d3.line()([[320 + 300 * (Math.sin(((2 * Math.PI) / 149) * i)), 500 + 300 * (Math.cos(((2 * Math.PI) / 149) * i))],
+                    [320 + 300 * (Math.sin(((2 * Math.PI) / 149) * goto_index)), 500 + 300 * (Math.cos(((2 * Math.PI) / 149) * goto_index))]]);
                 }
-
+                //Only for testing reasons
+                console.log([i, goto_index]);
                 return mail_line;
             })
             .attr('stroke', 'purple')
