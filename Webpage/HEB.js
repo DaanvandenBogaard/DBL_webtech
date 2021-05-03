@@ -38,38 +38,35 @@ function makeHEB(dataPath) {
 
         data.forEach(function(d) {
             //Check wheter the toId is already an object, if not create object with first found fromId
-            if(usableData.some(code => code.id == d.toId) == false) {
+            if(!usableData.some(code => code.id == d.toId)) {
                 usableData.push({"id": d.toId, "jobtitle": d.toJobtitle, "mails": [d.fromId]});
                 userIndex.push(d.toId);
             }
             //Check wheter fromId is already in mails array, if not add it
-            //De if moet nog in de juiste index van de passende "id" checken, hij checkt nu in iedere object
-            if(usableData.some(code => code.mails.includes(d.fromId)) == false) {
+            if(notInMails(d.fromId, d.toId)) {
                 indexOfUser = userIndex.indexOf(d.toId);
                 usableData[indexOfUser]["mails"].push(d.fromId);
             }
         });
+
+        function notInMails(curFromId, curToId) {
+            indexOfUser = userIndex.indexOf(curToId);
+            for (i = 0; i < usableData[indexOfUser]["mails"].length; i++ ) {
+                if (usableData[indexOfUser]["mails"][i] == curFromId) {
+                    return false;
+                }
+            }
+            return true;
+        }
         
         //Sort array by jobtitle
         usableData.sort((a, b) => d3.ascending(a.jobtitle, b.jobtitle) || d3.ascending(a.toId, b.toId));
 
         //Draw nodes 
-        /*
-        let node = svg.append("g")
-                      .selectAll("g")
-                      .data(filteredData)
-                      .join("g")
-                      .attr("transform", d => `rotate(${d.x * 180 / Math.PI - 90}) translate(${d.y},0)`)
-                      .append("text")
-                      .attr("dy", "0.31em")
-                      .attr("x", d => d.x < Math.PI ? 6 : -6)
-                      .attr("text-anchor", d => d.x < Math.PI ? "start" : "end")
-                      .attr("transform", d => d.x >= Math.PI ? "rotate(180)" : null)
-                      .text(d => d.name);
-        */
+        let unique_ids = [...new Set(usableData.map(ids => ids.id))];
 
         console.log(usableData);
     });
     
-    
+
 }
