@@ -118,12 +118,15 @@ function makeHEB(dataPath) {
              .text(function(d,i) { return d.id; })
         //Creates the edges NOTWORKINGYET
              var edges = g.append("path")
-             .attr('d', function(d){
-                 return d3.line()([[2,2],[500,500]]);})
+             .attr('d', function(d,i){
+                 //var goesto = d.mails[0]
+                // var g_i = usableData.indexOf(goesto)
+                var g_i = d.mails[0]
+                 return d3.line()([[320 + 300*(Math.sin(((2*Math.PI)/149)*i)) , 500 + 300*(Math.cos(((2*Math.PI)/149)*i))],
+                                    [320 + 300*(Math.sin(((2*Math.PI)/149)*g_i)) ,500 + 300*(Math.cos(((2*Math.PI)/149)*g_i))]]);})
              .attr('stroke', 'black')
              .attr('fill', 'none');
-//(function(d,i){return [[2,2],[800,800]];}
-//[[2,2],[500,500]]
+
         console.log(usableData);
         console.log(usableData.length);
         console.log(CEO_list2);
