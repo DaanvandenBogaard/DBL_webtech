@@ -61,12 +61,77 @@ function makeHEB(dataPath) {
         
         //Sort array by jobtitle
         usableData.sort((a, b) => d3.ascending(a.jobtitle, b.jobtitle) || d3.ascending(a.toId, b.toId));
+        
+       
 
-        //Draw nodes 
+        //TEMPORARILY array of CEO's
+        function ceo_check(d){
+            return d.jobtitle == "CEO"
+        }
+        const CEO_list2 = usableData.filter(ceo_check);
+        var CEO_ids = CEO_list2.map(function(item){return item.id;});
+
+        //Creating color array
+
+
+        //Get unique ids
         let unique_ids = [...new Set(usableData.map(ids => ids.id))];
 
+        //Get unique jobtitles
+        let Jobtitles_list = [...new Set(usableData.map(ids => ids.jobtitle))];
+
+        //Creates the svg object
+        var svg1 = d3.select("body").append("svg")  
+             .attr("width", 500)
+             .attr("height", 500);
+
+        //Creates the group object for all rows in the usableData set
+        var g =     svg.selectAll("g")
+               .data(usableData)
+               .enter()
+               .append("g")
+               
+        //creates circles for all working persons
+             var circle = g.append("circle")
+              .attr("cx", function(d,i){
+                return 320 + 300*(Math.sin(((2*Math.PI)/149)*i));
+             })
+             .attr("cy", function(d,i){
+                 return 500 + 300*(Math.cos(((2*Math.PI)/149)*i));
+             })
+             .attr("r", 5)
+             //Fills the circles according to jobtitle
+             .attr("fill", function(d){
+                if(d.jobtitle == "CEO"){return "green"}
+                else{return "red"}
+             })
+
+             var id_text = g.append("text")
+             .attr("x", function(d,i){
+                return 320 + 300*(Math.sin(((2*Math.PI)/149)*i));
+             })
+             .attr("y", function(d,i){
+                 return 500 + 300*(Math.cos(((2*Math.PI)/149)*i));
+             })
+             .attr("font-size", "10px")
+             .attr("text-anchor", "middle")
+             .text(function(d,i) { return d.id; })
+             
+             var edges = g.append("path")
+             .attr('d', function(d){
+                 return d3.line()([[2,2],[500,500]]);})
+             .attr('stroke', 'black')
+             .attr('fill', 'none');
+//(function(d,i){return [[2,2],[800,800]];}
+//[[2,2],[500,500]]
         console.log(usableData);
+        console.log(usableData.length);
+        console.log(CEO_list2);
+        console.log(Jobtitles_list);
     });
     
 
-}
+        
+    };
+    
+
