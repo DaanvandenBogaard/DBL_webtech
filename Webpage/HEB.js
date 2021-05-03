@@ -105,7 +105,7 @@ function makeHEB(dataPath) {
                 if(d.jobtitle == "CEO"){return "green"}
                 else{return "red"}
              })
-
+        //Creates the text for ids
              var id_text = g.append("text")
              .attr("x", function(d,i){
                 return 320 + 300*(Math.sin(((2*Math.PI)/149)*i));
@@ -116,7 +116,7 @@ function makeHEB(dataPath) {
              .attr("font-size", "10px")
              .attr("text-anchor", "middle")
              .text(function(d,i) { return d.id; })
-             
+        //Creates the edges NOTWORKINGYET
              var edges = g.append("path")
              .attr('d', function(d){
                  return d3.line()([[2,2],[500,500]]);})
