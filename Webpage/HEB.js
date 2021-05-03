@@ -116,16 +116,22 @@ function makeHEB(dataPath) {
              .attr("font-size", "10px")
              .attr("text-anchor", "middle")
              .text(function(d,i) { return d.id; })
-        //Creates the edges NOTWORKINGYET
+        //Creates all edges (mail-traffic)
              var edges = g.append("path")
              .attr('d', function(d,i){
-                 //var goesto = d.mails[0]
-                // var g_i = usableData.indexOf(goesto)
-                var g_i = d.mails[0]
-                 return d3.line()([[320 + 300*(Math.sin(((2*Math.PI)/149)*i)) , 500 + 300*(Math.cos(((2*Math.PI)/149)*i))],
-                                    [320 + 300*(Math.sin(((2*Math.PI)/149)*g_i)) ,500 + 300*(Math.cos(((2*Math.PI)/149)*g_i))]]);})
-             .attr('stroke', 'black')
-             .attr('fill', 'none');
+                var mail_line = []
+                for(k = 0; k < d.mails.length; k++){
+                    var g_i = d.mails[k]
+                    mail_line[k] = d3.line()([[320 + 300*(Math.sin(((2*Math.PI)/149)*i)) , 500 + 300*(Math.cos(((2*Math.PI)/149)*i))],
+                                        [320 + 300*(Math.sin(((2*Math.PI)/149)*g_i)) ,500 + 300*(Math.cos(((2*Math.PI)/149)*g_i))]]);}
+
+                                        return mail_line;
+                                    })
+             .attr('stroke', 'purple')
+             .attr('fill', 'none')
+             .attr("stroke-width", 1)
+             .style("opacity", 0.2);
+             
 
         console.log(usableData);
         console.log(usableData.length);
