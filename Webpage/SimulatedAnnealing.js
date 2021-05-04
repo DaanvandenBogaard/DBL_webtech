@@ -11,15 +11,16 @@ Returns:
 */
 function optimizeLayout(data, currentIDS, costFunction) {
     //Initialize the annealing parameters
-    let t = 100;                      //Starting temperature variable
+    let t = 5;                      //Starting temperature variable
     let tMin = 0;              //Ending temperature 
-    let decrease = 1;             //variable temperature is multiplied by for decreasing
-    let amountIterations = 25;     //Amount of iterations per temperature
+    let decrease = 0.02;             //variable temperature is multiplied by for decreasing
+    let amountIterations = 20;     //Amount of iterations per temperature
     //let perMul = 150;              //The amount of permutations done by newSolution is t*perMul
 
     //Calculates cost of the randomly generated first input before annealing.
     let currentEdges = getEdges(data, currentIDS);
     let currentCost = calculateCost(currentEdges);
+    console.log(meanEdgeLength(currentEdges));
  //   let contribution = calculateContribution(data, currentIDS, currentEdges, costFunction);
    // let currentCost = calculateCost(data, currentIDS, costFunction);
    let smallestCost = 100;
@@ -34,7 +35,7 @@ function optimizeLayout(data, currentIDS, costFunction) {
             //let newCost = calculateCost(data, newIDS, costFunction);
            
 
-            ap = Math.pow(Math.E, (currentCost - newCost)/t);
+            ap = Math.pow(Math.E, (newCost - currentCost)/t);
 
             //If it is a more optimal solution then it is automatically accepted otherwise it only sometimes accepts it
             if ((currentCost > newCost) ) {
@@ -63,7 +64,7 @@ function optimizeLayout(data, currentIDS, costFunction) {
         //console.log(contribution[0][1]);
     }
     console.log(smallestCost);
-    console.log(currentIDS);
+    console.log(meanEdgeLength(currentEdges));
     return smallestSol;
 }
 
@@ -75,14 +76,14 @@ Returns:
     array: the permuted array
 */
 function newSolution(array,  t) {
-    for (let i = 0; i < t; i++) {
+    for (let i = 0; i < t * 100; i++) {
         let j = Math.floor(Math.random() * 2);
       //  let j = Math.floor(array.length*Math.random());
         let k = Math.floor((array.length - 1 )*Math.random())  + 1;
        // let highest = contribution[contribution.length - i][0];
-     //   let x = array[k];
-     //   array[k] = array[j];
-     //   array[j] = x;
+      // let x = array[k];
+    //   array[k] = array[j];
+    //   array[j] = x;
      if(j == 0){
          if(k == array.length - 1){
              k -= 1;
@@ -98,7 +99,7 @@ function newSolution(array,  t) {
         array[k] = array[k - 1];
         array[k - 1] = x;
       } 
-    }
+    } 
 
     return array;
 }

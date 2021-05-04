@@ -84,9 +84,9 @@ function drawEdges(data, IDS){
                .style("stroke", "red")
           //     .style("opacity", 0.1)
                .style("stroke-width", 1)
-               .attr("x1", d.time * 2)
+               .attr("x1", d.time )
                .attr("y1", IDS[d.fromId - 1] * 5)
-               .attr("x2", d.time * 2)
+               .attr("x2", d.time )
                .attr("y2", IDS[d.toId - 1] * 5);
     })
 }
