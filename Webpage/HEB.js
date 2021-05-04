@@ -72,7 +72,7 @@ function makeHEB(dataPath) {
         var CEO_ids = CEO_list2.map(function (item) { return item.id; });
 
         //Creating color array
-
+        const color_arr = ["green", "blue","chartreuse", "cyan","darkmagenta", "deeppink","gold", "lightseagreen","mediumpurple", "olive","orchid", "seagreen","grey", "blue","green", "blue","green", "blue",];
 
         //Get unique ids
         let unique_ids = [...new Set(usableData.map(ids => ids.id))];
@@ -102,9 +102,11 @@ function makeHEB(dataPath) {
             .attr("r", 5)
             //Fills the circles according to jobtitle
             .attr("fill", function (d) {
-                if (d.jobtitle == "CEO") { return "green" }
-                else { return "red" }
+               var job_code = Jobtitles_list.indexOf(d.jobtitle);
+               console.log(job_code)
+               return color_arr[job_code];
             })
+
         //Creates the text for ids
         var id_text = g.append("text")
             .attr("x", function (d, i) {
@@ -116,27 +118,27 @@ function makeHEB(dataPath) {
             .attr("font-size", "10px")
             .attr("text-anchor", "middle")
             .text(function (d, i) { return d.id; })
+            
         //Creates all edges (mail-traffic)
-
         var edges = g.append("path")
             .attr('d', function (d, i) {
                 var mail_line = []
-                for (k = 0; k < 1; k++) {
-                    var goto_id = d.mails[0];
+                for (k = 0; k < d.mails.length; k++) {
+                    var goto_id = d.mails[k];
                     var goto_index = unique_ids.indexOf(goto_id);
-                    mail_line = d3.line()([[320 + 300 * (Math.sin(((2 * Math.PI) / 149) * i)), 500 + 300 * (Math.cos(((2 * Math.PI) / 149) * i))],
+                    mail_line[k] = d3.line()([[320 + 300 * (Math.sin(((2 * Math.PI) / 149) * i)), 500 + 300 * (Math.cos(((2 * Math.PI) / 149) * i))],
                     [320 + 300 * (Math.sin(((2 * Math.PI) / 149) * goto_index)), 500 + 300 * (Math.cos(((2 * Math.PI) / 149) * goto_index))]]);
                 }
                 //Only for testing reasons
-                console.log([i, goto_index]);
+                //console.log([i, goto_index]);
                 return mail_line;
             })
-            .attr('stroke', 'purple')
+            .attr('stroke', 'black')
             .attr('fill', 'none')
             .attr("stroke-width", 1)
             .style("opacity", 0.2);
 
-
+            //Testing logs
         console.log(usableData);
         console.log(usableData.length);
         console.log(CEO_list2);
