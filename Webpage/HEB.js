@@ -164,12 +164,12 @@ function makeHEB(dataPath) {
                 var mail_line = []   
 
                 job_code2 = Jobtitles_list.indexOf(d.jobtitle)
-                circ_x(150,group[job_code2]);
-                circ_y(150,group[job_code2]);
+                circ_x(200,group[job_code2]);
+                circ_y(200,group[job_code2]);
                     x_2 = x_c;
                     y_2 = y_c;
         //Fills array with the correct lines  
-                for (k = 0; k < 1; k++) {
+                for (k = 0; k < d.mails.length; k++) {
                     var goto_id = d.mails[k];
                     var goto_index = unique_ids.indexOf(goto_id);
                     circ_x(300,i);
@@ -181,7 +181,7 @@ function makeHEB(dataPath) {
 
                     circ_x(300,goto_index);
                     circ_y(300,goto_index);
-                    mail_line[k] = d3.line()([[x_1, y_1],[x_2,y_2],[x_c, y_c]]);
+                    mail_line[k] = d3.line().curve(d3.curveBundle.beta(0.85))([[x_1, y_1],[x_2,y_2],[x_c, y_c]]);
                 }
                 //Only for testing reasons
                 //console.log([i, goto_index]);
@@ -191,7 +191,7 @@ function makeHEB(dataPath) {
             .attr('stroke', 'black')
             .attr('fill', 'none')
             .attr("stroke-width", 1)
-            .style("opacity", 0.2);
+            .style("opacity", 0.3);
 
             //Testing logs
         console.log(usableData);
