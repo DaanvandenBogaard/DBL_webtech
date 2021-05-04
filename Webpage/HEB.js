@@ -36,6 +36,16 @@ function makeHEB(dataPath) {
         var usableData = [];
         var userIndex = [];
 
+        //Function for placement on HEB (X)
+        function circ_x(width, orientation){
+            x_c = 320 + width * (Math.sin(((2 * Math.PI) / 149) * orientation));
+        }
+
+        //Function for placement on HEB (Y)
+        function circ_y(width, orientation) {
+            y_c = 500 + width * (Math.cos(((2 * Math.PI) / 149) * orientation));
+        } 
+
         data.forEach(function (d) {
             //Check wheter the toId is already an object, if not create object with first found fromId
             if (!usableData.some(code => code.id == d.toId)) {
@@ -91,46 +101,91 @@ function makeHEB(dataPath) {
             .enter()
             .append("g")
 
+
         //creates circles for all working persons
         var circle = g.append("circle")
-            .attr("cx", function (d, i) {
-                return 320 + 300 * (Math.sin(((2 * Math.PI) / 149) * i));
+            .attr("cx", function(d,i){
+                circ_x(300,i);
+                return x_c;
             })
-            .attr("cy", function (d, i) {
-                return 500 + 300 * (Math.cos(((2 * Math.PI) / 149) * i));
+            .attr("cy", function(d,i){
+                circ_y(300,i);
+                return y_c;
             })
             .attr("r", 5)
             //Fills the circles according to jobtitle
             .attr("fill", function (d) {
                var job_code = Jobtitles_list.indexOf(d.jobtitle);
-               console.log(job_code)
                return color_arr[job_code];
             })
 
         //Creates the text for ids
         var id_text = g.append("text")
             .attr("x", function (d, i) {
-                return 320 + 300 * (Math.sin(((2 * Math.PI) / 149) * i));
+                circ_x(300,i);
+                return x_c;
             })
             .attr("y", function (d, i) {
-                return 500 + 300 * (Math.cos(((2 * Math.PI) / 149) * i));
+                circ_y(300,i);
+                return y_c;
             })
             .attr("font-size", "10px")
             .attr("text-anchor", "middle")
             .text(function (d, i) { return d.id; })
             
+        //Creates all group points
+        var group = [];
+        var i_g = 0;
+        var first_i = 0;
+        var prev_title = "";
+
+        for(p = 0; p < usableData.length; p++){
+        if(p==0){
+            first_i = p;
+        }
+        else if(usableData[p].jobtitle != prev_title){
+            group[i_g] = (first_i + p)/2;
+            i_g++;
+        }
+        else if(p == usableData.length - 1){
+            group[i_g] = (first_i + p)/2;
+        }
+        else{
+            first_i = p;
+        }
+        prev_title = usableData[p].jobtitle;
+    }
+    console.log(group);
+
         //Creates all edges (mail-traffic)
         var edges = g.append("path")
             .attr('d', function (d, i) {
-                var mail_line = []
-                for (k = 0; k < d.mails.length; k++) {
+        //Creates empty array per worker
+                var mail_line = []   
+
+                job_code2 = Jobtitles_list.indexOf(d.jobtitle)
+                circ_x(150,group[job_code2]);
+                circ_y(150,group[job_code2]);
+                    x_2 = x_c;
+                    y_2 = y_c;
+        //Fills array with the correct lines  
+                for (k = 0; k < 1; k++) {
                     var goto_id = d.mails[k];
                     var goto_index = unique_ids.indexOf(goto_id);
-                    mail_line[k] = d3.line()([[320 + 300 * (Math.sin(((2 * Math.PI) / 149) * i)), 500 + 300 * (Math.cos(((2 * Math.PI) / 149) * i))],
-                    [320 + 300 * (Math.sin(((2 * Math.PI) / 149) * goto_index)), 500 + 300 * (Math.cos(((2 * Math.PI) / 149) * goto_index))]]);
+                    circ_x(300,i);
+                    circ_y(300,i);
+                    x_1 = x_c;
+                    y_1 = y_c;
+
+                    
+
+                    circ_x(300,goto_index);
+                    circ_y(300,goto_index);
+                    mail_line[k] = d3.line()([[x_1, y_1],[x_2,y_2],[x_c, y_c]]);
                 }
                 //Only for testing reasons
                 //console.log([i, goto_index]);
+                var prev_title = d.jobtitle;
                 return mail_line;
             })
             .attr('stroke', 'black')
