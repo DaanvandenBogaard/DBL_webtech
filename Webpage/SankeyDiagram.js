@@ -3,15 +3,6 @@ Daan van den Bogaard (1534173)
 Myrte van Ginkel (1566237)
 */
 
-/*
-Mapping for date user selection:
-SLICE ON (userTimeIntervalSelector):
-    days: 0
-    months: 1
-    years: 2
-*/
-
-
 function makeSankey(dataPath) {
 
   //We start by making the SVG element.
@@ -188,12 +179,15 @@ function UpdateD3(data , sankey ,sliderVal ,idNums){
 }
 
 function MakeD3(dataSet , sankey , svg){
+  if (dataSet["links"].length == 0) {
+    console.log("In this dataset, during this year, no mail was sent by the people involved.");
+    return
+  }
   let {nodes, links} = sankey(dataSet);
   let width = d3.select("#sankeyID").style("width");
   width = width.slice(0,-2);
   width = +width;
   var textpadding = 10;
-  console.log(width);
   //Append a new group for the nodes and set it's attributes:
   //TODO: fix colors and possible names
   let node = svg.append("g")
@@ -203,7 +197,7 @@ function MakeD3(dataSet , sankey , svg){
                 .join("rect")
                 .attr("x" , d => d.x0)
                 .attr("y" , d => d.y0)
-                .attr("fill" , "#314f7d")
+                .attr("fill" , d => getColor(d.name))
                 .attr("width", d => d.x1 - d.x0 - 2)
                 .attr("height", d => d.y1 - d.y0)
                 .append("title")
@@ -215,7 +209,7 @@ function MakeD3(dataSet , sankey , svg){
                 .selectAll("g")
                 .data(links.sort((a, b) => b.width - a.width))
                 .join("g")
-                 .attr("stroke", d => d3.color(d.color) || getColor())
+                 .attr("stroke", d => d3.color(d.color) || getLinkColor())
                  .style("mix-blend-mode", "multiply");
 
   link.append("path")
@@ -235,8 +229,29 @@ function MakeD3(dataSet , sankey , svg){
      .text(d => d.name); //set the text value
 }
 
-function getColor() {
+function getLinkColor(){
+  let color = "#dddddd";
+  return color;
+}
+
+function getColor(node) {
     //Choose a color scale:
-    let color = "#dddddd";
+    var hash = 0;
+    //If string is a number, multiply by 15481654:
+    if(typeof node != "string"){
+      node = node * 154815185148845648961894894894894846572;
+      node = node.toString(5);
+    }
+
+    for (var i = 0; i < node.length; i++) {
+        hash = node.charCodeAt(i) + ((hash << 5) - hash);
+        hash = hash & hash;
+    }
+    var color = '#';
+    for (var i = 0; i < 3; i++) {
+        var value = (hash >> (i * 8)) & 255;
+        color += ('00' + value.toString(16)).substr(-2);
+    }   
     return color;
+
 }
