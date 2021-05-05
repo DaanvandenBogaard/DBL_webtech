@@ -7,19 +7,21 @@ function makeHEB(dataPath) {
 
     //Variables and constants
     let margin = { top: 15, right: 10, bottom: 15, left: 10 };
-    let diameter = 1000;
+    let figureSize = 1000;
+    let diameter = 600;
     let radius = diameter / 2;
-    let innerRadius = radius - 120;
 
     var bundleStrength = 0.85;
+    var startDate = 199811;
+    var endDate = 200106;
 
     //Make svg object
     let div = d3.select("#HEBFigure")
-        .attr("width", diameter)
-        .attr("height", diameter);
+        .attr("width", figureSize)
+        .attr("height", figureSize);
     let svg = div.append("svg")
-        .attr("width", diameter)
-        .attr("height", diameter)
+        .attr("width", figureSize)
+        .attr("height", figureSize)
         .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
 
     d3.csv(dataPath).then(function (data) {
@@ -37,42 +39,46 @@ function makeHEB(dataPath) {
         var userIndex = [];
 
         //Function for placement on HEB (X)
-        function circ_x(width, orientation){
-            x_c = 320 + width * (Math.sin(((2 * Math.PI) / 149) * orientation));
+        function circ_x(radius, index){
+            x_c = 320 + radius * (Math.cos(((2 * Math.PI) / 149) * index));
         }
 
         //Function for placement on HEB (Y)
-        function circ_y(width, orientation) {
-            y_c = 500 + width * (Math.cos(((2 * Math.PI) / 149) * orientation));
+        function circ_y(radius, index) {
+            y_c = 500 + radius * (Math.sin(((2 * Math.PI) / 149) * index));
         } 
 
         data.forEach(function (d) {
             //Check wheter the toId is already an object, if not create object with first found fromId
             if (!usableData.some(code => code.id == d.toId)) {
-                usableData.push({ "id": d.toId, "jobtitle": d.toJobtitle, "mails": [d.fromId] });
+                usableData.push({ "id": d.toId, "jobtitle": d.toJobtitle, "mails": [{"from": d.fromId, "date": dateFormat(d.date)}] });
                 userIndex.push(d.toId);
             }
             //Check wheter fromId is already in mails array, if not add it
-            if (notInMails(d.fromId, d.toId)) {
+            if (notInMails(d.fromId, d.toId, dateFormat(d.date))) {
                 indexOfUser = userIndex.indexOf(d.toId);
-                usableData[indexOfUser]["mails"].push(d.fromId);
+                usableData[indexOfUser]["mails"].push({"from": d.fromId, "date": dateFormat(d.date)});
             }
         });
 
-        function notInMails(curFromId, curToId) {
+        function notInMails(curFromId, curToId, curDate) {
             indexOfUser = userIndex.indexOf(curToId);
             for (i = 0; i < usableData[indexOfUser]["mails"].length; i++) {
-                if (usableData[indexOfUser]["mails"][i] == curFromId) {
+                if ((usableData[indexOfUser]["mails"][i]["from"] == curFromId) &&
+                     usableData[indexOfUser]["mails"][i]["date"] == curDate) {
                     return false;
                 }
             }
             return true;
         }
 
+        function dateFormat(date) {
+           return yearMonth = date.replace(/-/, "").slice(0, -3);
+        }
+
         //Sort array by jobtitle
         usableData.sort((a, b) => d3.ascending(a.jobtitle, b.jobtitle) || d3.ascending(a.toId, b.toId));
-
-
+        var angleStep = Math.PI * 2 / usableData.length;
 
         //TEMPORARILY array of CEO's
         function ceo_check(d) {
@@ -101,7 +107,6 @@ function makeHEB(dataPath) {
             .enter()
             .append("g")
 
-
         //creates circles for all working persons
         var circle = g.append("circle")
             .attr("cx", function(d,i){
@@ -117,21 +122,27 @@ function makeHEB(dataPath) {
             .attr("fill", function (d) {
                var job_code = Jobtitles_list.indexOf(d.jobtitle);
                return color_arr[job_code];
-            })
+            });
 
         //Creates the text for ids
         var id_text = g.append("text")
-            .attr("x", function (d, i) {
-                circ_x(300,i);
-                return x_c;
+            .attr("transform", function(d, i) {
+                if ((angle = i * angleStep >  Math.PI * 0.5) && (angle = i * angleStep <  Math.PI * 1.5)) {
+                    var angle = angleStep * i * 180 / Math.PI - 180;
+                } else {
+                    var angle = angleStep * i * 180 / Math.PI;
+                }
+                return "translate(" + (320 + (radius + 6) * (Math.cos(((2 * Math.PI) / 149) * i))) + ", " + (500 + (radius + 6) * (Math.sin(((2 * Math.PI) / 149) * i))) + ") rotate(" + angle + ")"
             })
-            .attr("y", function (d, i) {
-                circ_y(300,i);
-                return y_c;
+            .attr("text-anchor", function(d, i) {
+                if ((angle = i * angleStep >  Math.PI * 0.5) && (angle = i * angleStep <  Math.PI * 1.5)) {
+                    return "end";
+                } else {
+                    return "start";
+                }
             })
             .attr("font-size", "10px")
-            .attr("text-anchor", "middle")
-            .text(function (d, i) { return d.id; })
+            .text(function (d, i) { return d.id; });
             
         //Creates all group points
         var group = [];
@@ -157,6 +168,21 @@ function makeHEB(dataPath) {
     }
     console.log(group);
 
+        var colors = ["#4334eb", "#eb9834"];
+        var colorPicker = d3.scaleLinear().range(colors).domain([1, 2]);
+
+        var linearGradient = svg.append("defs")
+                                .append("linearGradient")
+                                .attr("id", "linear_gradient")
+
+            linearGradient.append("stop")
+                          .attr("offset", "0%")
+                          .attr("stop-color", colorPicker(1));
+
+            linearGradient.append("stop")
+                          .attr("offset", "100%")
+                          .attr("stop-color", colorPicker(2));
+
         //Creates all edges (mail-traffic)
         var edges = g.append("path")
             .attr('d', function (d, i) {
@@ -170,28 +196,30 @@ function makeHEB(dataPath) {
                     y_2 = y_c;
         //Fills array with the correct lines  
                 for (k = 0; k < d.mails.length; k++) {
-                    var goto_id = d.mails[k];
-                    var goto_index = unique_ids.indexOf(goto_id);
-                    circ_x(300,i);
-                    circ_y(300,i);
-                    x_1 = x_c;
-                    y_1 = y_c;
+                    if((d.mails[k]["date"] >= startDate) && (d.mails[k]["date"] <= endDate)) {
+                        var goto_id = d.mails[k]["from"];
+                        if (!mail_line.includes(goto_id)) {
+                            var goto_index = unique_ids.indexOf(goto_id);
+                            circ_x(300,i);
+                            circ_y(300,i);
+                            x_1 = x_c;
+                            y_1 = y_c;
 
-                    
-
-                    circ_x(300,goto_index);
-                    circ_y(300,goto_index);
-                    mail_line[k] = d3.line().curve(d3.curveBundle.beta(0.85))([[x_1, y_1],[x_2,y_2],[x_c, y_c]]);
+                            circ_x(300,goto_index);
+                            circ_y(300,goto_index);
+                            mail_line[k] = d3.line().curve(d3.curveBundle.beta(bundleStrength))([[x_1, y_1],[x_2,y_2],[x_c, y_c]]);
+                        }
+                    }
                 }
                 //Only for testing reasons
                 //console.log([i, goto_index]);
                 var prev_title = d.jobtitle;
                 return mail_line;
             })
-            .attr('stroke', 'black')
-            .attr('fill', 'none')
+            .attr("stroke", "url(#linear_gradient)")
+            .attr("fill", "none")
             .attr("stroke-width", 1)
-            .style("opacity", 0.3);
+            .style("opacity", 0.75);
 
             //Testing logs
         console.log(usableData);
