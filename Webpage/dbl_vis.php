@@ -65,10 +65,12 @@
 			<script src="https://unpkg.com/d3-path@1"></script>
 			<script src="https://unpkg.com/d3-shape@1"></script>
 			<script src="https://unpkg.com/d3-sankey@0"></script>
+			<script src="https://unpkg.com/d3-simple-slider"></script>
 			<script src= "SankeyDiagram.js"></script>
 
 			<!--We must define the following style: (may be moved to general CSS file)-->		
 			<style>
+			
 			.link {
   				fill: none;
   				stroke: #000;
@@ -79,6 +81,7 @@
 			}
 			</style>
 			<script> 
+		
 			if (localStorage.getItem('DataSet') != null) {
 				makeSankey(localStorage.getItem('DataSet'));
 			}
