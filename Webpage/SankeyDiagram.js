@@ -13,11 +13,11 @@ function makeSankey(dataPath) {
   let textpadding = 10;
   var nodeWidthSankey = 80;
   let div = d3.select("#sankeyID")
-              .attr("width" , width)
-              .attr("height" , height);
+              .attr("width" , width + 25)
+              .attr("height" , height + 25);
   let svg = div.append("svg")
-               .attr("width" , width)
-               .attr("height", height);
+               .attr("width" , width + 25)
+               .attr("height", height + 25);
   let g =   svg.append("g")
                .attr("width" , width)
                .attr("height", height)
@@ -32,9 +32,9 @@ function makeSankey(dataPath) {
                .nodeId(d => d.name)
                .size([width,height])
                .extent([[1, 5], [width - 1, height - 5]])
-               .iterations(50);
+               .iterations(25);
 
-              
+
   //Choose a color scale:
   let color = "#dddddd"
   //From now on, we load the data:
@@ -50,22 +50,45 @@ function makeSankey(dataPath) {
     });
 
     //For now, we will hardcode the ID number who's contact we want to see.
-    let idNums = [64,9];
+    var idInput = window.prompt("Enter ID-numbers (seperated by commas):")
+    let idNums = JSON.parse("[" + idInput + "]");
 
-    let linksDataRaw = data.filter( function(el) {
+    let linksDataDupRaw = data.filter( function(el) {
       return idNums.includes(el.fromId);
     });
 
-    let linksData = linksDataRaw.map(function(d){
+    let linksDataDup = linksDataDupRaw.map(function(d){
       return {
-        source:d.fromId,
-        target:d.toJobtitle,
+        source: d.fromId,
+        target: d.toJobtitle,
         value:1
       }
+    });  
+
+
+    let linksDataNestedFormat = d3.nest()
+    .key(function(d) { return d. source; })
+    .key(function(d) { return d.target; })
+    .rollup(function(leaves) { return d3.sum(leaves, function(d) {return parseFloat(d.value)})})
+    .entries(linksDataDup);
+
+    //We now reformat the array into the desired data format:
+    let linksData = [];
+    for(i = 0; i < linksDataNestedFormat.length; i++){
+      for(j = 0; j < linksDataNestedFormat[i]['values'].length; j++){
+        linksData.push({
+                  source : linksDataNestedFormat[i]["key"],
+                  target : linksDataNestedFormat[i]['values'][j]['key'],
+                  value : linksDataNestedFormat[i]['values'][j]['value']
+                });
+      }
+    }
+    
+    //Convert to numbers:
+    linksData.forEach(function(d) {
+      d.source = +d.source; 
     });
-    console.log(data);
-    //TEMP: we'll take a small slice of the LINKSDATA
-    //linksData = linksData.slice(10,100);
+    console.log(linksData);
 
     //We have to add all the toJobtitles as nodes as well.
     let extraNodesRaw = linksData.map(function(d) {
@@ -105,7 +128,7 @@ function makeSankey(dataPath) {
       {"source":4,"target":5,"value":4}
       ]};
     */
-     
+  
     dataSet = {"nodes" : nodesData , "links" : linksData};
     console.log(dataSet);
     //Define sankey data by sankey.js
@@ -146,8 +169,8 @@ function makeSankey(dataPath) {
        .selectAll("text")
        .data(nodes)
        .join("text")
-       .attr("y", d => (d.y1 + d.y0) / 2) //set x coordinate
-       .attr("x", d => d.x0 < width / 2 ? d.x1 + textpadding : d.x0 - textpadding) //set y coordinate based on the location of the node.
+       .attr("y", d => ((d.y1 + d.y0) / 2) + 17.5) //set y coordinate
+       .attr("x", d => d.x0 < width / 2 ? d.x1 + textpadding : d.x0 - textpadding) //set x coordinate based on the location of the node.
        .attr("text-anchor", d => d.x0 < width / 2 ? "start" : "end")
        .text(d => d.name) //set the text value
   }); 
