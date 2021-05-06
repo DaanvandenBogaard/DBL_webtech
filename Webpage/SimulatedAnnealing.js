@@ -1,5 +1,5 @@
 /* AUTHORS:
-Quinten van Eijsden (1529609)
+Quinten van Eijsden (1529609), Mike van den Anker (1565559)
 
 optimizeLayout: Optimizes the order of nodes to minimize or maximize a cost function
 Parameters:
@@ -14,7 +14,7 @@ function optimizeLayout(data, currentIDS, costFunction) {
     let t = 5;                      //Starting temperature variable
     let tMin = 0;              //Ending temperature 
     let decrease = 0.02;             //variable temperature is multiplied by for decreasing
-    let amountIterations = 20;     //Amount of iterations per temperature
+    let amountIterations = 40;     //Amount of iterations per temperature
     //let perMul = 150;              //The amount of permutations done by newSolution is t*perMul
 
     //Calculates cost of the randomly generated first input before annealing.
@@ -23,7 +23,7 @@ function optimizeLayout(data, currentIDS, costFunction) {
     console.log(meanEdgeLength(currentEdges));
  //   let contribution = calculateContribution(data, currentIDS, currentEdges, costFunction);
    // let currentCost = calculateCost(data, currentIDS, costFunction);
-   let smallestCost = 100;
+   let smallestCost = Infinity;
    let smallestSol = currentIDS;
 
     while (t > tMin) {
@@ -31,11 +31,12 @@ function optimizeLayout(data, currentIDS, costFunction) {
             //Calulates a new solution and its cost
             let newIDS = newSolution(currentIDS,  t);
             let newEdges = getEdges(data, newIDS);
-            let newCost = calculateCost(newEdges)
+            let newCost = calculateCost(newEdges);
             //let newCost = calculateCost(data, newIDS, costFunction);
            
 
-            ap = Math.pow(Math.E, (newCost - currentCost)/t);
+            ap = Math.pow(Math.E, (currentCost - newCost)/t);
+            
 
             //If it is a more optimal solution then it is automatically accepted otherwise it only sometimes accepts it
             if ((currentCost > newCost) ) {
@@ -59,7 +60,7 @@ function optimizeLayout(data, currentIDS, costFunction) {
         //Decreases temperature
         t -= decrease;
         //log costs for debug purposes
-        console.log("Currentcost: " + currentCost);
+       console.log("Currentcost: " + currentCost);
         //console.log("Current temperature: " + t);
         //console.log(contribution[0][1]);
     }
@@ -76,15 +77,15 @@ Returns:
     array: the permuted array
 */
 function newSolution(array,  t) {
-    for (let i = 0; i < t * 100; i++) {
+    for (let i = 0; i < t * 5; i++) {
         let j = Math.floor(Math.random() * 2);
-      //  let j = Math.floor(array.length*Math.random());
+  //      let j = Math.floor(array.length*Math.random());
         let k = Math.floor((array.length - 1 )*Math.random())  + 1;
        // let highest = contribution[contribution.length - i][0];
-      // let x = array[k];
-    //   array[k] = array[j];
+     //  let x = array[k];
+   //    array[k] = array[j];
     //   array[j] = x;
-     if(j == 0){
+    if(j == 0){
          if(k == array.length - 1){
              k -= 1;
          }
@@ -101,7 +102,7 @@ function newSolution(array,  t) {
       } 
     } 
 
-    return array;
+    return array; 
 }
 
 
@@ -114,7 +115,10 @@ Returns
     cost: the result of the function given the IDS input
 */
 function calculateCost(edges) {
-    var cost = 0;
+  //  var cost = 0;
+  //  data.forEach(function(d) {
+  //      cost += Math.abs(IDS[d.toId - 1] - IDS[d.fromId - 1]);
+  //  });
    return stdevEdgeLength(edges);
    // return cost;
 }

@@ -42,7 +42,7 @@ function makeMSV(dataPath) {
 
         //Create an array of unique ids
         let IDS = collectIDS(data);
-
+        console.log(IDS);
         //Find the maximum and minimum date of the data set and parse into useable format.
         var minMaxDates = findMinMax(data, "time");
         var minDate = parseDate(minMaxDates[0])
@@ -59,7 +59,7 @@ function makeMSV(dataPath) {
         });
 
         //Optimize layout
-        IDS = optimizeLayout(data, IDS, 1)
+        IDS = optimizeLayout(data, IDS, 1)      
 
         //Draw edges
         drawEdges(data, IDS);
