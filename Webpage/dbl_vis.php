@@ -66,20 +66,12 @@
 			<script src="https://unpkg.com/d3-shape@1"></script>
 			<script src="https://unpkg.com/d3-sankey@0"></script>
 			<script src="https://unpkg.com/d3-simple-slider"></script>
+			<script src="https://d3js.org/d3-dispatch.v2.min.js"></script>
+			<script src="https://d3js.org/d3-selection.v2.min.js"></script>
+			<script src="https://d3js.org/d3-drag.v2.min.js"></script>
 			<script src= "SankeyDiagram.js"></script>
 
-			<!--We must define the following style: (may be moved to general CSS file)-->		
-			<style>
 			
-			.link {
-  				fill: none;
-  				stroke: #000;
-  				stroke-opacity: .2;
-			}
-			.link:hover {
-				stroke-opacity: .5;
-			}
-			</style>
 			<script> 
 		
 			if (localStorage.getItem('DataSet') != null) {

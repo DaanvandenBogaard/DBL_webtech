@@ -2,6 +2,8 @@
 Daan van den Bogaard (1534173)
 Myrte van Ginkel (1566237)
 */
+var sankey;
+var dataSet;
 
 function makeSankey(dataPath) {
 
@@ -22,7 +24,7 @@ function makeSankey(dataPath) {
                .attr("transform" , "translate(" + margin.left  + "," + margin.top +")");
 
   //Import sankey package as variable:
-  var sankey = d3.sankey()
+  sankey = d3.sankey()
                .nodeWidth(nodeWidthSankey)
                .nodePadding(25)
                .nodeAlign(d3.sankeyCenter)
@@ -179,6 +181,7 @@ function UpdateD3(data , sankey ,sliderVal ,idNums){
 }
 
 function MakeD3(dataSet , sankey , svg){
+
   if (dataSet["links"].length == 0) {
     console.log("In this dataset, during this year, no mail was sent by the people involved.");
     return
@@ -190,6 +193,26 @@ function MakeD3(dataSet , sankey , svg){
   var textpadding = 10;
   //Append a new group for the nodes and set it's attributes:
   //TODO: fix colors and possible names
+    
+  //Append the links:
+  var link = svg.append("g")
+                .attr("id","link")
+                .attr("fill", "none")
+                .selectAll("g")
+                .data(links.sort((a, b) => b.width - a.width))
+                .join("g")
+                .attr("stroke", d => d3.color(d.color) || getLinkColor())
+                .style("mix-blend-mode", "multiply");
+
+  link.append("path")
+      .attr("d", d3.sankeyLinkHorizontal())
+      .attr("stroke-width", d => Math.max(1 , d.width));
+
+  drag = d3.drag()
+           .on("start", dragstarted)
+           .on("drag", dragged)
+           .on("end", dragended);
+
   let node = svg.append("g")
                 .attr("stoke" , "#000")
                 .selectAll("rect")
@@ -200,30 +223,20 @@ function MakeD3(dataSet , sankey , svg){
                 .attr("fill" , d => getColor(d.name))
                 .attr("width", d => d.x1 - d.x0 - 2)
                 .attr("height", d => d.y1 - d.y0)
+                .call(drag)
                 .append("title")
                 .text(d => d.name);
 
-    //Append the links:
-  let link = svg.append("g")
-                .attr("fill", "none")
-                .selectAll("g")
-                .data(links.sort((a, b) => b.width - a.width))
-                .join("g")
-                 .attr("stroke", d => d3.color(d.color) || getLinkColor())
-                 .style("mix-blend-mode", "multiply");
-
-  link.append("path")
-    .attr("d", d3.sankeyLinkHorizontal())
-    .attr("stroke-width", d => Math.max(1 , d.width));
-
     //Set text:
   svg.append("g")
+     .attr("id" , "text")
      .style("font", "35px sans-serif") //TODO ask Thomas for right font style
      .attr("pointer-events", "none")
      .selectAll("text")
      .data(nodes)
      .join("text")
-     .attr("y", d => ((d.y1 + d.y0) / 2) + 17.5) //set y coordinate
+     .attr("id" , d => d.name)
+     .attr("y", d => ((d.y1 + d.y0) / 2)) //set y coordinate
      .attr("x", d => d.x0 < width / 2 ? d.x1 + textpadding : d.x0 - textpadding) //set x coordinate based on the location of the node.
      .attr("text-anchor", d => d.x0 < width / 2 ? "start" : "end")
      .text(d => d.name); //set the text value
@@ -254,4 +267,31 @@ function getColor(node) {
     }   
     return color;
 
+}
+
+function dragstarted(event, d) {
+  d3.select(this).raise().attr("stroke", "black");
+}
+
+function dragged(event, d) {
+  //Update values of d:
+  d.x0 = d.x0 + event.dx;
+  d.y0 = d.y0 + event.dy;
+  d.x1 += event.dx;
+  d.y1 += event.dy;
+  sankey.update(dataSet);
+  //update visuals:
+  d3.select(this)
+    .attr("x", d.x0)
+    .attr("y", d.y0); 
+  console.log(d.name);
+  var textVar = d3.select("#text").select("#" + d.name.trim());
+  textVar.attr("x", d.x0 < (d3.select("#sankeyID").attr("wdith") / 2 ) ? d.x1 + 10 : d.x0 - 10)
+         .attr("y", ((d.y1 + d.y0) / 2)); 
+  d3.selectAll("#link").selectAll("path").attr("d", d3.sankeyLinkHorizontal())
+                                         .attr("stroke-width", d => Math.max(1 , d.width));
+}
+
+function dragended(event, d) {
+  d3.select(this).attr("stroke", null);
 }
