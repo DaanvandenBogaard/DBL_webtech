@@ -27,6 +27,7 @@ function makeSankey(dataPath) {
   
   tooltip = div.append("div")
                .style("opacity", 0)
+               .style("position", "absolute")
                .attr("class", "tooltip")
                .style("background-color", "white")
                .style("border", "solid")
@@ -205,7 +206,6 @@ function MakeD3(dataSet , sankey , svg){
   
   //Set functions for hover over tooltip:
   var mouseover = function(d) {
-    console.log("ENTER");
     tooltip.style("opacity", 1);
     d3.select(this).attr("stroke", d => d3.color(d.color) || "#BBBBBB");
   }
@@ -215,10 +215,38 @@ function MakeD3(dataSet , sankey , svg){
            .style("top", (event.y) + "px");
   }
   var mouseleave = function(d) {
-    console.log("EXIT");
     tooltip.style("opacity", 0);
     d3.select(this).attr("stroke", d => d3.color(d.color) || getLinkColor());
   }
+
+  var mousemoveNode = function(event , d) {
+    //Calculate the total number of emails sent by the source (node).
+    //Determine type of variable:
+    if (typeof d.name === "number") {
+      let sum = 0;
+      links.forEach(function(entry){
+        if (entry.source['name'] === d.name) {
+          sum += entry.value;
+        }
+      });
+      tooltip.html(d.name + " has sent " + sum + " emails.")
+             .style("left", (event.x + 70) + "px")
+             .style("top", (event.y) + "px");
+    } 
+    else{
+      let sum = 0;
+      links.forEach(function(entry){
+        if (entry.target['name'] === d.name) {
+          sum += entry.value;
+        }
+      });
+      tooltip.html(d.name + " has received " + sum + " emails.")
+             .style("left", (event.x + 70) + "px")
+             .style("top", (event.y) + "px");
+    }
+  }
+
+
 
   //Append the links:
   var link = svg.append("g")
@@ -254,6 +282,15 @@ function MakeD3(dataSet , sankey , svg){
                 .attr("width", d => d.x1 - d.x0 - 2)
                 .attr("height", d => d.y1 - d.y0)
                 .call(drag)
+                .on("mouseover", function(d) {
+                  tooltip.style("opacity", 1);
+                  d3.select(this).raise().attr("stroke", "black");
+                })
+                .on("mousemove", mousemoveNode)
+                .on("mouseleave", function(d) {
+                  tooltip.style("opacity", 0);
+                  d3.select(this).attr("stroke", null);
+                })
                 .append("title")
                 .text(d => d.name);
 
@@ -272,6 +309,7 @@ function MakeD3(dataSet , sankey , svg){
      .text(d => d.name); //set the text value
 }
 
+//Functions handling color retrival and hashing names to colours. 
 function getLinkColor(){
   let color = "#dddddd";
   return color;
@@ -299,6 +337,7 @@ function getColor(node) {
 
 }
 
+//Functions for drag behaviour of nodes:
 function dragstarted(event, d) {
   d3.select(this).raise().attr("stroke", "black");
 }
