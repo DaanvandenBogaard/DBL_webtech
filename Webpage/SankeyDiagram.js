@@ -5,6 +5,8 @@ Myrte van Ginkel (1566237)
 var sankey;
 var dataSet;
 
+var tooltip;
+
 function makeSankey(dataPath) {
 
   //We start by making the SVG element.
@@ -22,6 +24,15 @@ function makeSankey(dataPath) {
                .attr("width" , width)
                .attr("height", height)
                .attr("transform" , "translate(" + margin.left  + "," + margin.top +")");
+  
+  tooltip = div.append("div")
+               .style("opacity", 0)
+               .attr("class", "tooltip")
+               .style("background-color", "white")
+               .style("border", "solid")
+               .style("border-width", "2px")
+               .style("border-radius", "5px")
+               .style("padding", "5px");
 
   //Import sankey package as variable:
   sankey = d3.sankey()
@@ -191,9 +202,24 @@ function MakeD3(dataSet , sankey , svg){
   width = width.slice(0,-2);
   width = +width;
   var textpadding = 10;
-  //Append a new group for the nodes and set it's attributes:
-  //TODO: fix colors and possible names
-    
+  
+  //Set functions for hover over tooltip:
+  var mouseover = function(d) {
+    console.log("ENTER");
+    tooltip.style("opacity", 1);
+    d3.select(this).attr("stroke", d => d3.color(d.color) || "#BBBBBB");
+  }
+  var mousemove = function(event , d) {
+    tooltip.html("The number of emails between " + d.source['name'] + " and " + d.target['name'] + " is "  + d.value + ".")
+           .style("left", (event.x + 70) + "px")
+           .style("top", (event.y) + "px");
+  }
+  var mouseleave = function(d) {
+    console.log("EXIT");
+    tooltip.style("opacity", 0);
+    d3.select(this).attr("stroke", d => d3.color(d.color) || getLinkColor());
+  }
+
   //Append the links:
   var link = svg.append("g")
                 .attr("id","link")
@@ -202,7 +228,10 @@ function MakeD3(dataSet , sankey , svg){
                 .data(links.sort((a, b) => b.width - a.width))
                 .join("g")
                 .attr("stroke", d => d3.color(d.color) || getLinkColor())
-                .style("mix-blend-mode", "multiply");
+                .style("mix-blend-mode", "multiply")
+                .on("mouseover", mouseover)
+                .on("mousemove", mousemove)
+                .on("mouseleave", mouseleave);
 
   link.append("path")
       .attr("d", d3.sankeyLinkHorizontal())
@@ -213,6 +242,7 @@ function MakeD3(dataSet , sankey , svg){
            .on("drag", dragged)
            .on("end", dragended);
 
+//Append a new group for the nodes and set it's attributes:
   let node = svg.append("g")
                 .attr("stoke" , "#000")
                 .selectAll("rect")
@@ -294,3 +324,4 @@ function dragged(event, d) {
 function dragended(event, d) {
   d3.select(this).attr("stroke", null);
 }
+
