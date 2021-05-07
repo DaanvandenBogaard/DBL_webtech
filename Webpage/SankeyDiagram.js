@@ -235,7 +235,7 @@ function MakeD3(dataSet , sankey , svg){
      .selectAll("text")
      .data(nodes)
      .join("text")
-     .attr("id" , d => d.name)
+     .attr("id" , d => ("ID" + d.name).replace(/ /g,'') )
      .attr("y", d => ((d.y1 + d.y0) / 2)) //set y coordinate
      .attr("x", d => d.x0 < width / 2 ? d.x1 + textpadding : d.x0 - textpadding) //set x coordinate based on the location of the node.
      .attr("text-anchor", d => d.x0 < width / 2 ? "start" : "end")
@@ -284,9 +284,8 @@ function dragged(event, d) {
   d3.select(this)
     .attr("x", d.x0)
     .attr("y", d.y0); 
-  console.log(d.name);
-  var textVar = d3.select("#text").select("#" + d.name.trim());
-  textVar.attr("x", d.x0 < (d3.select("#sankeyID").attr("wdith") / 2 ) ? d.x1 + 10 : d.x0 - 10)
+  var textVar = d3.select("#text").select(("#" + "ID" +  d.name).replace(/ /g,''));
+  textVar.attr("x", d.x0 < ((d3.select("#sankeyID").select("svg").attr("width")) / 2 ) ? d.x1 + 10 : d.x0 - 10)
          .attr("y", ((d.y1 + d.y0) / 2)); 
   d3.selectAll("#link").selectAll("path").attr("d", d3.sankeyLinkHorizontal())
                                          .attr("stroke-width", d => Math.max(1 , d.width));
