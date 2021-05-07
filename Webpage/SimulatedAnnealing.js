@@ -21,7 +21,8 @@ function optimizeLayout(data, currentIDS, costFunction) {
     let currentEdges = getEdges(data, currentIDS);
     let currentCost = calculateCost(currentEdges);
     console.log(meanEdgeLength(currentEdges));
- //   let contribution = calculateContribution(data, currentIDS, currentEdges, costFunction);
+
+   // let contribution = calculateContribution(data, currentIDS, currentEdges, costFunction);
    // let currentCost = calculateCost(data, currentIDS, costFunction);
    let smallestCost = Infinity;
    let smallestSol = currentIDS;
@@ -79,29 +80,27 @@ Returns:
 function newSolution(array,  t) {
     for (let i = 0; i < t * 5; i++) {
         let j = Math.floor(Math.random() * 2);
-  //      let j = Math.floor(array.length*Math.random());
         let k = Math.floor((array.length - 1 )*Math.random())  + 1;
-       // let highest = contribution[contribution.length - i][0];
-     //  let x = array[k];
-   //    array[k] = array[j];
-    //   array[j] = x;
-    if(j == 0){
-         if(k == array.length - 1){
-             k -= 1;
-         }
-        let x = array[k];
-        array[k] = array[k + 1];
-        array[k + 1] = x;
-      } else {
-        if(k == 0){
-            k += 1;
-        }
-        let x = array[k];
-        array[k] = array[k - 1];
-        array[k - 1] = x;
-      } 
-    } 
 
+        if(j == 0){
+            if(k == array.length - 1){
+                k -= 1;
+            }
+
+           let x = array[k];
+           array[k] = array[k + 1];
+           array[k + 1] = x;
+
+         } else {
+           if(k == 0){
+               k += 1;
+           }
+
+           let x = array[k];
+           array[k] = array[k - 1];
+           array[k - 1] = x;
+         } 
+       } 
     return array; 
 }
 
@@ -144,34 +143,7 @@ function calculateCost(edges) {
     });
 
     return sortContribution(contribution);
-}
-
-function sortContribution(array) {
-    for (let i=1; i < 1000000; i *= 10) {
-        array = countingSort(array, i);
-    }
-    return array
-}
-
-function countingSort(array, digit) {
-    let count = new Array(10).fill(0);
-    let output = new Array(array.length);
-
-    for (let i = 0; i < array.length; i++) {
-        count[Math.floor(((array[i][1] % (digit*10))/digit))]++;
-    }
-
-    for (let i = 1; i < count.length; i++) {
-        count[i] += count[i-1];
-    }
-
-    for (let i = array.length - 1; i >= 0; i--) {
-        inputDigit = Math.floor(((array[i][1] % (digit*10))/digit));
-        output[count[inputDigit] - 1] = array[i];
-        count[inputDigit]--;
-    }
-    return output
-} */
+}*/
 
 /*getEdges: Creates edge array with all edges (stored as an edge class)
 *Parameters:
@@ -186,8 +158,8 @@ function getEdges(data, IDS) {
 
     //calculate length for each edge and store them as edge element
     for (let i = 0; i < data.length; i++){
-        edgeLenght = Math.abs(IDS[data[i].fromId -1] - IDS[data[i].toId - 1]) / (IDS.length - 1) * 100;
-        edges[i] = new Edge(IDS[data[i].fromId - 1], IDS[data[i].toId - 1], edgeLenght);
+        edgeLength = Math.abs(IDS[data[i].fromId] - IDS[data[i].toId]) / (IDS.length - 1) * 100;
+        edges[i] = new Edge(IDS[data[i].fromId], IDS[data[i].toId], edgeLength);
     }
     return edges;
 }
