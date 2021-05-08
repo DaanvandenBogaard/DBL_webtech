@@ -73,7 +73,7 @@
 				<label for="animateToggle"> animation </label>
 				<button id="startHEB" type="button" name="HEB" onclick="makeHEB(localStorage.getItem('DataSet'))"> Start </button>
 			</div>
-			<button id="togglePause" type="button" name="togglePause" onclick="pauseAnim()"> Play </button>
+			<button id="togglePause" type="button" name="togglePause"> Play </button>
 			<label for="togglePause" id="pauseIcon" class="fa fa-play"></label>
 			<div id="HEBFigure"> </div>
 		</div>

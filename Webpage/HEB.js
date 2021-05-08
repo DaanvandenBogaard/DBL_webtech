@@ -3,9 +3,6 @@ Thomas Broers (1538705)
 Bas van Hoeflaken (1556282)
 */
 
-var isPaused = false;
-var frameTime = 1000;
-
 function makeHEB(dataPath) {
 
     var startYear = document.getElementById("startYear");
@@ -13,12 +10,16 @@ function makeHEB(dataPath) {
     var endYear = document.getElementById("endYear");
     var endMonth = document.getElementById("endMonth");
     var animToggle = document.getElementById("animateToggle");
+    var pauseIcon = document.getElementById("pauseIcon");
+    var togglePause = document.getElementById("togglePause");
 
     var endYearAdjust = false;
     var startDate = 0;
     var endDate = 0;
 
     var doAnimate = animToggle.checked;
+    var isPaused = true;
+    var frameTime = 1000;
 
     if(startYear.value < 1998) {
         startYear.value = 1998;
@@ -189,16 +190,12 @@ function makeHEB(dataPath) {
                 }
             })
             .attr("font-size", "10px")
-            .attr("dominant-baseline", "middle")
+            .attr("dominant-baseline", "central")
             .text(function (d, i) { return d.id; });
             
         //Creates all group points
 
         var jobGroupIndex = [];
-        var group = [];
-        var i_g = 0;
-        var first_i = 0;
-        var prev_title = "";
 
         Jobtitles_list.forEach(function(d){
             startIndex = findIndex(usableData, d, "front");
@@ -221,24 +218,6 @@ function makeHEB(dataPath) {
                 }
             }
         }
-
-        for(p = 0; p < usableData.length; p++){
-        if(p==0){
-            first_i = p;
-        }
-        else if(usableData[p].jobtitle != prev_title){
-            group[i_g] = (first_i + p)/2;
-            i_g++;
-        }
-        else if(p == usableData.length - 1){
-            group[i_g] = (first_i + p)/2;
-        }
-        else{
-            first_i = p;
-        }
-        prev_title = usableData[p].jobtitle;
-    }
-    console.log(group);
 
         var colors = ["#4334eb", "#eb9834"];
         var colorPicker = d3.scaleLinear().range(colors).domain([1, 2]);
@@ -374,12 +353,30 @@ function makeHEB(dataPath) {
             console.log(curDate);
         }
 
+        togglePause.addEventListener("click", function() {
+            if (isPaused == false) {
+                isPaused = true;
+                pauseIcon.className = "fa fa-play";
+                togglePause.innerHTML = "Play";
+                clearTimeout(animTimer);
+            } else {
+                isPaused = false;
+                pauseIcon.className = "fa fa-pause";
+                togglePause.innerHTML = "Pause";
+                nextFrame();
+                console.log("test");
+            }
+        })
+
+        var animTimer;
+
         if (doAnimate == true && isPaused == false) {
-            setTimeout(function(){ nextFrame() }, frameTime);
+            animTimer = setTimeout(function(){ nextFrame() }, frameTime);
+            animTimer;
         }
 
         function nextFrame() {
-            if (curDate != endDate){ 
+            if (curDate != endDate && isPaused != true){ 
                 if (curDate % 100 < 12) {
                     curDate++;
                 } else {
@@ -391,7 +388,7 @@ function makeHEB(dataPath) {
                 generateEdges();
 
                 if (isPaused != true) {
-                    setTimeout(function(){ nextFrame() }, frameTime);
+                    animTimer = setTimeout(function(){ nextFrame() }, frameTime);
                 }
             }            
         }
@@ -405,19 +402,3 @@ function makeHEB(dataPath) {
 
 }
 
-function pauseAnim() {
-
-    var pauseIcon = document.getElementById("pauseIcon");
-    var togglePause = document.getElementById("togglePause");
-
-    if (isPaused == false) {
-        isPaused = true;
-        pauseIcon.className = "fa fa-play";
-        togglePause.innerHTML = "Play";
-    } else {
-        isPaused = false;
-        pauseIcon.className = "fa fa-pause";
-        togglePause.innerHTML = "Pause";
-    }
-
-}
