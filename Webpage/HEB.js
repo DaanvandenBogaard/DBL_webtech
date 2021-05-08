@@ -71,6 +71,9 @@ function makeHEB(dataPath) {
 
     var bundleStrength = 0.90;
 
+    //Delete previous object
+    d3.select("#HEBFigure").select("svg").remove();
+
     //Make svg object
     let div = d3.select("#HEBFigure")
         .attr("width", figureSize)
