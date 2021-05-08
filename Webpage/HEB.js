@@ -3,17 +3,73 @@ Thomas Broers (1538705)
 Bas van Hoeflaken (1556282)
 */
 
+var isPaused = false;
+var frameTime = 1000;
+
 function makeHEB(dataPath) {
+
+    var startYear = document.getElementById("startYear");
+    var startMonth = document.getElementById("startMonth");
+    var endYear = document.getElementById("endYear");
+    var endMonth = document.getElementById("endMonth");
+    var animToggle = document.getElementById("animateToggle");
+
+    var endYearAdjust = false;
+    var startDate = 0;
+    var endDate = 0;
+
+    var doAnimate = animToggle.checked;
+
+    if(startYear.value < 1998) {
+        startYear.value = 1998;
+    } else if(startYear.value > 2002) {
+        startYear.value = 2002;
+    } 
+
+    if(startMonth.value < 1) {
+        startMonth.value = 1;
+    } else if(startMonth.value > 12) {
+        startMonth.value = 12;
+    }
+
+    if(startMonth.value.length == 1) {
+        startMonth.value = 0 + startMonth.value;
+    }
+
+    if(endYear.value < 1998) {
+        endYear.value = 1998;
+    } else if(endYear.value > 2002) {
+        endYear.value = 2002;
+    } else if(endYear.value < startYear.value){
+        endYear.value = startYear.value;
+        endYearAdjust = true;
+    }
+
+    if(endMonth.value < 1) {
+        endMonth.value = 1;
+    } else if(endMonth.value > 12) {
+        endMonth.value = 12;
+    } else if((endYearAdjust == true || startYear.value == endYear.value) && endMonth.value < startMonth.value) {
+        endMonth.value = startMonth.value;
+    }
+
+    if(endMonth.value.length == 1) {
+        endMonth.value = 0 + endMonth.value;
+    }
+
+    startDate = parseInt(startYear.value + startMonth.value);
+    endDate = parseInt(endYear.value + endMonth.value);
+    var curYear = parseInt(startYear.value);
+    var curDate = startDate;
 
     //Variables and constants
     let margin = { top: 15, right: 10, bottom: 15, left: 10 };
     let figureSize = 1000;
     let diameter = 600;
     let radius = diameter / 2;
+    let innerRadius = radius / 10;
 
-    var bundleStrength = 0.85;
-    var startDate = 199811;
-    var endDate = 200106;
+    var bundleStrength = 0.90;
 
     //Make svg object
     let div = d3.select("#HEBFigure")
@@ -29,23 +85,17 @@ function makeHEB(dataPath) {
 
         //Construct array with data in a usable order 
 
-        //Filtered data unused
-        filteredData = d3.nest()
-            .key(function (d) { return d.fromJobtitle; })
-            .key(function (d) { return d.fromId; })
-            .entries(data);
-
         var usableData = [];
         var userIndex = [];
 
         //Function for placement on HEB (X)
         function circ_x(radius, index){
-            x_c = 320 + radius * (Math.cos(((2 * Math.PI) / 149) * index));
+            return 320 + radius * (Math.cos(((2 * Math.PI) / 149) * index));
         }
 
         //Function for placement on HEB (Y)
         function circ_y(radius, index) {
-            y_c = 500 + radius * (Math.sin(((2 * Math.PI) / 149) * index));
+            return 500 + radius * (Math.sin(((2 * Math.PI) / 149) * index));
         } 
 
         data.forEach(function (d) {
@@ -56,7 +106,7 @@ function makeHEB(dataPath) {
             }
             //Check wheter fromId is already in mails array, if not add it
             if (notInMails(d.fromId, d.toId, dateFormat(d.date))) {
-                indexOfUser = userIndex.indexOf(d.toId);
+                var indexOfUser = userIndex.indexOf(d.toId);
                 usableData[indexOfUser]["mails"].push({"from": d.fromId, "date": dateFormat(d.date)});
             }
         });
@@ -64,8 +114,9 @@ function makeHEB(dataPath) {
         function notInMails(curFromId, curToId, curDate) {
             indexOfUser = userIndex.indexOf(curToId);
             for (i = 0; i < usableData[indexOfUser]["mails"].length; i++) {
-                if ((usableData[indexOfUser]["mails"][i]["from"] == curFromId) &&
-                     usableData[indexOfUser]["mails"][i]["date"] == curDate) {
+                if (((usableData[indexOfUser]["mails"][i]["from"] == curFromId) &&
+                     usableData[indexOfUser]["mails"][i]["date"] == curDate) || 
+                     curToId == curFromId) {
                     return false;
                 }
             }
@@ -73,7 +124,7 @@ function makeHEB(dataPath) {
         }
 
         function dateFormat(date) {
-           return yearMonth = date.replace(/-/, "").slice(0, -3);
+           return yearMonth = parseInt(date.replace(/-/, "").slice(0, -3), 10);
         }
 
         //Sort array by jobtitle
@@ -95,12 +146,7 @@ function makeHEB(dataPath) {
 
         //Get unique jobtitles
         let Jobtitles_list = [...new Set(usableData.map(ids => ids.jobtitle))];
-
-        //Creates the svg object
-        var svg1 = d3.select("body").append("svg")
-            .attr("width", 500)
-            .attr("height", 500);
-
+        
         //Creates the group object for all rows in the usableData set
         var g = svg.selectAll("g")
             .data(usableData)
@@ -110,12 +156,10 @@ function makeHEB(dataPath) {
         //creates circles for all working persons
         var circle = g.append("circle")
             .attr("cx", function(d,i){
-                circ_x(300,i);
-                return x_c;
+                return circ_x(300,i);
             })
             .attr("cy", function(d,i){
-                circ_y(300,i);
-                return y_c;
+                return circ_y(300,i);
             })
             .attr("r", 5)
             //Fills the circles according to jobtitle
@@ -142,13 +186,38 @@ function makeHEB(dataPath) {
                 }
             })
             .attr("font-size", "10px")
+            .attr("dominant-baseline", "middle")
             .text(function (d, i) { return d.id; });
             
         //Creates all group points
+
+        var jobGroupIndex = [];
         var group = [];
         var i_g = 0;
         var first_i = 0;
         var prev_title = "";
+
+        Jobtitles_list.forEach(function(d){
+            startIndex = findIndex(usableData, d, "front");
+            endIndex = findIndex(usableData, d, "back");
+            jobGroupIndex.push([d, startIndex + ((endIndex - startIndex) / 2)]);
+        })
+
+        function findIndex(array, jobtitle, direction) {
+            if (direction == "front"){
+                for (i = 0; i < array.length; i++) {
+                    if (array[i]["jobtitle"] == jobtitle) {
+                        return i;
+                    }
+                }
+            } else {
+                for (i = array.length - 1; i > 0; i--) {
+                    if (array[i]["jobtitle"] == jobtitle) {
+                        return i;
+                    }
+                }
+            }
+        }
 
         for(p = 0; p < usableData.length; p++){
         if(p==0){
@@ -173,53 +242,156 @@ function makeHEB(dataPath) {
 
         var linearGradient = svg.append("defs")
                                 .append("linearGradient")
-                                .attr("id", "linear_gradient")
+                                .attr("id", "linear_gradient");
 
-            linearGradient.append("stop")
-                          .attr("offset", "0%")
-                          .attr("stop-color", colorPicker(1));
+                  linearGradient.append("stop")
+                                .attr("offset", "0%")
+                                .attr("stop-color", colorPicker(1));
+      
+                  linearGradient.append("stop")
+                                .attr("offset", "100%")
+                                .attr("stop-color", colorPicker(2));
 
-            linearGradient.append("stop")
-                          .attr("offset", "100%")
-                          .attr("stop-color", colorPicker(2));
+        var drawnEdges = [];
 
-        //Creates all edges (mail-traffic)
+        generateEdges();
+
+        function generateEdges() {
+
         var edges = g.append("path")
-            .attr('d', function (d, i) {
-        //Creates empty array per worker
-                var mail_line = []   
+                     .attr("d", function(d,i) {
 
-                job_code2 = Jobtitles_list.indexOf(d.jobtitle)
-                circ_x(200,group[job_code2]);
-                circ_y(200,group[job_code2]);
-                    x_2 = x_c;
-                    y_2 = y_c;
-        //Fills array with the correct lines  
-                for (k = 0; k < d.mails.length; k++) {
-                    if((d.mails[k]["date"] >= startDate) && (d.mails[k]["date"] <= endDate)) {
+            if (doAnimate == false) { 
+                for (k = 0; k < d.mails.length; k++) { 
+                    if ((d.mails[k]["date"] >= startDate) && (d.mails[k]["date"] <= endDate)) {
                         var goto_id = d.mails[k]["from"];
-                        if (!mail_line.includes(goto_id)) {
-                            var goto_index = unique_ids.indexOf(goto_id);
-                            circ_x(300,i);
-                            circ_y(300,i);
-                            x_1 = x_c;
-                            y_1 = y_c;
+                        if (notDrawn(d["id"], goto_id)) {
+                            drawnEdges.push([d["id"], goto_id]);
+                            targetJob = findJobtitle(goto_id);
+                            x_source  = circ_x(radius, i);
+                            y_source = circ_y(radius, i);
+                            x_1 = circ_x(radius/2, findJobIndex(d["jobtitle"]));
+                            y_1 = circ_y(radius/2, findJobIndex(d["jobtitle"]));
+                            x_2 = circ_x(innerRadius, findJobIndex(d["jobtitle"]));
+                            y_2 = circ_y(innerRadius, findJobIndex(d["jobtitle"]));
+                            x_3 = circ_x(innerRadius, findJobIndex(targetJob));
+                            y_3 = circ_y(innerRadius, findJobIndex(targetJob));
+                            x_4 = circ_x(radius/2, findJobIndex(targetJob));
+                            y_4 = circ_y(radius/2, findJobIndex(targetJob));
+                            x_target = circ_x(radius, unique_ids.indexOf(goto_id));
+                            y_target = circ_y(radius, unique_ids.indexOf(goto_id));
 
-                            circ_x(300,goto_index);
-                            circ_y(300,goto_index);
-                            mail_line[k] = d3.line().curve(d3.curveBundle.beta(bundleStrength))([[x_1, y_1],[x_2,y_2],[x_c, y_c]]);
+                            var coords = [{"xcoord": x_source, "ycoord": y_source},
+                                          {"xcoord": x_1, "ycoord": y_1},
+                                          {"xcoord": x_2, "ycoord": y_2},
+                                          {"xcoord": x_3, "ycoord": y_3},
+                                          {"xcoord": x_4, "ycoord": y_4},
+                                          {"xcoord": x_target, "ycoord": y_target}];
+
+                            var line = d3.line()
+                                         .x((c) => c.xcoord)
+                                         .y((c) => c.ycoord)
+                                         .curve(d3.curveBundle.beta(bundleStrength))
+
+                            return line(coords);
+                            
+                        } 
+                    }
+                }
+            } else {
+                for (k = 0; k < d.mails.length; k++) {
+                    if (d.mails[k]["date"] == curDate) {
+                        var goto_id = d.mails[k]["from"];
+                        if (notDrawn(d["id"], goto_id)) {
+                            drawnEdges.push([d["id"], goto_id]);
+                            targetJob = findJobtitle(goto_id);
+                            x_source  = circ_x(radius, i);
+                            y_source = circ_y(radius, i);
+                            x_1 = circ_x(radius/2, findJobIndex(d["jobtitle"]));
+                            y_1 = circ_y(radius/2, findJobIndex(d["jobtitle"]));
+                            x_2 = circ_x(innerRadius, findJobIndex(d["jobtitle"]));
+                            y_2 = circ_y(innerRadius, findJobIndex(d["jobtitle"]));
+                            x_3 = circ_x(innerRadius, findJobIndex(targetJob));
+                            y_3 = circ_y(innerRadius, findJobIndex(targetJob));
+                            x_4 = circ_x(radius/2, findJobIndex(targetJob));
+                            y_4 = circ_y(radius/2, findJobIndex(targetJob));
+                            x_target = circ_x(radius, unique_ids.indexOf(goto_id));
+                            y_target = circ_y(radius, unique_ids.indexOf(goto_id));
+
+                            var coords = [{"xcoord": x_source, "ycoord": y_source},
+                                          {"xcoord": x_1, "ycoord": y_1},
+                                          {"xcoord": x_2, "ycoord": y_2},
+                                          {"xcoord": x_3, "ycoord": y_3},
+                                          {"xcoord": x_4, "ycoord": y_4},
+                                          {"xcoord": x_target, "ycoord": y_target}];
+
+                            var line = d3.line()
+                                         .x((c) => c.xcoord)
+                                         .y((c) => c.ycoord)
+                                         .curve(d3.curveBundle.beta(bundleStrength))
+
+                            return line(coords);
                         }
                     }
                 }
-                //Only for testing reasons
-                //console.log([i, goto_index]);
-                var prev_title = d.jobtitle;
-                return mail_line;
-            })
-            .attr("stroke", "url(#linear_gradient)")
-            .attr("fill", "none")
-            .attr("stroke-width", 1)
-            .style("opacity", 0.75);
+            }
+                    })
+                    .attr("id", "path")
+                    .attr("stroke", "url(#linear_gradient)")
+                    .attr("fill", "none")
+                    .attr("stroke-width", 1)
+                    .style("opacity", 0.75);
+
+            function findJobIndex(jobtitle) {
+                for (i = 0; i < jobGroupIndex.length; i++) {
+                    if (jobGroupIndex[i][0] == jobtitle){
+                        return jobGroupIndex[i][1];
+                    }
+                }
+            }
+
+            function findJobtitle(id) {
+                for (i = 0; i < usableData.length; i++) {
+                    if (usableData[i]["id"] == id){
+                        return usableData[i]["jobtitle"];
+                    }
+                }
+            }
+        
+            function notDrawn(from, to) {
+                for(i = 0; i < drawnEdges.length; i++) {
+                    if(drawnEdges[i][0] == from &&
+                       drawnEdges[i][1] == to) {
+                           return false;
+                       }
+                }
+                return true;
+            }
+
+            console.log(curDate);
+        }
+
+        if (doAnimate == true && isPaused == false) {
+            setTimeout(function(){ nextFrame() }, frameTime);
+        }
+
+        function nextFrame() {
+            if (curDate != endDate){ 
+                if (curDate % 100 < 12) {
+                    curDate++;
+                } else {
+                    curYear++;
+                    curDate = parseInt(curYear.toString() + "01", 10);
+                }
+
+                d3.selectAll("#path").remove();
+                generateEdges();
+
+                if (isPaused != true) {
+                    setTimeout(function(){ nextFrame() }, frameTime);
+                }
+            }            
+        }
 
             //Testing logs
         console.log(usableData);
@@ -228,8 +400,21 @@ function makeHEB(dataPath) {
         console.log(Jobtitles_list);
     });
 
+}
 
+function pauseAnim() {
 
-};
+    var pauseIcon = document.getElementById("pauseIcon");
+    var togglePause = document.getElementById("togglePause");
 
+    if (isPaused == false) {
+        isPaused = true;
+        pauseIcon.className = "fa fa-play";
+        togglePause.innerHTML = "Play";
+    } else {
+        isPaused = false;
+        pauseIcon.className = "fa fa-pause";
+        togglePause.innerHTML = "Pause";
+    }
 
+}

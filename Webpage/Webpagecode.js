@@ -45,7 +45,7 @@ function toggleToolbar() {
     }
 }
 
-function changeLabel() {
+function changeFile() {
     var fileInput = document.getElementById("file_input");
     var fileChosen = document.getElementById("file_chosen");
     var submitFile = document.getElementById("submit_file");

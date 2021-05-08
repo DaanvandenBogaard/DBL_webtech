@@ -48,7 +48,7 @@
 
 			<!--Upload/replace dataset: -->
 			<form action="upload.php" method="POST" enctype="multipart/form-data" >
-				<input id="file_input" type="file" name="dataset" accept=".csv" onchange="changeLabel()">
+				<input id="file_input" type="file" name="dataset" accept=".csv" onchange="changeFile()">
 				<label id="upload_button" for="file_input">
 					<i class="fa fa-upload" id="upload_icon" style="font-size: 20px;"></i>
 					Upload dataset
@@ -62,7 +62,19 @@
 
 			<!-- HEB -->
 			<script src="HEB.js"></script>
-			<button id="startHEB" type="button" name="HEB" onclick="makeHEB(localStorage.getItem('DataSet'))"> Start </button>
+			<span> From (year-month) </span>
+			<input id="startYear" type="number" name="startYear" default=1998>
+			<input id="startMonth" type="number" name="startMonth" default=01>
+			<span> to (year-month) </span>
+			<input id="endYear" type="number" name="endYear" default=2002>
+			<input id="endMonth" type="number" name="endMonth" default=12>
+			<div>
+				<input id="animateToggle" type="checkbox">
+				<label for="animateToggle"> animation </label>
+				<button id="startHEB" type="button" name="HEB" onclick="makeHEB(localStorage.getItem('DataSet'))"> Start </button>
+			</div>
+			<button id="togglePause" type="button" name="togglePause" onclick="pauseAnim()"> Play </button>
+			<label for="togglePause" id="pauseIcon" class="fa fa-play"></label>
 			<div id="HEBFigure"> </div>
 		</div>
 	</body>
