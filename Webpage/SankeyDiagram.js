@@ -343,6 +343,16 @@ function dragstarted(event, d) {
 }
 
 function dragged(event, d) {
+  //Check if the mouse is still in frame:
+    //retrieve height and width:
+    let width = d3.select("#sankeyID").select("svg").attr("width");
+    let height = d3.select("#sankeyID").select("svg").attr("height");
+    let padding = 10;
+  
+  if (event.x < padding || event.x > width - padding || event.y < padding || event.y > height -padding) {
+    return;
+  }
+  
   //Update values of d:
   d.x0 = d.x0 + event.dx;
   d.y0 = d.y0 + event.dy;
@@ -354,7 +364,7 @@ function dragged(event, d) {
     .attr("x", d.x0)
     .attr("y", d.y0); 
   var textVar = d3.select("#text").select(("#" + "ID" +  d.name).replace(/ /g,''));
-  textVar.attr("x", d.x0 < ((d3.select("#sankeyID").select("svg").attr("width")) / 2 ) ? d.x1 + 10 : d.x0 - 10)
+  textVar.attr("x", d.x0 < (width / 2) ? d.x1 + 10 : d.x0 - 10)
          .attr("y", ((d.y1 + d.y0) / 2)); 
   d3.selectAll("#link").selectAll("path").attr("d", d3.sankeyLinkHorizontal())
                                          .attr("stroke-width", d => Math.max(1 , d.width));
