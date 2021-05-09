@@ -295,6 +295,7 @@ function MakeD3(dataSet , sankey , svg){
                 .text(d => d.name);
 
     //Set text:
+    //MAY CAUSE ISSUES WHEN USING NUMBERS ON THE RIGHT SIDE AND/OR TEXT ON THE LEFT SIDE!
   svg.append("g")
      .attr("id" , "text")
      .style("font", "35px sans-serif") //TODO ask Thomas for right font style
@@ -303,10 +304,10 @@ function MakeD3(dataSet , sankey , svg){
      .data(nodes)
      .join("text")
      .attr("id" , d => ("ID" + d.name).replace(/ /g,'') )
-     .attr("y", d => ((d.y1 + d.y0) / 2)) //set y coordinate
+     .attr("y", d => ((d.y1 + d.y0) / 2) + 10) //set y coordinate
      .attr("x", d => d.x0 < width / 2 ? d.x1 + textpadding : d.x0 - textpadding) //set x coordinate based on the location of the node.
      .attr("text-anchor", d => d.x0 < width / 2 ? "start" : "end")
-     .text(d => d.name); //set the text value
+     .text(d => d.name.toString()); //set the text value
 }
 
 //Functions handling color retrival and hashing names to colours. 
@@ -348,14 +349,13 @@ function dragged(event, d) {
     let width = d3.select("#sankeyID").select("svg").attr("width");
     let height = d3.select("#sankeyID").select("svg").attr("height");
     let padding = 10;
-  
   if (event.x < padding || event.x > width - padding || event.y < padding || event.y > height -padding) {
     return;
   }
   
   //Update values of d:
-  d.x0 = d.x0 + event.dx;
-  d.y0 = d.y0 + event.dy;
+  d.x0 += event.dx;
+  d.y0 += event.dy;
   d.x1 += event.dx;
   d.y1 += event.dy;
   sankey.update(dataSet);
@@ -363,11 +363,19 @@ function dragged(event, d) {
   d3.select(this)
     .attr("x", d.x0)
     .attr("y", d.y0); 
+
   var textVar = d3.select("#text").select(("#" + "ID" +  d.name).replace(/ /g,''));
-  textVar.attr("x", d.x0 < (width / 2) ? d.x1 + 10 : d.x0 - 10)
-         .attr("y", ((d.y1 + d.y0) / 2)); 
+  let BBox = textVar.node().getBBox();
+  if (Number.isNaN((+d.name))) {
+    textVar.attr("x", d.x0 < (width / 2) ? d.x1 + BBox.width + 10  : d.x0 - 10); 
+  } else {
+    textVar.attr("x", d.x0 < (width / 2) ? d.x1 + 10: d.x0 - BBox.width - 10);
+  }
+  textVar.attr("y", d => ((d.y1 + d.y0) / 2) + 10);
+
   d3.selectAll("#link").selectAll("path").attr("d", d3.sankeyLinkHorizontal())
                                          .attr("stroke-width", d => Math.max(1 , d.width));
+
 }
 
 function dragended(event, d) {
