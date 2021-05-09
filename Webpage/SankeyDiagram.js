@@ -6,6 +6,7 @@ var sankey;
 var dataSet;
 
 var tooltip;
+var outOfBounds = false;
 
 function makeSankey(dataPath) {
 
@@ -246,8 +247,6 @@ function MakeD3(dataSet , sankey , svg){
     }
   }
 
-
-
   //Append the links:
   var link = svg.append("g")
                 .attr("id","link")
@@ -349,7 +348,8 @@ function dragged(event, d) {
     let width = d3.select("#sankeyID").select("svg").attr("width");
     let height = d3.select("#sankeyID").select("svg").attr("height");
     let padding = 10;
-  if (event.x < padding || event.x > width - padding || event.y < padding || event.y > height -padding) {
+  if (event.x < padding || event.x > width - padding || event.y < padding || event.y > height -padding || outOfBounds) {
+    outOfBounds = true;
     return;
   }
   
@@ -380,5 +380,6 @@ function dragged(event, d) {
 
 function dragended(event, d) {
   d3.select(this).attr("stroke", null);
+  outOfBounds = false;
 }
 
