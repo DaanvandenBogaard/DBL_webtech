@@ -243,80 +243,48 @@ function makeHEB(dataPath) {
         var edges = g.append("path")
                      .attr("d", function(d,i) {
 
-            if (doAnimate == false) { 
-                for (k = 0; k < d.mails.length; k++) { 
-                    if ((d.mails[k]["date"] >= startDate) && (d.mails[k]["date"] <= endDate)) {
-                        var goto_id = d.mails[k]["from"];
-                        if (notDrawn(d["id"], goto_id)) {
-                            drawnEdges.push([d["id"], goto_id]);
-                            targetJob = findJobtitle(goto_id);
-                            x_source  = circ_x(radius, i);
-                            y_source = circ_y(radius, i);
-                            x_1 = circ_x(radius/2, findJobIndex(d["jobtitle"]));
-                            y_1 = circ_y(radius/2, findJobIndex(d["jobtitle"]));
-                            x_2 = circ_x(innerRadius, findJobIndex(d["jobtitle"]));
-                            y_2 = circ_y(innerRadius, findJobIndex(d["jobtitle"]));
-                            x_3 = circ_x(innerRadius, findJobIndex(targetJob));
-                            y_3 = circ_y(innerRadius, findJobIndex(targetJob));
-                            x_4 = circ_x(radius/2, findJobIndex(targetJob));
-                            y_4 = circ_y(radius/2, findJobIndex(targetJob));
-                            x_target = circ_x(radius, unique_ids.indexOf(goto_id));
-                            y_target = circ_y(radius, unique_ids.indexOf(goto_id));
+            var mail_lines = [];
 
-                            var coords = [{"xcoord": x_source, "ycoord": y_source},
-                                          {"xcoord": x_1, "ycoord": y_1},
-                                          {"xcoord": x_2, "ycoord": y_2},
-                                          {"xcoord": x_3, "ycoord": y_3},
-                                          {"xcoord": x_4, "ycoord": y_4},
-                                          {"xcoord": x_target, "ycoord": y_target}];
+            for (k = 0; k < d.mails.length; k++) { 
+                if ((doAnimate == false && (d.mails[k]["date"] >= startDate && d.mails[k]["date"] <= endDate)) ||
+                    (doAnimate == true  && d.mails[k]["date"] == curDate)) {
+                    var goto_id = d.mails[k]["from"];
+                    if (notDrawn(d["id"], goto_id)) {
+                        drawnEdges.push([d["id"], goto_id]);
+                        targetJob = findJobtitle(goto_id);
+                        x_source  = circ_x(radius, i);
+                        y_source = circ_y(radius, i);
+                        x_1 = circ_x(radius/2, findJobIndex(d["jobtitle"]));
+                        y_1 = circ_y(radius/2, findJobIndex(d["jobtitle"]));
+                        x_2 = circ_x(innerRadius, findJobIndex(d["jobtitle"]));
+                        y_2 = circ_y(innerRadius, findJobIndex(d["jobtitle"]));
+                        x_3 = circ_x(innerRadius, findJobIndex(targetJob));
+                        y_3 = circ_y(innerRadius, findJobIndex(targetJob));
+                        x_4 = circ_x(radius/2, findJobIndex(targetJob));
+                        y_4 = circ_y(radius/2, findJobIndex(targetJob));
+                        x_target = circ_x(radius, unique_ids.indexOf(goto_id));
+                        y_target = circ_y(radius, unique_ids.indexOf(goto_id));
 
-                            var line = d3.line()
-                                         .x((c) => c.xcoord)
-                                         .y((c) => c.ycoord)
-                                         .curve(d3.curveBundle.beta(bundleStrength))
+                        var coords = [{"xcoord": x_source, "ycoord": y_source},
+                                      {"xcoord": x_1, "ycoord": y_1},
+                                      {"xcoord": x_2, "ycoord": y_2},
+                                      {"xcoord": x_3, "ycoord": y_3},
+                                      {"xcoord": x_4, "ycoord": y_4},
+                                      {"xcoord": x_target, "ycoord": y_target}];
 
-                            return line(coords);
-                            
-                        } 
-                    }
-                }
-            } else {
-                for (k = 0; k < d.mails.length; k++) {
-                    if (d.mails[k]["date"] == curDate) {
-                        var goto_id = d.mails[k]["from"];
-                        if (notDrawn(d["id"], goto_id)) {
-                            drawnEdges.push([d["id"], goto_id]);
-                            targetJob = findJobtitle(goto_id);
-                            x_source  = circ_x(radius, i);
-                            y_source = circ_y(radius, i);
-                            x_1 = circ_x(radius/2, findJobIndex(d["jobtitle"]));
-                            y_1 = circ_y(radius/2, findJobIndex(d["jobtitle"]));
-                            x_2 = circ_x(innerRadius, findJobIndex(d["jobtitle"]));
-                            y_2 = circ_y(innerRadius, findJobIndex(d["jobtitle"]));
-                            x_3 = circ_x(innerRadius, findJobIndex(targetJob));
-                            y_3 = circ_y(innerRadius, findJobIndex(targetJob));
-                            x_4 = circ_x(radius/2, findJobIndex(targetJob));
-                            y_4 = circ_y(radius/2, findJobIndex(targetJob));
-                            x_target = circ_x(radius, unique_ids.indexOf(goto_id));
-                            y_target = circ_y(radius, unique_ids.indexOf(goto_id));
+                        var line = d3.line()
+                                     .x((c) => c.xcoord)
+                                     .y((c) => c.ycoord)
+                                     .curve(d3.curveBundle.beta(bundleStrength));
 
-                            var coords = [{"xcoord": x_source, "ycoord": y_source},
-                                          {"xcoord": x_1, "ycoord": y_1},
-                                          {"xcoord": x_2, "ycoord": y_2},
-                                          {"xcoord": x_3, "ycoord": y_3},
-                                          {"xcoord": x_4, "ycoord": y_4},
-                                          {"xcoord": x_target, "ycoord": y_target}];
-
-                            var line = d3.line()
-                                         .x((c) => c.xcoord)
-                                         .y((c) => c.ycoord)
-                                         .curve(d3.curveBundle.beta(bundleStrength))
-
-                            return line(coords);
-                        }
-                    }
+                        mail_lines.push(line(coords));
+                        
+                    } 
                 }
             }
+
+            return mail_lines;
+
                     })
                     .attr("id", "path")
                     .attr("stroke", "url(#linear_gradient)")
