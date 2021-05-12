@@ -1,5 +1,9 @@
 <!DOCTYPE html>
 <html>
+	<script>
+		//All global hardcoded variables:
+		var visualisations = ["Sankey" , "HEB" , "MSV" , "Gestalt"];
+	</script>
 	<head>
 		<meta charset="utf-8" />
 		<meta name="viewpoint" content="width=device-width, initial-scale=1.0" />
@@ -58,7 +62,7 @@
 			</form>
 		</div>
 			<div id = "Vis1" style = "display: inline-block;"> </div>
-
+			<div id = "Vis2" style = "display: inline-block;"> </div>
 			<!--Visualisation-->
 			<!-- Imports Sankey -->
 			<script src="https://unpkg.com/d3-array@1"></script>
@@ -77,58 +81,57 @@
 			if (localStorage.getItem('DataSet') != 'null') {
 				var uploadHTML = d3.select("#upload");
 				uploadHTML.style("display" , "none");
+				CreateVisField('Vis1');
+				CreateVisField('Vis2');
+			}
 
+			//A function handling the creationg of new visualisation fields:
+			//Input:
+			//Changes:
+			function CreateVisField(fieldName){
 				//Decide what type of visualisation the user wants to use (in this specific div). 
-				var vis1 = d3.select("#Vis1");
-				var innervis1 = vis1.append("div")
+				
+				var vis = d3.select("#" + fieldName);
+				var innervis = vis.append("div")
 									.attr("id" , "sankeyID");								
-				var upperbar = innervis1.append("div")
+				var upperbar = innervis.append("div")
 										.attr("class" , "upperVisBox")
 										.attr("float" , "left")
 										.attr("id" , "upperbar");
 
 				//define ('hardcode') the possible visualisations:
-				let parsemessage = 12;
-				let visualisations = ["Sankey" , "HEB" , "MSV" , "Gestalt"]
+			
 				let select = upperbar.append("select")
-									 .attr("id" , "selector" + "vis1")				 
+									 .attr("id" , "selector" + fieldName)				 
 								 	 .attr("class" , "test")
-									 .attr("onchange" , "onChangeSelect("+ parsemessage +")");
+									 .attr("onchange" , "onChangeSelect("+ "'"  + fieldName + "'" +")");
 								
-				var selector = document.getElementById("selectorvis1");
+				var selector = document.getElementById("selector" + fieldName);
 				visualisations.forEach(function(d){
 					let newOption = document.createElement("option");
 					newOption.text = d;
 					selector.add(newOption);
 				});
 
-				var options = select.selectAll("option")
-									.data(visualisations)
-									.enter()
-									.append('option')
-									.attr("value" , d => d)
-									.text(d => d);
-									
+				//set invisible option:					
 				select.append("option")
 					  .attr("selected" , "true")
 					  .attr("hidden" , "true")
 					  .text("Choose a visualisation");		
-
 			
 			}
 
 			//A function handling the change of option for visualisations.
-			function onChangeSelect(test){
-				console.log(test);
+			function onChangeSelect(fieldName){
 				//First clean html:
 			
 					
 
 				//Now add new visualisation:
 	
-				selectValue = d3.select('select').property('value');
+				selectValue = d3.select("#" + fieldName).select('select').property('value');
 				if (selectValue == "Sankey") {
-					makeSankey(localStorage.getItem('DataSet'));
+					makeSankey(localStorage.getItem('DataSet') , fieldName);
 				} 
 			}
 			</script>

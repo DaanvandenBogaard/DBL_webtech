@@ -4,19 +4,20 @@ Myrte van Ginkel (1566237)
 */
 var sankey;
 var dataSet;
-
 var tooltip;
 var outOfBounds = false;
 
-function makeSankey(dataPath) {
-
+function makeSankey(dataPath , visField) {
+  //Ask the user for the desired ID numbers:
+  var idInput = window.prompt("Enter ID-numbers (seperated by commas):")
+  let idNums = JSON.parse("[" + idInput + "]");
   //We start by making the SVG element.
   let margin = {top : 15, right : 10, bottom: 15, left: 10} //For now, hardcoded margins 
   var width = 1500; //for now, hardcoded width
   var height = 800; //for now, hardcoded height
   var nodeWidthSankey = 80;
-
-  let div = d3.select("#sankeyID")
+  let fieldName = visField;
+  let div = d3.select("#" + fieldName).select("#sankeyID")
               .attr("width" , width + 25)
               .attr("height" , height + 25);
 
@@ -96,18 +97,14 @@ function makeSankey(dataPath) {
     .displayValue(false)
     .on('onchange', (val) => {
       sliderVal = val;
-      UpdateD3(data , sankey ,sliderVal ,idNums);
+      UpdateD3(data , sankey ,sliderVal ,idNums , fieldName);
     });
 
     sliderHTML.call(slider); 
 
-    //Ask the user for the desired ID numbers:
-    var idInput = window.prompt("Enter ID-numbers (seperated by commas):")
-    let idNums = JSON.parse("[" + idInput + "]");
-
     //Define sankey data by sankey.js
     dataSet = constrDataSet(data , idNums , sliderVal);
-    MakeD3(dataSet , sankey , svg);
+    MakeD3(dataSet , sankey , d3.select("#" + fieldName).select("#sankeyID").select('#visualisation') , fieldName);
 
 
   }); 
@@ -193,22 +190,22 @@ function findMinMax(data, attribute) {
   return [min, max]
 }
 
-function UpdateD3(data , sankey ,sliderVal ,idNums){
+function UpdateD3(data , sankey ,sliderVal ,idNums  ,fieldName){
   //Delete old chart:
-  d3.select("#sankeyID").select("#visualisation").selectAll("g").remove();
+  d3.select("#" + fieldName).select("#sankeyID").select("#visualisation").selectAll("g").remove();
   //Construct new chart:
   dataSet = constrDataSet(data, idNums , sliderVal);
-  MakeD3(dataSet, sankey, d3.select("#sankeyID").select("#visualisation"));
+  MakeD3(dataSet, sankey, d3.select("#" + fieldName).select("#sankeyID").select("#visualisation") , fieldName);
 }
 
-function MakeD3(dataSet , sankey , svg){
+function MakeD3(dataSet , sankey , svg , fieldName){
 
   if (dataSet["links"].length == 0) {
     console.log("In this dataset, during this year, no mail was sent by the people involved.");
     return
   }
   let {nodes, links} = sankey(dataSet);
-  let width = d3.select("#sankeyID").style("width");
+  let width = d3.select("#" + fieldName).select("#sankeyID").style("width");
   width = width.slice(0,-2);
   width = +width;
   var textpadding = 10;
@@ -255,7 +252,7 @@ function MakeD3(dataSet , sankey , svg){
   }
 
   //Append the links:
-  var link = svg.append("g")
+  var link = d3.select("#" + fieldName).select("#sankeyID").select('#visualisation').append("g")
                 .attr("id","link")
                 .attr("fill", "none")
                 .selectAll("g")
@@ -273,11 +270,45 @@ function MakeD3(dataSet , sankey , svg){
 
   drag = d3.drag()
            .on("start", dragstarted)
-           .on("drag", dragged)
+           .on("drag", function dragged(event, d) {
+            //Check if the mouse is still in frame:
+              //retrieve height and width:
+              let width = d3.select("#" + fieldName).select("#sankeyID").select("#visualisation").attr("width");
+              let height = d3.select("#" + fieldName).select("#sankeyID").select("#visualisation").attr("height");
+              let padding = 10;
+            if (event.x < padding || event.x > width - padding || event.y < padding || event.y > height -padding || outOfBounds) {
+              outOfBounds = true;
+              return;
+            }
+            
+            //Update values of d:
+            d.x0 += event.dx;
+            d.y0 += event.dy;
+            d.x1 += event.dx;
+            d.y1 += event.dy;
+            sankey.update(dataSet);
+            //update visuals:
+            d3.select(this)
+              .attr("x", d.x0)
+              .attr("y", d.y0); 
+          
+            var textVar = d3.select("#" + fieldName).select("#text").select(("#" + "ID" +  d.name).replace(/ /g,''));
+            let BBox = textVar.node().getBBox();
+            if (Number.isNaN((+d.name))) {
+              textVar.attr("x", d.x0 < (width / 2) ? d.x1 + BBox.width + 10  : d.x0 - 10); 
+            } else {
+              textVar.attr("x", d.x0 < (width / 2) ? d.x1 + 10: d.x0 - BBox.width - 10);
+            }
+            textVar.attr("y", d => ((d.y1 + d.y0) / 2) + 10); 
+          
+            d3.select("#" + fieldName).selectAll("#link").selectAll("path").attr("d", d3.sankeyLinkHorizontal())
+                                                   .attr("stroke-width", d => Math.max(1 , d.width));
+          
+          })
            .on("end", dragended);
 
 //Append a new group for the nodes and set it's attributes:
-  let node = svg.append("g")
+  let node = d3.select("#" + fieldName).select("#sankeyID").select('#visualisation').append("g")
                 .attr("stoke" , "#000")
                 .selectAll("rect")
                 .data(nodes) 
@@ -302,7 +333,7 @@ function MakeD3(dataSet , sankey , svg){
 
     //Set text:
     //MAY CAUSE ISSUES WHEN USING NUMBERS ON THE RIGHT SIDE AND/OR TEXT ON THE LEFT SIDE!
-  svg.append("g")
+    d3.select("#" + fieldName).select("#sankeyID").select('#visualisation').append("g")
      .attr("id" , "text")
      .style("font", "35px sans-serif") //TODO ask Thomas for right font style
      .attr("pointer-events", "none")
@@ -349,41 +380,6 @@ function dragstarted(event, d) {
   d3.select(this).raise().attr("stroke", "black");
 }
 
-function dragged(event, d) {
-  //Check if the mouse is still in frame:
-    //retrieve height and width:
-    let width = d3.select("#sankeyID").select("#visualisation").attr("width");
-    let height = d3.select("#sankeyID").select("#visualisation").attr("height");
-    let padding = 10;
-  if (event.x < padding || event.x > width - padding || event.y < padding || event.y > height -padding || outOfBounds) {
-    outOfBounds = true;
-    return;
-  }
-  
-  //Update values of d:
-  d.x0 += event.dx;
-  d.y0 += event.dy;
-  d.x1 += event.dx;
-  d.y1 += event.dy;
-  sankey.update(dataSet);
-  //update visuals:
-  d3.select(this)
-    .attr("x", d.x0)
-    .attr("y", d.y0); 
-
-  var textVar = d3.select("#text").select(("#" + "ID" +  d.name).replace(/ /g,''));
-  let BBox = textVar.node().getBBox();
-  if (Number.isNaN((+d.name))) {
-    textVar.attr("x", d.x0 < (width / 2) ? d.x1 + BBox.width + 10  : d.x0 - 10); 
-  } else {
-    textVar.attr("x", d.x0 < (width / 2) ? d.x1 + 10: d.x0 - BBox.width - 10);
-  }
-  textVar.attr("y", d => ((d.y1 + d.y0) / 2) + 10);
-
-  d3.selectAll("#link").selectAll("path").attr("d", d3.sankeyLinkHorizontal())
-                                         .attr("stroke-width", d => Math.max(1 , d.width));
-
-}
 
 function dragended(event, d) {
   d3.select(this).attr("stroke", null);
