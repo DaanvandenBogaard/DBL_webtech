@@ -7,7 +7,7 @@ var dataSet;
 var tooltip;
 var outOfBounds = false;
 
-function makeSankey(dataPath , visField) {
+function makeSankey(dataPath , fieldName) {
   //Ask the user for the desired ID numbers:
   var idInput = window.prompt("Enter ID-numbers (seperated by commas):")
   let idNums = JSON.parse("[" + idInput + "]");
@@ -16,7 +16,6 @@ function makeSankey(dataPath , visField) {
   var width = 1500; //for now, hardcoded width
   var height = 800; //for now, hardcoded height
   var nodeWidthSankey = 80;
-  let fieldName = visField;
   let div = d3.select("#" + fieldName).select("#sankeyID")
               .attr("width" , width + 25)
               .attr("height" , height + 25);
@@ -379,7 +378,6 @@ function getColor(node) {
 function dragstarted(event, d) {
   d3.select(this).raise().attr("stroke", "black");
 }
-
 
 function dragended(event, d) {
   d3.select(this).attr("stroke", null);
