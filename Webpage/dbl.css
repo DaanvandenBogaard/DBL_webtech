@@ -273,3 +273,9 @@ button#submit_file {
 	font-size: 30px;
 	align-items: center;
   }
+
+  .visField {
+	border-style: solid;
+	border-color: coral;
+	display: inline-block;
+  }

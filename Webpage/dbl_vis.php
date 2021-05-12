@@ -61,8 +61,8 @@
 				<button id="submit_file" type="submit" name="submit"> Submit </button>
 			</form>
 		</div>
-			<div id = "Vis1" style = "display: inline-block;"> </div>
-			<div id = "Vis2" style = "display: inline-block;"> </div>
+			<div id = "Vis1" class = "visField"> </div>
+			<div id = "Vis2" class = "visField"> </div>
 			<!--Visualisation-->
 			<!-- Imports Sankey -->
 			<script src="https://unpkg.com/d3-array@1"></script>
@@ -127,8 +127,7 @@
 			
 					
 
-				//Now add new visualisation:
-	
+				//Now add new visualisation:	
 				selectValue = d3.select("#" + fieldName).select('select').property('value');
 				if (selectValue == "Sankey") {
 					makeSankey(localStorage.getItem('DataSet') , fieldName);
