@@ -30,14 +30,16 @@ function makeSankey(dataPath) {
                .style("border-radius" , "5px")
                .style("padding" , "5px");
 
-  
-              let sliderHTML = div.append('svg')
-               .attr('width', 500)
-               .attr('height', 100)
-               .append('g')
-               .attr('transform', 'translate(30,30)')
+  let sliderHTML = div.select("#upperbar")
+                      .append('svg')
+                      .attr('width', 500)
+                      .attr('height', 100)
+                      .attr("display" , "inline")
+                      .attr("class" , "test")
+                      .attr("vertical-align" , "middle")
+                      .append('g')
+                      .attr('transform', 'translate(30,30)');
                            
-
   let svg = div.append("svg")
                .attr("id" , "visualisation")
                .attr("width" , width + 25)
@@ -99,7 +101,6 @@ function makeSankey(dataPath) {
 
     sliderHTML.call(slider); 
 
-
     //Ask the user for the desired ID numbers:
     var idInput = window.prompt("Enter ID-numbers (seperated by commas):")
     let idNums = JSON.parse("[" + idInput + "]");
@@ -131,10 +132,10 @@ function constrDataSet(data, idNums , sliderVal){
   });  
 
   let linksDataNestedFormat = d3.nest()
-  .key(function(d) { return d. source; })
-  .key(function(d) { return d.target; })
-  .rollup(function(leaves) { return d3.sum(leaves, function(d) {return parseFloat(d.value)})})
-  .entries(linksDataDup);
+                                .key(function(d) { return d. source; })
+                                .key(function(d) { return d.target; })
+                                .rollup(function(leaves) { return d3.sum(leaves, function(d) {return parseFloat(d.value)})})
+                                .entries(linksDataDup);
 
   //We now reformat the array into the desired data format:
   let linksData = [];
@@ -226,7 +227,6 @@ function MakeD3(dataSet , sankey , svg){
     tooltip.style("opacity", 0);
     d3.select(this).attr("stroke", d => d3.color(d.color) || getLinkColor());
   }
-
   var mousemoveNode = function(event , d) {
     //Calculate the total number of emails sent by the source (node).
     //Determine type of variable:

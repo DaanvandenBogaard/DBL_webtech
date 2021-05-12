@@ -258,3 +258,18 @@ button#submit_file {
 .methodDesc {
 	color: var(--smallText);
 }
+
+/* Visualisation UI */
+.upperVisBox {
+	display: flex;
+	align-items: center;
+	justify-content: center; 
+}
+
+/*.upperVisBox > select*/ .test {
+	background-color: #f1f1f1;
+	margin: 10px;
+	padding: 20px;
+	font-size: 30px;
+	align-items: center;
+  }

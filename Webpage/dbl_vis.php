@@ -74,21 +74,64 @@
 
 			
 			<script> 
-			console.log(localStorage.getItem('DataSet') != 'null');
 			if (localStorage.getItem('DataSet') != 'null') {
 				var uploadHTML = d3.select("#upload");
 				uploadHTML.style("display" , "none");
 
 				//Decide what type of visualisation the user wants to use (in this specific div). 
 				var vis1 = d3.select("#Vis1");
-				vis1.append("div")
-					.attr("id" , "sankeyID");
-				makeSankey(localStorage.getItem('DataSet'));
+				var innervis1 = vis1.append("div")
+									.attr("id" , "sankeyID");								
+				var upperbar = innervis1.append("div")
+										.attr("class" , "upperVisBox")
+										.attr("float" , "left")
+										.attr("id" , "upperbar");
 
+				//define ('hardcode') the possible visualisations:
+				let parsemessage = 12;
+				let visualisations = ["Sankey" , "HEB" , "MSV" , "Gestalt"]
+				let select = upperbar.append("select")
+									 .attr("id" , "selector" + "vis1")				 
+								 	 .attr("class" , "test")
+									 .attr("onchange" , "onChangeSelect("+ parsemessage +")");
+								
+				var selector = document.getElementById("selectorvis1");
+				visualisations.forEach(function(d){
+					let newOption = document.createElement("option");
+					newOption.text = d;
+					selector.add(newOption);
+				});
 
-				
+				var options = select.selectAll("option")
+									.data(visualisations)
+									.enter()
+									.append('option')
+									.attr("value" , d => d)
+									.text(d => d);
+									
+				select.append("option")
+					  .attr("selected" , "true")
+					  .attr("hidden" , "true")
+					  .text("Choose a visualisation");		
+
+			
 			}
-			</script>			
+
+			//A function handling the change of option for visualisations.
+			function onChangeSelect(test){
+				console.log(test);
+				//First clean html:
+			
+					
+
+				//Now add new visualisation:
+	
+				selectValue = d3.select('select').property('value');
+				if (selectValue == "Sankey") {
+					makeSankey(localStorage.getItem('DataSet'));
+				} 
+			}
+			</script>
 			
 		</div>
 	</body>
