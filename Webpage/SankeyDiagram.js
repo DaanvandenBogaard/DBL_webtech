@@ -14,11 +14,18 @@ function makeSankey(dataPath , fieldName) {
   //We start by making the SVG element.
   let margin = {top : 15, right : 10, bottom: 15, left: 10} //For now, hardcoded margins 
   var width = 1500; //for now, hardcoded width
-  var height = 800; //for now, hardcoded height
+  var height = 1000; //for now, hardcoded height
+
   var nodeWidthSankey = 80;
-  let div = d3.select("#" + fieldName).select("#sankeyID")
-              .attr("width" , width + 25)
-              .attr("height" , height + 25);
+  let div = d3.select("#" + fieldName);
+  let sankeyDiv = div.select("#localBox").append("div").attr("id" , "sankeyID");
+  //retrieve width and height:
+  console.log(parseFloat( div.style("height") ));
+  //var height = parseFloat( div.style("height") );
+  //var width = parseFloat( div.style("width") );
+
+  sankeyDiv.style("height" , height)
+           .style("width" , width);
 
   tooltip = div.append("div")
                .style("opacity", 0)
@@ -32,7 +39,7 @@ function makeSankey(dataPath , fieldName) {
 
   let sliderHTML = div.select("#upperbar")
                       .append('svg')
-                      .attr('width', 500)
+                      .attr('width', 350)
                       .attr('height', 100)
                       .attr("display" , "inline")
                       .attr("class" , "test")
@@ -40,13 +47,13 @@ function makeSankey(dataPath , fieldName) {
                       .append('g')
                       .attr('transform', 'translate(30,30)');
                            
-  let svg = div.append("svg")
-               .attr("id" , "visualisation")
-               .attr("width" , width + 25)
-               .attr("height", height + 25);
+  let svg = sankeyDiv.append("svg")
+                     .attr("id" , "visualisation")
+                     .attr("width" , width + 50)
+                     .attr("height", height + 50);
   let g =   svg.append("g")
-               .attr("width" , width)
-               .attr("height", height)
+               //.attr("width" , width)
+               //.attr("height", height)
                .attr("transform" , "translate(" + margin.left  + "," + margin.top +")");
 
 
