@@ -42,6 +42,7 @@
 		<div id="pageContent" class="pageContent">
 
 			<!--temp text-->
+		<div id = "upload">
 			<p class="title">Visualisation</p>
 			<p>Upload a dataset to start the visualisation</p>
 
@@ -55,8 +56,8 @@
 				<span id="file_chosen"> Choose a file (.csv) </span>
 				<button id="submit_file" type="submit" name="submit"> Submit </button>
 			</form>
-
-			<div id = "sankeyID" style = "display: inline-block;"></div>
+		</div>
+			<div id = "Vis1" style = "display: inline-block;"> </div>
 
 			<!--Visualisation-->
 			<!-- Imports Sankey -->
@@ -73,9 +74,19 @@
 
 			
 			<script> 
-		
-			if (localStorage.getItem('DataSet') != null) {
+			console.log(localStorage.getItem('DataSet') != 'null');
+			if (localStorage.getItem('DataSet') != 'null') {
+				var uploadHTML = d3.select("#upload");
+				uploadHTML.style("display" , "none");
+
+				//Decide what type of visualisation the user wants to use (in this specific div). 
+				var vis1 = d3.select("#Vis1");
+				vis1.append("div")
+					.attr("id" , "sankeyID");
 				makeSankey(localStorage.getItem('DataSet'));
+
+
+				
 			}
 			</script>			
 			

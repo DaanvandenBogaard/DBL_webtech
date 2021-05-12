@@ -15,26 +15,39 @@ function makeSankey(dataPath) {
   var width = 1500; //for now, hardcoded width
   var height = 800; //for now, hardcoded height
   var nodeWidthSankey = 80;
+
   let div = d3.select("#sankeyID")
               .attr("width" , width + 25)
               .attr("height" , height + 25);
+
+  tooltip = div.append("div")
+               .style("opacity", 0)
+               .style("position" , "absolute")
+               .attr("class" , "tooltip")
+               .style("background-color" , "white")
+               .style("border" , "solid")
+               .style("border-width" , "2px")
+               .style("border-radius" , "5px")
+               .style("padding" , "5px");
+
+  
+              let sliderHTML = div.append('svg')
+               .attr('width', 500)
+               .attr('height', 100)
+               .append('g')
+               .attr('transform', 'translate(30,30)')
+                           
+
   let svg = div.append("svg")
+               .attr("id" , "visualisation")
                .attr("width" , width + 25)
                .attr("height", height + 25);
   let g =   svg.append("g")
                .attr("width" , width)
                .attr("height", height)
                .attr("transform" , "translate(" + margin.left  + "," + margin.top +")");
-  
-  tooltip = div.append("div")
-               .style("opacity", 0)
-               .style("position", "absolute")
-               .attr("class", "tooltip")
-               .style("background-color", "white")
-               .style("border", "solid")
-               .style("border-width", "2px")
-               .style("border-radius", "5px")
-               .style("padding", "5px");
+
+
 
   //Import sankey package as variable:
   sankey = d3.sankey()
@@ -68,7 +81,6 @@ function makeSankey(dataPath) {
     let minMaxDates = findMinMax(data, "year");
 
     //Slider:
-    let sliderDiv = div.append("div");
     let sliderVal = minMaxDates[0];
     var slider = d3
     .sliderHorizontal()
@@ -85,13 +97,8 @@ function makeSankey(dataPath) {
       UpdateD3(data , sankey ,sliderVal ,idNums);
     });
 
-  sliderDiv
-    .append('svg')
-    .attr('width', 500)
-    .attr('height', 100)
-    .append('g')
-    .attr('transform', 'translate(30,30)')
-    .call(slider);
+    sliderHTML.call(slider); 
+
 
     //Ask the user for the desired ID numbers:
     var idInput = window.prompt("Enter ID-numbers (seperated by commas):")
@@ -187,10 +194,10 @@ function findMinMax(data, attribute) {
 
 function UpdateD3(data , sankey ,sliderVal ,idNums){
   //Delete old chart:
-  d3.select("#sankeyID").select("svg").selectAll("g").remove();
+  d3.select("#sankeyID").select("#visualisation").selectAll("g").remove();
   //Construct new chart:
   dataSet = constrDataSet(data, idNums , sliderVal);
-  MakeD3(dataSet, sankey, d3.select("#sankeyID").select("svg"));
+  MakeD3(dataSet, sankey, d3.select("#sankeyID").select("#visualisation"));
 }
 
 function MakeD3(dataSet , sankey , svg){
@@ -345,8 +352,8 @@ function dragstarted(event, d) {
 function dragged(event, d) {
   //Check if the mouse is still in frame:
     //retrieve height and width:
-    let width = d3.select("#sankeyID").select("svg").attr("width");
-    let height = d3.select("#sankeyID").select("svg").attr("height");
+    let width = d3.select("#sankeyID").select("#visualisation").attr("width");
+    let height = d3.select("#sankeyID").select("#visualisation").attr("height");
     let padding = 10;
   if (event.x < padding || event.x > width - padding || event.y < padding || event.y > height -padding || outOfBounds) {
     outOfBounds = true;
