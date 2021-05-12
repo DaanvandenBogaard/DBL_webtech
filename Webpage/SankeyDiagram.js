@@ -14,15 +14,15 @@ function makeSankey(dataPath , fieldName) {
   //We start by making the SVG element.
   let margin = {top : 15, right : 10, bottom: 15, left: 10} //For now, hardcoded margins 
   var width = 1500; //for now, hardcoded width
-  var height = 1000; //for now, hardcoded height
+  var height = 1000; //for now, hardcoded height*/
 
   var nodeWidthSankey = 80;
   let div = d3.select("#" + fieldName);
   let sankeyDiv = div.select("#localBox").append("div").attr("id" , "sankeyID");
   //retrieve width and height:
   console.log(parseFloat( div.style("height") ));
-  //var height = parseFloat( div.style("height") );
-  //var width = parseFloat( div.style("width") );
+  //var height = parseFloat( d3.select("#pageContent").style("height") );
+  //var width = parseFloat( d3.select("#pageContent").style("width") );
 
   sankeyDiv.style("height" , height)
            .style("width" , width);
