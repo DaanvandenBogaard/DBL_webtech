@@ -187,7 +187,10 @@ function makeHEB(dataPath) {
                         for (p = 0; p < d.mails.length; p++) {
                             if ((doAnimate == false && (d.mails[p]["date"] >= startDate && d.mails[p]["date"] <= endDate)) ||
                                 (doAnimate == true && d.mails[p]["date"] == curDate)) {
-                                mails_amount++
+                                    var goto_id = d.mails[k]["from"];
+                                    if (notDrawn(d["id"], goto_id)) {
+                                        mails_amount++;
+                                    }
                             }
                         }
                         tooltip_string = d.id + " is a(n) " + d.jobtitle + " has recieved mails from " + mails_amount + " people in this period.";
@@ -459,14 +462,11 @@ function findJobIndex(jobtitle) {
     }
 }
 
-var counter = 0;
-
 //Finds the jobtitle for the selected id
 function findJobtitle(id) {
     for (i = 0; i < usableData.length; i++) {
         if (usableData[i]["id"] == id){
             return usableData[i]["jobtitle"];
-            counter++;
         }
     }
 }
