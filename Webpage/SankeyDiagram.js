@@ -252,16 +252,16 @@ function MakeD3(dataSet , sankey , svg , fieldName){
 
   //Append the links:
   var link = d3.select("#" + fieldName).select("#sankeyID").select('#visualisation').append("g")
-                .attr("id","link")
-                .attr("fill", "none")
-                .selectAll("g")
-                .data(links.sort((a, b) => b.width - a.width))
-                .join("g")
-                .attr("stroke", d => d3.color(d.color) || getLinkColor())
-                .style("mix-blend-mode", "multiply")
-                .on("mouseover", mouseover)
-                .on("mousemove", mousemove)
-                .on("mouseleave", mouseleave);
+               .attr("id","link")
+               .attr("fill", "none")
+               .selectAll("g")
+               .data(links.sort((a, b) => b.width - a.width))
+               .join("g")
+               .attr("stroke", d => d3.color(d.color) || getLinkColor())
+               .style("mix-blend-mode", "multiply")
+               .on("mouseover", mouseover)
+               .on("mousemove", mousemove)
+               .on("mouseleave", mouseleave);
 
   link.append("path")
       .attr("d", d3.sankeyLinkHorizontal())

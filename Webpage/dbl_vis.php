@@ -124,8 +124,8 @@
 			//A function handling the change of option for visualisations.
 			function onChangeSelect(fieldName){
 				//First clean html:
-			
-					
+				d3.select("#" + fieldName).selectAll("svg").remove();
+				d3.select("#" + fieldName).selectAll(".tooltip").remove();	
 
 				//Now add new visualisation:	
 				selectValue = d3.select("#" + fieldName).select('select').property('value');
