@@ -3,107 +3,154 @@ Thomas Broers (1538705)
 Bas van Hoeflaken (1556282)
 */
 
-
 function makeHEB(dataPath) {
-    //VARIABLES AND CONSTANTS
-    //VARIABLES AND CONSTANTS
-    //VARIABLES AND CONSTANTS
-    let margin = { top: 15, right: 10, bottom: 15, left: 10 };
-    let diameter = 1000;
-    let radius = diameter / 2;
-    let innerRadius = radius - 120
-    let radius1 = 300;
 
-    var i_g = 0;
-    var first_i = 0;
-    var bundleStrength = 0.85;
-    var startDate = 0;
-    var endDate = 999999999;
-
-    var usableData = [];
-    var userIndex = [];
-    var group = [];
-    var mail_line = [];
-
-    var prev_title = "";
-
-    var endYearAdjust = false;
-
-    //The next couple variables are for the coloring of edges
-    var colors = ["#4334eb", "#eb9834"];
-    var colorPicker = d3.scaleLinear().range(colors).domain([1, 2]);
-
-
-    //Color array for different jobtitles
-    const color_arr = ["green", "blue", "chartreuse", "cyan", "darkmagenta", "deeppink", "gold", "lightseagreen", "mediumpurple", "olive", "orchid", "seagreen", "grey", "blue", "green", "blue", "green", "blue",];
-
-    //MAIN FUNCTION
-    //MAIN FUNCTION
-    //MAIN FUNCTION
-    //Reads the inputs for date
     var startYear = document.getElementById("startYear");
     var startMonth = document.getElementById("startMonth");
     var endYear = document.getElementById("endYear");
     var endMonth = document.getElementById("endMonth");
+    var animToggle = document.getElementById("animateToggle");
+    var pauseIcon = document.getElementById("pauseIcon");
+    var togglePause = document.getElementById("togglePause");
+
+    var endYearAdjust = false;
+    var startDate = 0;
+    var endDate = 0;
+
+    var doAnimate = animToggle.checked;
+    var isPaused = true;
+    var frameTime = 1000;
+
+    if(startYear.value < 1998) {
+        startYear.value = 1998;
+    } else if(startYear.value > 2002) {
+        startYear.value = 2002;
+    } 
+
+    if(startMonth.value < 1) {
+        startMonth.value = 1;
+    } else if(startMonth.value > 12) {
+        startMonth.value = 12;
+    }
+
+    if(startMonth.value.length == 1) {
+        startMonth.value = 0 + startMonth.value;
+    }
+
+    if(endYear.value < 1998) {
+        endYear.value = 1998;
+    } else if(endYear.value > 2002) {
+        endYear.value = 2002;
+    } else if(endYear.value < startYear.value){
+        endYear.value = startYear.value;
+        endYearAdjust = true;
+    }
+
+    if(endMonth.value < 1) {
+        endMonth.value = 1;
+    } else if(endMonth.value > 12) {
+        endMonth.value = 12;
+    } else if((endYearAdjust == true || startYear.value == endYear.value) && endMonth.value < startMonth.value) {
+        endMonth.value = startMonth.value;
+    }
+
+    if(endMonth.value.length == 1) {
+        endMonth.value = 0 + endMonth.value;
+    }
+
+    startDate = parseInt(startYear.value + startMonth.value);
+    endDate = parseInt(endYear.value + endMonth.value);
+    var curYear = parseInt(startYear.value);
+    var curDate = startDate;
+
+    //Variables and constants
+    let margin = { top: 15, right: 10, bottom: 15, left: 10 };
+    let figureSize = 1000;
+    let diameter = 600;
+    let radius = diameter / 2;
+    let innerRadius = radius / 10;
+
+    var bundleStrength = 0.90;
+
+    //Delete previous object
+    d3.select("#HEBFigure").select("svg").remove();
 
     //Make svg object
     let div = d3.select("#HEBFigure")
-        .attr("width", diameter)
-        .attr("height", diameter);
+        .attr("width", figureSize)
+        .attr("height", figureSize);
     let svg = div.append("svg")
-        .attr("width", diameter)
-        .attr("height", diameter)
+        .attr("width", figureSize)
+        .attr("height", figureSize)
         .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
 
-    //Appends gradient
-    var linearGradient = svg.append("defs")
-        .append("linearGradient")
-        .attr("id", "linear_gradient");
-
-    linearGradient.append("stop")
-        .attr("offset", "0%")
-        .attr("stop-color", colorPicker(1));
-
-    linearGradient.append("stop")
-        .attr("offset", "100%")
-        .attr("stop-color", colorPicker(2));
-
-    //Since d3.csv is asynchronous (it is not loaded immediatly, but it is a request to the webserver) we need all our code from the data in here. 
     d3.csv(dataPath).then(function (data) {
+        //Since d3.csv is asynchronous (it is not loaded immediatly, but it is a request to the webserver) we need all our code from the data in here. 
 
-        //TESTING PURPOSES ONLY:
-        console.log("STARTDATE" + startDate);
+        //Construct array with data in a usable order 
 
-        //Forming array better suited for visualisation
+        var usableData = [];
+        var userIndex = [];
+
+        //Function for placement on HEB (X)
+        function circ_x(radius, index){
+            return 320 + radius * (Math.cos(((2 * Math.PI) / 149) * index));
+        }
+
+        //Function for placement on HEB (Y)
+        function circ_y(radius, index) {
+            return 500 + radius * (Math.sin(((2 * Math.PI) / 149) * index));
+        } 
+
         data.forEach(function (d) {
-            //First it checks if the date is in the given interval
-            if (dateFormat(d.date) >= startDate && dateFormat(d.date) <= endDate) {
-                //Add all unique recipients with jobtitle and an empty array of incoming mails
-                if (!usableData.some(code => code.id == d.toId)) {
-                    usableData.push({ "id": d.toId, "jobtitle": d.toJobtitle, "mails": [], "dates": [] });
-                    userIndex.push(d.toId);
-                }
-                //Add all unique incoming mails/dates to the mails/dates array
-                indexOfUser = userIndex.indexOf(d.toId);
-                usableData[indexOfUser]["mails"].push(d.fromId);
-                usableData[indexOfUser]["dates"].push(dateFormat(d.date));
+            //Check wheter the toId is already an object, if not create object with first found fromId
+            if (!usableData.some(code => code.id == d.toId)) {
+                usableData.push({ "id": d.toId, "jobtitle": d.toJobtitle, "mails": [{"from": d.fromId, "date": dateFormat(d.date)}] });
+                userIndex.push(d.toId);
+            }
+            //Check wheter fromId is already in mails array, if not add it
+            if (notInMails(d.fromId, d.toId, dateFormat(d.date))) {
+                var indexOfUser = userIndex.indexOf(d.toId);
+                usableData[indexOfUser]["mails"].push({"from": d.fromId, "date": dateFormat(d.date)});
             }
         });
 
-        //Sort usableData by jobtitle
+        function notInMails(curFromId, curToId, curDate) {
+            indexOfUser = userIndex.indexOf(curToId);
+            for (i = 0; i < usableData[indexOfUser]["mails"].length; i++) {
+                if (((usableData[indexOfUser]["mails"][i]["from"] == curFromId) &&
+                     usableData[indexOfUser]["mails"][i]["date"] == curDate) || 
+                     curToId == curFromId) {
+                    return false;
+                }
+            }
+            return true;
+        }
+
+        function dateFormat(date) {
+           return yearMonth = parseInt(date.replace(/-/, "").slice(0, -3), 10);
+        }
+
+        //Sort array by jobtitle
         usableData.sort((a, b) => d3.ascending(a.jobtitle, b.jobtitle) || d3.ascending(a.toId, b.toId));
+        var angleStep = Math.PI * 2 / usableData.length;
+
+        //TEMPORARILY array of CEO's
+        function ceo_check(d) {
+            return d.jobtitle == "CEO"
+        }
+        const CEO_list2 = usableData.filter(ceo_check);
+        var CEO_ids = CEO_list2.map(function (item) { return item.id; });
+
+        //Creating color array
+        const color_arr = ["green", "blue","chartreuse", "cyan","darkmagenta", "deeppink","gold", "lightseagreen","mediumpurple", "olive","orchid", "seagreen","grey", "blue","green", "blue","green", "blue",];
 
         //Get unique ids
         let unique_ids = [...new Set(usableData.map(ids => ids.id))];
 
         //Get unique jobtitles
         let Jobtitles_list = [...new Set(usableData.map(ids => ids.jobtitle))];
-
-        //Creates the svg object
-        var svg1 = d3.select("body").append("svg")
-            .attr("width", 500)
-            .attr("height", 500);
-
+        
         //Creates the group object for all rows in the usableData set
         var g = svg.selectAll("g")
             .data(usableData)
@@ -112,112 +159,246 @@ function makeHEB(dataPath) {
 
         //creates circles for all working persons
         var circle = g.append("circle")
-            .attr("cx", function (d, i) {
-                circ_x(radius1, i);
-                return x_c;
+            .attr("cx", function(d,i){
+                return circ_x(300,i);
             })
-            .attr("cy", function (d, i) {
-                circ_y(radius1, i);
-                return y_c;
+            .attr("cy", function(d,i){
+                return circ_y(300,i);
             })
             .attr("r", 5)
             //Fills the circles according to jobtitle
             .attr("fill", function (d) {
-                var job_code = Jobtitles_list.indexOf(d.jobtitle);
-                return color_arr[job_code];
-            })
+               var job_code = Jobtitles_list.indexOf(d.jobtitle);
+               return color_arr[job_code];
+            });
 
         //Creates the text for ids
         var id_text = g.append("text")
-            .attr("x", function (d, i) {
-                circ_x(radius1, i);
-                return x_c;
+            .attr("transform", function(d, i) {
+                if ((angle = i * angleStep >  Math.PI * 0.5) && (angle = i * angleStep <  Math.PI * 1.5)) {
+                    var angle = angleStep * i * 180 / Math.PI - 180;
+                } else {
+                    var angle = angleStep * i * 180 / Math.PI;
+                }
+                return "translate(" + (320 + (radius + 6) * (Math.cos(((2 * Math.PI) / 149) * i))) + ", " + (500 + (radius + 6) * (Math.sin(((2 * Math.PI) / 149) * i))) + ") rotate(" + angle + ")"
             })
-            .attr("y", function (d, i) {
-                circ_y(radius1, i);
-                return y_c;
+            .attr("text-anchor", function(d, i) {
+                if ((angle = i * angleStep >  Math.PI * 0.5) && (angle = i * angleStep <  Math.PI * 1.5)) {
+                    return "end";
+                } else {
+                    return "start";
+                }
             })
             .attr("font-size", "10px")
-            .attr("text-anchor", "middle")
-            .text(function (d, i) { return d.id; })
-
+            .attr("dominant-baseline", "central")
+            .text(function (d, i) { return d.id; });
+            
         //Creates all group points
-        /*This for loops looks at where to put the groupwise meeting points for the edges.
-          The loop checks where the first and last person of each jobtitle is and calculates the middle and puts this in array group[]. */
-        for (p = 0; p < usableData.length; p++) {
-            if (p == 0) {
-                first_i = p;
-            }
-            else if (usableData[p].jobtitle != prev_title) {
-                group[i_g] = (first_i + p) / 2;
-                i_g++;
-            }
-            else if (p == usableData.length - 1) {
-                group[i_g] = (first_i + p) / 2;
-            }
-            else {
-                first_i = p;
-            }
-            prev_title = usableData[p].jobtitle;
-        }
-        console.log(group);
 
-        //Creates all edges (mail-traffic)
-        var edges = g.append("path")
-            .attr('d', function (d, i) {
-                //The x_2, y_2 coordinates are the coordinates where the edges join that come from same jobtitle
-                job_code2 = Jobtitles_list.indexOf(d.jobtitle)
-                circ_x(200, group[job_code2]);
-                circ_y(200, group[job_code2]);
-                x_2 = x_c;
-                y_2 = y_c;
-                //Fills array with the correct lines  
-                for (k = 0; k < d.mails.length; k++) {
-                    var goto_id = d.mails[k];
-                    var goto_index = unique_ids.indexOf(goto_id);
-                    //The x_1, y_1 coordinates are the coordinates of the recipient
-                    circ_x(300, i);
-                    circ_y(300, i);
-                    x_1 = x_c;
-                    y_1 = y_c;
-                    //The last coordinates are calculated for the sender
-                    circ_x(300, goto_index);
-                    circ_y(300, goto_index);
-                    mail_line[k] = d3.line().curve(d3.curveBundle.beta(0.85))([[x_1, y_1], [x_2, y_2], [x_c, y_c]]);
+        var jobGroupIndex = [];
+
+        Jobtitles_list.forEach(function(d){
+            startIndex = findIndex(usableData, d, "front");
+            endIndex = findIndex(usableData, d, "back");
+            jobGroupIndex.push([d, startIndex + ((endIndex - startIndex) / 2)]);
+        })
+
+        function findIndex(array, jobtitle, direction) {
+            if (direction == "front"){
+                for (i = 0; i < array.length; i++) {
+                    if (array[i]["jobtitle"] == jobtitle) {
+                        return i;
+                    }
                 }
-                return mail_line;
-            })
-            .attr("stroke", "url(#linear_gradient)")
-            .attr('fill', 'none')
-            .attr("stroke-width", 1)
-            .style("opacity", 0.3);
+            } else {
+                for (i = array.length - 1; i > 0; i--) {
+                    if (array[i]["jobtitle"] == jobtitle) {
+                        return i;
+                    }
+                }
+            }
+        }
 
-        //Testing logs
+        var colors = ["#4334eb", "#eb9834"];
+        var colorPicker = d3.scaleLinear().range(colors).domain([1, 2]);
+
+        var linearGradient = svg.append("defs")
+                                .append("linearGradient")
+                                .attr("id", "linear_gradient");
+
+                  linearGradient.append("stop")
+                                .attr("offset", "0%")
+                                .attr("stop-color", colorPicker(1));
+      
+                  linearGradient.append("stop")
+                                .attr("offset", "100%")
+                                .attr("stop-color", colorPicker(2));
+
+        var drawnEdges = [];
+
+        generateEdges();
+
+        function generateEdges() {
+
+        var edges = g.append("path")
+                     .attr("d", function(d,i) {
+
+            if (doAnimate == false) { 
+                for (k = 0; k < d.mails.length; k++) { 
+                    if ((d.mails[k]["date"] >= startDate) && (d.mails[k]["date"] <= endDate)) {
+                        var goto_id = d.mails[k]["from"];
+                        if (notDrawn(d["id"], goto_id)) {
+                            drawnEdges.push([d["id"], goto_id]);
+                            targetJob = findJobtitle(goto_id);
+                            x_source  = circ_x(radius, i);
+                            y_source = circ_y(radius, i);
+                            x_1 = circ_x(radius/2, findJobIndex(d["jobtitle"]));
+                            y_1 = circ_y(radius/2, findJobIndex(d["jobtitle"]));
+                            x_2 = circ_x(innerRadius, findJobIndex(d["jobtitle"]));
+                            y_2 = circ_y(innerRadius, findJobIndex(d["jobtitle"]));
+                            x_3 = circ_x(innerRadius, findJobIndex(targetJob));
+                            y_3 = circ_y(innerRadius, findJobIndex(targetJob));
+                            x_4 = circ_x(radius/2, findJobIndex(targetJob));
+                            y_4 = circ_y(radius/2, findJobIndex(targetJob));
+                            x_target = circ_x(radius, unique_ids.indexOf(goto_id));
+                            y_target = circ_y(radius, unique_ids.indexOf(goto_id));
+
+                            var coords = [{"xcoord": x_source, "ycoord": y_source},
+                                          {"xcoord": x_1, "ycoord": y_1},
+                                          {"xcoord": x_2, "ycoord": y_2},
+                                          {"xcoord": x_3, "ycoord": y_3},
+                                          {"xcoord": x_4, "ycoord": y_4},
+                                          {"xcoord": x_target, "ycoord": y_target}];
+
+                            var line = d3.line()
+                                         .x((c) => c.xcoord)
+                                         .y((c) => c.ycoord)
+                                         .curve(d3.curveBundle.beta(bundleStrength))
+
+                            return line(coords);
+                            
+                        } 
+                    }
+                }
+            } else {
+                for (k = 0; k < d.mails.length; k++) {
+                    if (d.mails[k]["date"] == curDate) {
+                        var goto_id = d.mails[k]["from"];
+                        if (notDrawn(d["id"], goto_id)) {
+                            drawnEdges.push([d["id"], goto_id]);
+                            targetJob = findJobtitle(goto_id);
+                            x_source  = circ_x(radius, i);
+                            y_source = circ_y(radius, i);
+                            x_1 = circ_x(radius/2, findJobIndex(d["jobtitle"]));
+                            y_1 = circ_y(radius/2, findJobIndex(d["jobtitle"]));
+                            x_2 = circ_x(innerRadius, findJobIndex(d["jobtitle"]));
+                            y_2 = circ_y(innerRadius, findJobIndex(d["jobtitle"]));
+                            x_3 = circ_x(innerRadius, findJobIndex(targetJob));
+                            y_3 = circ_y(innerRadius, findJobIndex(targetJob));
+                            x_4 = circ_x(radius/2, findJobIndex(targetJob));
+                            y_4 = circ_y(radius/2, findJobIndex(targetJob));
+                            x_target = circ_x(radius, unique_ids.indexOf(goto_id));
+                            y_target = circ_y(radius, unique_ids.indexOf(goto_id));
+
+                            var coords = [{"xcoord": x_source, "ycoord": y_source},
+                                          {"xcoord": x_1, "ycoord": y_1},
+                                          {"xcoord": x_2, "ycoord": y_2},
+                                          {"xcoord": x_3, "ycoord": y_3},
+                                          {"xcoord": x_4, "ycoord": y_4},
+                                          {"xcoord": x_target, "ycoord": y_target}];
+
+                            var line = d3.line()
+                                         .x((c) => c.xcoord)
+                                         .y((c) => c.ycoord)
+                                         .curve(d3.curveBundle.beta(bundleStrength))
+
+                            return line(coords);
+                        }
+                    }
+                }
+            }
+                    })
+                    .attr("id", "path")
+                    .attr("stroke", "url(#linear_gradient)")
+                    .attr("fill", "none")
+                    .attr("stroke-width", 1)
+                    .style("opacity", 0.75);
+
+            function findJobIndex(jobtitle) {
+                for (i = 0; i < jobGroupIndex.length; i++) {
+                    if (jobGroupIndex[i][0] == jobtitle){
+                        return jobGroupIndex[i][1];
+                    }
+                }
+            }
+
+            function findJobtitle(id) {
+                for (i = 0; i < usableData.length; i++) {
+                    if (usableData[i]["id"] == id){
+                        return usableData[i]["jobtitle"];
+                    }
+                }
+            }
+        
+            function notDrawn(from, to) {
+                for(i = 0; i < drawnEdges.length; i++) {
+                    if(drawnEdges[i][0] == from &&
+                       drawnEdges[i][1] == to) {
+                           return false;
+                       }
+                }
+                return true;
+            }
+
+            console.log(curDate);
+        }
+
+        togglePause.addEventListener("click", function() {
+            if (isPaused == false) {
+                isPaused = true;
+                pauseIcon.className = "fa fa-play";
+                togglePause.innerHTML = "Play";
+                clearTimeout(animTimer);
+            } else {
+                isPaused = false;
+                pauseIcon.className = "fa fa-pause";
+                togglePause.innerHTML = "Pause";
+                nextFrame();
+                console.log("test");
+            }
+        })
+
+        var animTimer;
+
+        if (doAnimate == true && isPaused == false) {
+            animTimer = setTimeout(function(){ nextFrame() }, frameTime);
+            animTimer;
+        }
+
+        function nextFrame() {
+            if (curDate != endDate && isPaused != true){ 
+                if (curDate % 100 < 12) {
+                    curDate++;
+                } else {
+                    curYear++;
+                    curDate = parseInt(curYear.toString() + "01", 10);
+                }
+
+                d3.selectAll("#path").remove();
+                generateEdges();
+
+                if (isPaused != true) {
+                    animTimer = setTimeout(function(){ nextFrame() }, frameTime);
+                }
+            }            
+        }
+
+            //Testing logs
         console.log(usableData);
         console.log(usableData.length);
         console.log(CEO_list2);
         console.log(Jobtitles_list);
     });
 
+}
 
-
-
-    //FUNCTIONS FOR HEB:
-    //FUNCTIONS FOR HEB:
-    //FUNCTIONS FOR HEB:
-
-    //Function for placement on HEB (X)
-    function circ_x(width, orientation) {
-        x_c = 320 + width * (Math.sin(((2 * Math.PI) / usableData.length) * orientation));
-    }
-
-    //Function for placement on HEB (Y)
-    function circ_y(width, orientation) {
-        y_c = 500 + width * (Math.cos(((2 * Math.PI) / usableData.length) * orientation));
-    }
-    //Function converting the date format to an integer
-    function dateFormat(date) {
-        return yearMonth = parseInt(date.replace(/-/, "").slice(0, -3), 10);
-    }
-
-};
