@@ -3,6 +3,8 @@ Daan van den Bogaard (1534173)
 Myrte van Ginkel (1566237)
 */
 
+//Git info: Branched from main after merging main with Sankey.
+
 var dataSet;
 var tooltip;
 var outOfBounds = false;
