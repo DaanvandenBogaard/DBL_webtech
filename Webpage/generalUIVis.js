@@ -40,6 +40,12 @@ function CreateVisField(fieldName){
 
 //A function handling the change of option for visualisations.
 function onChangeSelect(fieldName){
+    //Check if dataset is loaded (only works because this file is directely loaded into dbl_vis.php!!!)
+    if (localStorage.getItem('DataSet') == 'null') {
+        console.log("Please load a dataset first!");
+        return
+    }
+    
     //First clean html:
     d3.select("#" + fieldName).selectAll("svg").remove();
     d3.select("#" + fieldName).selectAll(".tooltip").remove();	
@@ -50,6 +56,16 @@ function onChangeSelect(fieldName){
     if (selectValue == "Sankey") {
         makeSankey(localStorage.getItem('DataSet') , fieldName);
     } 
+    else if (selectValue == "HEB") {
+        /*TO THOMAS&BAS: hier zetten wij jullie UI weg, wil je deze later weghalen uit het bestand, aanpassen, of iets aan toevoegen? Doe dat hier!
+        
+        Deze UI elementen worden in de "upperbar" gezet. Dit is een flex element wat bovenin de visualisation box zit.
+        (zie documentation over de general UI handling voor meer info) */
+        d3.select('#' + fieldName).select("#upperbar").html('<span> From (year-month) </span><input id="startYear" type="number" name="startYear" default=1998><input id="startMonth" type="number" name="startMonth" default=01><span> to (year-month) </span><input id="endYear" type="number" name="endYear" default=2002><input id="endMonth" type="number" name="endMonth" default=12><div><input id="animateToggle" type="checkbox"><label for="animateToggle"> animation </label><button id="startHEB" type="button" name="HEB" onclick="makeHEB(localStorage.getItem(' + "'DataSet'" + '))"> Start </button></div><button id="togglePause" type="button" name="togglePause"> Play </button><label for="togglePause" id="pauseIcon" class="fa fa-play"></label><div id="HEBFigure"> </div>');
+    }
+    else {
+        console.log('Sorry! We were unable to load the correct visualisation. Please submit this bug.');
+    }
 }
 
 function AddVisualisationBlock(){
