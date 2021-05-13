@@ -2,7 +2,7 @@
 Daan van den Bogaard (1534173)
 Myrte van Ginkel (1566237)
 */
-var sankey;
+
 var dataSet;
 var tooltip;
 var outOfBounds = false;
