@@ -3,8 +3,10 @@ Thomas Broers (1538705)
 Bas van Hoeflaken (1556282)
 */
 
-function makeHEB(dataPath) {
-
+//Datapath is the location of the user's dataset. 
+//fieldName is the name (id) of the visualisationBox the dataset is currently in.
+function makeHEB(dataPath , fieldName) {
+    console.log(fieldName);
     var startYear = document.getElementById("startYear");
     var startMonth = document.getElementById("startMonth");
     var endYear = document.getElementById("endYear");
@@ -73,10 +75,10 @@ function makeHEB(dataPath) {
     var bundleStrength = 0.90;
 
     //Delete previous object
-    d3.select("#HEBFigure").select("svg").remove();
+    d3.select("#" + fieldName).select("#HEBFigure").select("svg").remove();
 
     //Make svg object
-    let div = d3.select("#HEBFigure")
+    let div = d3.select("#" + fieldName).select("#HEBFigure")
         .attr("width", figureSize)
         .attr("height", figureSize);
     let svg = div.append("svg")
@@ -352,7 +354,7 @@ function makeHEB(dataPath) {
                     curDate = parseInt(curYear.toString() + "01", 10);
                 }
 
-                d3.selectAll("#path").remove();
+                d3.select("#" + fieldName).selectAll("#path").remove();
                 generateEdges();
 
                 if (isPaused != true) {
