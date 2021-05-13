@@ -18,7 +18,7 @@ function makeSankey(dataPath , fieldName) {
 
   var nodeWidthSankey = 80;
   let div = d3.select("#" + fieldName);
-  let sankeyDiv = div.select("#localBox").append("div").attr("id" , "sankeyID");
+  let sankeyDiv = div.append("div").attr("id" , "sankeyID");
   //retrieve width and height:
   console.log(parseFloat( div.style("height") ));
   //var height = parseFloat( d3.select("#pageContent").style("height") );
@@ -71,6 +71,7 @@ function makeSankey(dataPath , fieldName) {
 
   //From now on, we load the data:
   d3.csv(dataPath).then(function(data) {
+
     //Since d3.csv is asynchronous (it is not loaded immediatly, but it is a request to the webserver) we need all our code from the data in here. 
     //Now, we must define our link and node data. This will later be something the user can choose, but for now, we simply hardcode:
 

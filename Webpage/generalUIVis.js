@@ -8,9 +8,8 @@ var index = 0;
 function CreateVisField(fieldName){
 //Decide what type of visualisation the user wants to use (in this specific div). 
 	var vis = d3.select("#" + fieldName);
-	var innervis = vis.append("div")
-					  .attr("id" , "localBox");								
-	var upperbar = innervis.append("div")
+							
+	var upperbar = vis.append("div")
 						   .attr("class" , "upperVisBox")
 						   .attr("float" , "left")
 						   .attr("id" , "upperbar");
