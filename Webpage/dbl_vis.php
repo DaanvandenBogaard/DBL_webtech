@@ -7,6 +7,7 @@
 		<link rel="stylesheet" type="text/css" href="dbl.css" />
 		<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
 		<script src="https://d3js.org/d3.v6.min.js"></script>
+		<script src="https://d3js.org/d3-collection.v1.min.js"></script>
 		<script src="Webpagecode.js"></script>
 		<title> dbl/visualisation </title> 
 		<script src="D3Functions.js"></script>
@@ -51,7 +52,7 @@
 
 			<!--Upload/replace dataset: -->
 			<form action="upload.php" method="POST" enctype="multipart/form-data" >
-				<input id="file_input" type="file" name="dataset" accept=".csv" onchange="changeLabel()">
+				<input id="file_input" type="file" name="dataset" accept=".csv" onchange="changeFile()">
 				<label id="upload_button" for="file_input">
 					<i class="fa fa-upload" id="upload_icon" style="font-size: 20px;"></i>
 					Upload dataset
@@ -61,6 +62,7 @@
 			</form>
 		</div>
 			<!--Visualisation-->
+
 			<!-- Imports Sankey -->
 			<script src="https://unpkg.com/d3-array@1"></script>
 			<script src="https://unpkg.com/d3-collection@1"></script>
@@ -72,7 +74,10 @@
 			<script src="https://d3js.org/d3-selection.v2.min.js"></script>
 			<script src="https://d3js.org/d3-drag.v2.min.js"></script>
 			<script src= "SankeyDiagram.js"></script>
-
+			
+			<!-- HEB -->
+			<!-- Import HEB -->
+			<script src="HEB.js"></script>
 			
 			<script> 
 			//Handle upload button: 
@@ -81,8 +86,8 @@
 				uploadHTML.style("display" , "none");
 			}
 			</script>
-			
-			
+
+
 		</div>
 	</body>
 </html>

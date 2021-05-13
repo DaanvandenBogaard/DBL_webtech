@@ -281,3 +281,12 @@ button#submit_file {
 	height: 100%;
 	margin: 10px;
 }
+
+#HEBFigure {
+	font-family: var(--font);
+	font-size: 10pt;
+}
+
+.label {
+	padding-left: 4px;
+}
