@@ -75,6 +75,8 @@
 			</div>
 			<button id="togglePause" type="button" name="togglePause"> Play </button>
 			<label for="togglePause" id="pauseIcon" class="fa fa-play"></label>
+			<input id="strengthSlider" type="range" name="strengthSlider" min="0.00" max="1.00" value="0.85" step="0.05">
+			<label for="strengthSlider"> Bundle strength </label>
 			<div id="HEBFigure"> </div>
 		</div>
 	</body>

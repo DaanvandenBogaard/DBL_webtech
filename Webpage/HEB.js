@@ -18,6 +18,7 @@ function makeHEB(dataPath) {
     var animToggle = document.getElementById("animateToggle");
     var pauseIcon = document.getElementById("pauseIcon");
     var togglePause = document.getElementById("togglePause");
+    var strengthSlider = document.getElementById("strengthSlider");
 
     var endYearAdjust = false;
     var startDate = 0;
@@ -83,8 +84,9 @@ function makeHEB(dataPath) {
     let radius = diameter / 2;
     let innerRadius = radius / 10;
 
-    //Set the strength of the line curves
-    var bundleStrength = 0.90;
+    //Variables for lines
+    var bundleStrength = strengthSlider.value;
+    var lineOpacity = 0.6;
 
     //Delete previous object
     d3.select("#HEBFigure").select("svg").remove();
@@ -147,6 +149,9 @@ function makeHEB(dataPath) {
             .data(usableData)
             .enter()
             .append("g")
+            .attr("id", function(d) {
+                return "id" + d.id;
+            });
 
         var circle_clicked = false;
 
@@ -168,14 +173,22 @@ function makeHEB(dataPath) {
             if (!circle_clicked) {
                 d3.select(this)
                   .attr("", function (d) { line_class_sel = ".id" + d.id; });
+                //Change width color and opacity for incoming selected mails
                 d3.selectAll(line_class_sel)
-                  .attr("stroke-width", 5);
+                  .style("opacity", 1)
+                  .attr("stroke", "#eb4034")
+                  .attr("stroke-width", 2)
+                //Place selected paths on top of others
+                d3.select(this.parentNode).raise();
                 circle_clicked = true;
             }
             else{
                 d3.select(this)
                   .attr("", function (d) { line_class_sel = ".id" + d.id; });
+                //Reset previously selected paths to normal
                 d3.selectAll(line_class_sel)
+                  .style("opacity", lineOpacity)
+                  .attr("stroke", "url(#linearGradient)")
                   .attr("stroke-width", 1);
                 circle_clicked = false;
                 }            
@@ -187,10 +200,7 @@ function makeHEB(dataPath) {
                         for (p = 0; p < d.mails.length; p++) {
                             if ((doAnimate == false && (d.mails[p]["date"] >= startDate && d.mails[p]["date"] <= endDate)) ||
                                 (doAnimate == true && d.mails[p]["date"] == curDate)) {
-                                    var goto_id = d.mails[k]["from"];
-                                    if (notDrawn(d["id"], goto_id)) {
-                                        mails_amount++;
-                                    }
+                                    mails_amount++;
                             }
                         }
                         tooltip_string = d.id + " is a(n) " + d.jobtitle + " has recieved mails from " + mails_amount + " people in this period.";
@@ -313,6 +323,10 @@ function makeHEB(dataPath) {
                         x_target = circ_x(radius, unique_ids.indexOf(goto_id));
                         y_target = circ_y(radius, unique_ids.indexOf(goto_id));
 
+                        //Find coordinates of jobtitle group point if both have the same job
+                        x_s = circ_x(radius - 100, findJobIndex(d["jobtitle"]));
+                        y_s = circ_y(radius - 100, findJobIndex(d["jobtitle"]));
+
                         //Save coordinates in array
                         var coords = [{"xcoord": x_source, "ycoord": y_source},
                                       {"xcoord": x_1, "ycoord": y_1},
@@ -320,6 +334,10 @@ function makeHEB(dataPath) {
                                       {"xcoord": x_3, "ycoord": y_3},
                                       {"xcoord": x_4, "ycoord": y_4},
                                       {"xcoord": x_target, "ycoord": y_target}];
+                                    
+                        var shortCoords = [{"xcoord": x_source, "ycoord": y_source},
+                                           {"xcoord": x_s, "ycoord": y_s},
+                                           {"xcoord": x_target, "ycoord": y_target}];
 
                         //Make line with x and y mapped to the coordinates
                         var line = d3.line()
@@ -329,8 +347,11 @@ function makeHEB(dataPath) {
                                      .curve(d3.curveBundle.beta(bundleStrength));
 
                         //Add lines to array that gets added to the data of the <path> per node
-                        mail_lines.push(line(coords));
-                        
+                        if(d["jobtitle"] == targetJob) {
+                            mail_lines.push(line(shortCoords));
+                        } else {
+                            mail_lines.push(line(coords));
+                        }
                     } 
                 }
             }
@@ -343,8 +364,7 @@ function makeHEB(dataPath) {
                     .attr("stroke", "url(#linear_gradient)")
                     .attr("fill", "none")
                     .attr("stroke-width", 1)
-                    .style("opacity", 0.75)
-                    //Make line wide when selected
+                    .style("opacity", lineOpacity)
                     .attr("class", function (d) {
                         line_class = "id" + d.id;
                         return line_class;
@@ -366,6 +386,13 @@ function makeHEB(dataPath) {
                 //Draw next frame when unpaused
                 nextFrame();
             }
+        })
+
+        //Event handler that changes the bundlestrength when changed at slider
+        strengthSlider.addEventListener("input", function() {
+            bundleStrength = strengthSlider.value;
+            d3.selectAll("#path").remove();
+            generateEdges();
         })
 
         var animTimer;
@@ -403,7 +430,6 @@ function makeHEB(dataPath) {
         console.log(usableData);
         console.log(usableData.length);
         console.log(Jobtitles_list);
-        console.log(counter);
     });
 
 }
