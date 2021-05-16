@@ -10,71 +10,101 @@ var drawnEdges = [];
 
 function makeHEB(dataPath) {
 
+    //Make id
+    hebId = Math.floor(Math.random() * 100000);
+    console.log(hebId);
+
     //Link elements in dbl_vis.php to variables
-    var startYear = document.getElementById("startYear");
-    var startMonth = document.getElementById("startMonth");
-    var endYear = document.getElementById("endYear");
-    var endMonth = document.getElementById("endMonth");
-    var animToggle = document.getElementById("animateToggle");
-    var pauseIcon = document.getElementById("pauseIcon");
-    var togglePause = document.getElementById("togglePause");
-    var strengthSlider = document.getElementById("strengthSlider");
+    var startYear = d3.select("#startYear");
+    var startMonth = d3.select("#startMonth");
+    var endYear = d3.select("#endYear");
+    var endMonth = d3.select("#endMonth");
+    var animToggle = d3.select("#animateToggle");
+    var pauseIcon = d3.select("#pauseIcon");
+    var togglePause = d3.select("#togglePause");
+    var strengthSlider = d3.select("#strengthSlider");
+
+    /* Cheat sheet d3 inputs
+    //number input
+    var d3StartYear = d3.select("#startYear");
+    console.log(d3StartYear.property("value"));
+
+    //change number value
+    d3StartYear.property("value", 2000);
+    console.log(d3StartYear.property("value"));
+
+    //toggle input
+    var d3AnimToggle = d3.select("#animateToggle");
+    console.log(d3AnimToggle.property("checked"));
+
+    //button input
+    var d3TogglePause = d3.select("#togglePause");
+    d3TogglePause.on("click", function() {
+        console.log("Pause toggled");
+    });
+
+    var d3StrengthSlider = d3.select("#strengthSlider");
+    console.log(d3StrengthSlider.property("value"));
+    d3StrengthSlider.on("input", function(){
+        console.log(d3StrengthSlider.property("value"));
+    })
+    */
 
     var endYearAdjust = false;
     var startDate = 0;
     var endDate = 0;
 
-    var doAnimate = animToggle.checked;
+    var doAnimate = animToggle.property("checked");
     var isPaused = true;
     var frameTime = 1000;
 
     //Check if startYear is outside of allowed values
-    if(startYear.value < 1998) {
-        startYear.value = 1998;
-    } else if(startYear.value > 2002) {
-        startYear.value = 2002;
+    if(startYear.property("value") < 1998) {
+        startYear.property("value", 1998);
+    } else if(startYear.property("value") > 2002) {
+        startYear.property("value", 2002);
     } 
 
     //Check if startMonth is outside of allowed values
-    if(startMonth.value < 1) {
-        startMonth.value = 1;
-    } else if(startMonth.value > 12) {
-        startMonth.value = 12;
+    if(startMonth.property("value") < 1) {
+        startMonth.property("value", 1);
+    } else if(startMonth.property("value") > 12) {
+        startMonth.property("value", 12);
     }
 
     //If startMonth is 1-9 add 0 in front to match date format
-    if(startMonth.value.length == 1) {
-        startMonth.value = 0 + startMonth.value;
+    if(startMonth.property("value").length == 1) {
+        startMonth.property("value", 0 + startMonth.property("value"));
     }  
 
     //Check if endYear is outside of allowed values or below startYear
-    if(endYear.value < 1998) {
-        endYear.value = 1998;
-    } else if(endYear.value > 2002) {
-        endYear.value = 2002;
-    } else if(endYear.value < startYear.value){
-        endYear.value = startYear.value;
+    if(endYear.property("value") < 1998) {
+        endYear.property("value", 1998);
+    } else if(endYear.property("value") > 2002) {
+        endYear.property("value", 2002);
+    } else if(endYear.property("value") < startYear.property("value")){
+        endYear.property("value", startYear.property("value"));
         endYearAdjust = true;
     }
 
     //Check if endMonth is outside of allowed value or if endDate is before startDate
-    if(endMonth.value < 1) {
-        endMonth.value = 1;
-    } else if(endMonth.value > 12) {
-        endMonth.value = 12;
-    } else if((endYearAdjust == true || startYear.value == endYear.value) && endMonth.value < startMonth.value) {
-        endMonth.value = startMonth.value;
+    if(endMonth.property("value") < 1) {
+        endMonth.property("value", 1);
+    } else if(endMonth.property("value") > 12) {
+        endMonth.property("value", 12);
+    } else if((endYearAdjust == true || startYear.property("value") == endYear.property("value")) && endMonth.property("value") < startMonth.property("value")) {
+        endMonth.property("value", startMonth.property("value"));
     }
 
     //If endMonth is 1-9 add 0 in front to match date format
-    if(endMonth.value.length == 1) {
-        endMonth.value = 0 + endMonth.value;
+    if(endMonth.property("value").length == 1) {
+        endMonth.property("value", 0 + endMonth.property("value"));
     }
 
     //Set dates to right format and set curDate to startDate for start of animation
-    startDate = parseInt(startYear.value + startMonth.value);
-    endDate = parseInt(endYear.value + endMonth.value);
-    var curYear = parseInt(startYear.value);
+    startDate = parseInt(startYear.property("value") + startMonth.property("value"));
+    endDate = parseInt(endYear.property("value") + endMonth.property("value"));
+    var curYear = parseInt(startYear.property("value"));
     var curDate = startDate;
 
     //Set dimensions
@@ -85,7 +115,7 @@ function makeHEB(dataPath) {
     let innerRadius = radius / 10;
 
     //Variables for lines
-    var bundleStrength = strengthSlider.value;
+    var bundleStrength = strengthSlider.property("value");
     var lineOpacity = 0.6;
 
     //Delete previous object
@@ -188,7 +218,7 @@ function makeHEB(dataPath) {
                 //Reset previously selected paths to normal
                 d3.selectAll(line_class_sel)
                   .style("opacity", lineOpacity)
-                  .attr("stroke", "url(#linearGradient)")
+                  .attr("stroke", "url(#linear_gradient)")
                   .attr("stroke-width", 1);
                 circle_clicked = false;
                 }            
@@ -373,24 +403,24 @@ function makeHEB(dataPath) {
         }
 
         //Check if pausebutton has been clicked 
-        togglePause.addEventListener("click", function() {
+        togglePause.on("click", function() {
             if (isPaused == false) {
                 isPaused = true;
-                pauseIcon.className = "fa fa-play";
-                togglePause.innerHTML = "Play";
+                pauseIcon.attr("class", "fa fa-play");
+                togglePause.text("Play");
                 clearTimeout(animTimer);
             } else {
                 isPaused = false;
-                pauseIcon.className = "fa fa-pause";
-                togglePause.innerHTML = "Pause";
+                pauseIcon.attr("class", "fa fa-pause");
+                togglePause.text("Pause");
                 //Draw next frame when unpaused
                 nextFrame();
             }
         })
 
         //Event handler that changes the bundlestrength when changed at slider
-        strengthSlider.addEventListener("input", function() {
-            bundleStrength = strengthSlider.value;
+        strengthSlider.on("input", function() {
+            bundleStrength = strengthSlider.property("value");
             d3.selectAll("#path").remove();
             generateEdges();
         })
@@ -425,11 +455,6 @@ function makeHEB(dataPath) {
                 }
             }            
         }
-
-        //Testing logs
-        console.log(usableData);
-        console.log(usableData.length);
-        console.log(Jobtitles_list);
     });
 
 }
