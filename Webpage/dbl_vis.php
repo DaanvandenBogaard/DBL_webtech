@@ -61,6 +61,7 @@
 			<!--Visualisation-->
 			<script src="D3Functions.js"></script>
             <script src="SimulatedAnnealing.js"></script>
+			<script src="MSVMethods.js"></script>
 			<script src="MSV.js"></script>
 			<script> 
 			if (localStorage.getItem('DataSet') != null) {
