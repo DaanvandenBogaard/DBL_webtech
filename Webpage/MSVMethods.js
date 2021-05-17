@@ -127,6 +127,7 @@ Returns:
     The average x position of the node v
 */
 function calcAverageXPos(v, data){
+    //select edges that v goes to and goes from and combine them
     let edgesFrom = data.filter(x => x.fromId === v);
     let edgesTo = data.filter(x => x.toId === v);
     let E_v = edgesFrom.concat(edgesTo);
@@ -136,6 +137,7 @@ function calcAverageXPos(v, data){
         edgeSum += E_v[i].time / data.length;
     }
 
+    //calculate mean as described in paper
     let meanX = (1 / E_v.length) * edgeSum;
 
     return meanX;
@@ -199,25 +201,29 @@ Returns:
 function blockColouring(data, IDS, blockNumber){
     let colouring = new Array(data.length).fill();
     var messageCount = new Array();
-    var arrayBlocks = [];
-    var numberOfBlocks = blockNumber; 
+    var arrayBlocks = new Array();
 
     for(let i = 0; i < data.length; i++){
+        //if there does not exist an element for this nodeset yet create one and add data[i] (edge) to the edgeset of these nodes
         if(!messageCount.some(row => row.includes(IDS[data[i].fromId] + '' + IDS[data[i].toId]))){
             messageCount[messageCount.length] = [IDS[data[i].fromId] + '' + IDS[data[i].toId], [data[i]]];
         }
         else {
+            //add data[i] (edge) to corresponding edgeset
             let messageArr = messageCount[messageCount.findIndex(row => row.includes(IDS[data[i].fromId] + '' + IDS[data[i].toId]))];
             messageArr[messageArr.length] = data[i];
         }
     }
 
+    //create array containing the edgeset and the edgesets length
     for(let i = 0; i < messageCount.length; i++){
         arrayBlocks[arrayBlocks.length] =  [messageCount[i], messageCount[i].length];
     }
+    //sort array decreasingly on the edgeset length
     arrayBlocks.sort(function(a, b){return b[1] - a[1]});
 
-    for (let i = 0; i < numberOfBlocks; i++) {
+    //for the desired number of edgesets, give the edges in the sets a colour corresponding to the edgeset
+    for (let i = 0; i < blockNumber; i++) {
         let stringColor = arrayBlocks[i][0];
         let color = getColor(parseInt(stringColor));
         for (let j = 0; j < arrayBlocks[i][1]; j++) {
@@ -229,6 +235,7 @@ function blockColouring(data, IDS, blockNumber){
     return colouring;
 }
 
+//Daan's colour function
 function getColor(node) {
     //Choose a color scale:
     var hash = 0;
@@ -248,14 +255,5 @@ function getColor(node) {
         color += ('00' + value.toString(16)).substr(-2);
     }   
 
-    console.log(color)
     return color;
-}
-
-function arraySize(array){
-    let i = 0;
-    for(e in array){
-        i++;
-    }
-    return i;
 }

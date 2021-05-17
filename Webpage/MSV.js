@@ -1,5 +1,5 @@
 /*AUTHORS:
-Quinten van Eijsden (1529609), Mike van den Anker (156559)
+Quinten van Eijsden (1529609), Mike van den Anker (1565559)
 
 makeMSV: Creates an MSV visualization in the #MSVID division
 Parameters:
@@ -15,8 +15,10 @@ function makeMSV(dataPath, fieldName) {
     let textpadding = 10;
     var nodeWidthMSV = 80;
     var monthToTime = [0, 31, 59, 90, 120, 151, 181, 212, 243, 273, 304, 334];
-
-    let div = d3.select("#MSVID")
+    fieldName = '#' + fieldName;
+    let div = d3.select(fieldName)
+              .append("div")
+              .attr("id", "MSVID")
               .attr("width" , width)
               .attr("height" , height);
     let svg = div.append("svg")
@@ -26,7 +28,7 @@ function makeMSV(dataPath, fieldName) {
                .attr("width" , width)
                .attr("height", height)
                .attr("transform" , "translate(" + margin.left  + "," + margin.top +")");
-
+    
     //This loads the data, make sure to only use the data in this section:
     d3.csv(dataPath).then(function(data) {
         //Since d3.csv is asynchronous (it is not loaded immediatly, but it is a request to the webserver) we need all our code from the data in here. 
@@ -67,11 +69,11 @@ function makeMSV(dataPath, fieldName) {
         let currentColouring = colouring;
 
         //select the type of MSV and colouring 
-        selectType(data, IDS, colouring, currentIDS, currentColouring);
-        selectColor(data, colouring, IDS, currentIDS, currentColouring);
+        selectType(data, IDS, colouring, currentIDS, currentColouring, fieldName);
+        selectColor(data, colouring, IDS, currentIDS, currentColouring, fieldName);
 
         //Draw edges
-        drawEdges(data, IDS,  colouring);
+        drawEdges(data, IDS,  colouring, fieldName);
     }); 
 }
 
@@ -79,25 +81,26 @@ function makeMSV(dataPath, fieldName) {
 Parameters:
    data: data object of the edges
    IDS: sequential list of node appearance
+   colouring: Array containing the colour of the edge corresponding to the index of the data
+   fieldName: class tag of the field the current visualization is in
 Returns:
    None  
 */
-function drawEdges(data, IDS, colouring){
+function drawEdges(data, IDS, colouring, fieldName){
     const max = d3.max(data, function(d) { return +d.value; });
-    let lines = d3.select("#MSVID")
+    let lines = d3.select(fieldName).select("#MSVID")
                   .select("svg")
                   .append("g");
-    console.log(colouring)
 
     //go to function for drawing gradient
     if(colouring[0] === "fromTo"){
-        colourLines(data, lines, IDS)
+        colourLines(data, IDS, fieldName);
     }
 
-    //draw edges and add nice animation if data set is small enough
+    //draw edges and add nice animation if data set is small enough, else draw it without the animation
     if(data.length < 3500){              
         for(let i = 0; i < data.length; i++) {
-        let line =    lines.append('line')
+        lines.append('line')
             .style("stroke",  colouring[i])
             .style("stroke-width", 1)
             .attr("x1", data[i].time )
@@ -106,7 +109,6 @@ function drawEdges(data, IDS, colouring){
             .transition()
             .duration(2000)
             .attr("y2", IDS[data[i].toId])
-            .style("z-index", "2")
         }
     }
     else{
@@ -124,21 +126,26 @@ function drawEdges(data, IDS, colouring){
 
 /*selectType: Creates a selector and adds options for selecting the type of MSV
 Parameters:
-    The dataset, the basic array colourings, the basic list of IDS, the list of current IDS, the array of the current colourings
+    data: The dataset
+    IDS: The standard sequential list of node appearance
+    colouring: The standard array containing the colour of the edge corresponding to the index of the data, containing all blue edges
+    currentIDS: The current sequential list of node appearance
+    currentColouring: The current array containing the colour of the edge corresponding to the index of the data
+    fieldName: class tag of the field the current visualization is in
 Returns:
     None
 */
-function selectType(data, IDS, colouring, currentIDS, currentColouring){
+function selectType(data, IDS, colouring, currentIDS, currentColouring, fieldName){
     var types = ["Standard", "Degree", "In-degree", "Out-degree", "Activity"]
 
-    let select = d3.select("#MSVID")
+    let select = d3.select(fieldName).select("#MSVID")
             .append("select")
             .attr('class', 'select')
             .attr('float', 'left')
             .on("change", function(d){
                 let selected = d3.select(this).property("value")
-                let selectedColouring = d3.select("#MSVID").select(".selectColor").property("value")
-                updateType(selected, selectedColouring, data, IDS, colouring, currentIDS, currentColouring)
+                let selectedColouring = d3.select(fieldName).select("#MSVID").select(".selectColor").property("value")
+                updateType(selected, selectedColouring, data, IDS, colouring, currentIDS, currentColouring, fieldName)
             });
 
     let options = select
@@ -151,23 +158,28 @@ function selectType(data, IDS, colouring, currentIDS, currentColouring){
         
 }
 
-/*selectColor: Creates a selector and adds options for selecting the type of MSV
+/*selectColor: Creates a selector and adds options for selecting the type of colouring
 Parameters:
-   The dataset, the basic array colourings, the basic list of IDS, the list of current IDS, the array of the current colourings
+    data: The dataset
+    IDS: The standard sequential list of node appearance
+    colouring: The standard array containing the colour of the edge corresponding to the index of the data, containing all blue edges
+    currentIDS: The current sequential list of node appearance
+    currentColouring: The current array containing the colour of the edge corresponding to the index of the data
+    fieldName: class tag of the field the current visualization is in
 Returns:
     None
 */
-function selectColor(data, colouring, IDS, currentIDS, currentColouring){
+function selectColor(data, colouring, IDS, currentIDS, currentColouring, fieldName){
     var types = ['None', 'From-To', 'Length', 'Sentiment', 'Blocks']
 
-    let selectColor = d3.select("#MSVID")
+    let selectColor = d3.select(fieldName).select("#MSVID")
             .append("select")
             .attr('class', 'selectColor')
             .attr('float', 'left')
             .on("change", function(d){
                 let selectedColouring = d3.select(this).property("value")
-                let selected = d3.select("#MSVID").select(".select").property("value")
-                updateType(selected, selectedColouring, data, IDS, colouring, currentIDS, currentColouring)
+                let selected = d3.select(fieldName).select("#MSVID").select(".select").property("value")
+                updateType(selected, selectedColouring, data, IDS, colouring, currentIDS, currentColouring, fieldName)
             })
 
     let optionsColor = selectColor
@@ -182,16 +194,23 @@ function selectColor(data, colouring, IDS, currentIDS, currentColouring){
 
 /*selectType: Updates the type of MSV after selecting an option on the selector
 Parameters:
-    The currently selected type, the currently selected colouring, the dataset, the basic array colourings, the basic list of IDS, the list of current IDS, the array of the current colourings
+    selected: String of the currently selected type of MSV
+    selectedColouring: String of the currently selected type of colouring
+    data: The dataset
+    IDS: The standard sequential list of node appearance
+    colouring: The standard array containing the colour of the edge corresponding to the index of the data, containing all blue edges
+    currentIDS: The current sequential list of node appearance
+    currentColouring: The current array containing the colour of the edge corresponding to the index of the data
+    fieldName: class tag of the field the current visualization is in
 Returns:
     None
 */
-function updateType(selected, selectedColouring, data, IDS, colouring, currentIDS, currentColouring){   
+function updateType(selected, selectedColouring, data, IDS, colouring, currentIDS, currentColouring, fieldName){   
     //If there already is an input for blockcolouring, store its value and remove it. Otherwise set the val to the min of 5 and IDS.lenght /2.  
     let val =  Math.min(5, IDS.length / 2);
-    if(document.querySelectorAll('#MSVID .blockInput').length == 1){
-        val = d3.select("#MSVID").select(".blockInput").property("value");
-        d3.select("#MSVID").select("input").remove();
+    if(document.querySelectorAll(fieldName + ' #MSVID .blockInput').length == 1){
+        val = d3.select(fieldName).select("#MSVID").select(".blockInput").property("value");
+        d3.select(fieldName).select("#MSVID").select("input").remove();
     }
 
     //select the right type of MSV
@@ -223,36 +242,41 @@ function updateType(selected, selectedColouring, data, IDS, colouring, currentID
     }
     else if(selectedColouring === "Blocks"){
         //create new input
-        createBlockBox(data, currentIDS, currentColouring, val);
-        currentColouring = blockColouring(data, currentIDS, d3.select("#MSVID").select(".blockInput").property("value"));
+        createBlockBox(data, currentIDS, currentColouring, val, fieldName);
+        currentColouring = blockColouring(data, currentIDS, d3.select(fieldName).select("#MSVID").select(".blockInput").property("value"));
     } 
     else {
         currentColouring = colouring;
     }
 
     //clear MSV
-    d3.select("#MSVID").select("svg").selectAll("g").remove();
+    d3.select(fieldName).select("#MSVID").select("svg").selectAll("g").remove();
+    d3.select(fieldName).select("#MSVID").select("svg").selectAll("defs").remove();
 
     //draw new MSV
-    drawEdges(data, currentIDS, currentColouring);
+    drawEdges(data, currentIDS, currentColouring, fieldName);
 }
 
 
-//this is a very ugly function that makes the gradient for the from-to colouring
-function colourLines(data, lines, IDS) {
+/*selectType: Updates the type of colouring after selecting an option on the selector
+Parameters:
+    data: The dataset
+    IDS: The standard sequential list of node appearance
+    fieldName: class tag of the field the current visualization is in
+Returns:
+    None
+*/
+function colourLines(data, IDS, fieldName) {
+    let svg = d3.select(fieldName).select("#MSVID").select("svg");
+    
+    //draw the edges with gradient, add animation if datasetis small enough
     if(data.length < 3500) {              
         for(let i = 0; i < data.length; i++) {
-        
+            
+            //look whether the edge needs to be from-to or to-from and colour/draw accordingly
             if(IDS[data[i].fromId] < IDS[data[i].toId]) {
-                
-                lines.append('svg')
-                .attr("id", "line" + i + "") 
-                .attr("x1", data[i].time )
-                .attr("y1", IDS[data[i].fromId] )
-                .attr("x2", data[i].time )
-                .attr("y2", IDS[data[i].toId])
-
-                let line = lines.select('#line' + i + '')
+        
+                let line =  svg
                     .append("defs").append("linearGradient")
                     .attr("id", "grad" + i + "")
                     .attr("gradientUnits", "userSpaceOnUse")
@@ -271,7 +295,7 @@ function colourLines(data, lines, IDS) {
                     .style("stop-color", "rgb(0, 0, 255)")
                     .style("stop-opacity", 1)
             
-                lines.select('#line' + i + "").append("line")
+                    svg.select("g").append("line")
                     .attr("stroke", "url(#grad" + i + ")")
                     .style("stroke-width", 1)
                     .attr("x1", data[i].time )
@@ -283,15 +307,8 @@ function colourLines(data, lines, IDS) {
 
             } 
             else {
-                
-                lines.append('svg')
-                .attr("id", "line" + i + "") 
-                .attr("x1", data[i].time )
-                .attr("y1", IDS[data[i].toId] )
-                .attr("x2", data[i].time )
-                .attr("y2", IDS[data[i].fromId])
 
-                let line = lines.select('#line' + i + '')
+                let line =  svg
                     .append("defs").append("linearGradient")
                     .attr("id", "grad" + i + "")
                     .attr("gradientUnits", "userSpaceOnUse")
@@ -310,7 +327,7 @@ function colourLines(data, lines, IDS) {
                     .style("stop-color", "rgb(255, 140, 0)")
                     .style("stop-opacity", 1)
             
-                lines.select('#line' + i + "").append("line")
+                svg.select("g").append("line")
                     .attr("stroke", "url(#grad" + i + ")")
                     .style("stroke-width", 1)
                     .attr("x1", data[i].time )
@@ -323,18 +340,10 @@ function colourLines(data, lines, IDS) {
         }
     }
     else{
-        for(let i = 0; i < data.length; i++) {
-        
+        for(let i = 0; i < data.length; i++) {  
             if(IDS[data[i].fromId] < IDS[data[i].toId]) {
-                
-                lines.append('svg')
-                .attr("id", "line" + i + "") 
-                .attr("x1", data[i].time )
-                .attr("y1", IDS[data[i].fromId] )
-                .attr("x2", data[i].time )
-                .attr("y2", IDS[data[i].toId])
 
-                let line = lines.select('#line' + i + '')
+                let line = svg
                     .append("defs").append("linearGradient")
                     .attr("id", "grad" + i + "")
                     .attr("gradientUnits", "userSpaceOnUse")
@@ -353,7 +362,7 @@ function colourLines(data, lines, IDS) {
                     .style("stop-color", "rgb(0, 0, 255)")
                     .style("stop-opacity", 1)
             
-                lines.select('#line' + i + "").append("line")
+                svg.select("g").append("line")
                     .attr("stroke", "url(#grad" + i + ")")
                     .style("stroke-width", 1)
                     .attr("x1", data[i].time )
@@ -363,15 +372,8 @@ function colourLines(data, lines, IDS) {
 
             } 
             else {
-                
-                lines.append('svg')
-                .attr("id", "line" + i + "") 
-                .attr("x1", data[i].time )
-                .attr("y1", IDS[data[i].toId] )
-                .attr("x2", data[i].time )
-                .attr("y2", IDS[data[i].fromId])
 
-                let line = lines.select('#line' + i + '')
+                let line = svg
                     .append("defs").append("linearGradient")
                     .attr("id", "grad" + i + "")
                     .attr("gradientUnits", "userSpaceOnUse")
@@ -390,7 +392,7 @@ function colourLines(data, lines, IDS) {
                     .style("stop-color", "rgb(255, 140, 0)")
                     .style("stop-opacity", 1)
             
-                lines.select('#line' + i + "").append("line")
+                svg.select("g").append("line")
                     .attr("stroke", "url(#grad" + i + ")")
                     .style("stroke-width", 1)
                     .attr("x1", data[i].time )
@@ -404,22 +406,41 @@ function colourLines(data, lines, IDS) {
 
 /*createBlockBox: Creates input box for block colouring
 Parameters:
-   data object, list of current IDS, the current colouring and the value the box initially contains
+    data: The dataset
+    currentIDS: The current sequential list of node appearance
+    currentColouring: The current array containing the colour of the edge corresponding to the index of the data
+    val = the value the inputbox should contain initially
+    fieldName: class tag of the field the current visualization is in
 Returns:
    None
 */
-function createBlockBox( data, currentIDS, currentColouring, val){
-    console.log('help')
-    d3.select("#MSVID")
+function createBlockBox( data, currentIDS, currentColouring, val, fieldName){
+    d3.select(fieldName).select("#MSVID")
             .append("input")
             .attr('type', 'number')
+            .attr('min', "" + 1)
+            .attr('max', "" + currentIDS.length)
             .attr('class', 'blockInput')
             .attr('float', 'left')
             .attr('value', val)
             .on("change", function(d){ 
-                currentColouring = blockColouring(data, currentIDS, d3.select("#MSVID").select(".blockInput").property("value"));
-                d3.select("#MSVID").select("svg").selectAll("g").remove();
-                drawEdges(data, currentIDS, currentColouring);
+                let newVal = 5;
+                //handle min, max
+                if(d3.select(fieldName).select("#MSVID").select(".blockInput").property("value") <= 0){
+                    newVal = 1;
+                }
+                else if(d3.select(fieldName).select("#MSVID").select(".blockInput").property("value") > currentIDS.length){
+                    newVal = currentIDS.length -1;
+                } 
+                else{
+                    newVal = d3.select(fieldName).select("#MSVID").select(".blockInput").property("value");
+                }
+                //update colouring
+                currentColouring = blockColouring(data, currentIDS, newVal);
+                //remove old edges
+                d3.select(fieldName).select("#MSVID").select("svg").selectAll("g").remove();
+                //draw new edges
+                drawEdges(data, currentIDS, currentColouring, fieldName);
             });
 }
 
