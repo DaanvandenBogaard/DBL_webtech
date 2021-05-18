@@ -56,10 +56,11 @@
 				<button id="submit_file" type="submit" name="submit"> Submit </button>
 			</form>
 
-
+            <div id = "vis0" height = "800" style = "display: inline-block;"></div>
 
 			<!--Visualisation-->
 			<script src="D3Functions.js"></script>
+            <!--<script src="SimulatedAnnealing.js"></script>-->
 			<script src="MSVMethods.js"></script>
 			<script src="MSV.js"></script>
 			<script> 

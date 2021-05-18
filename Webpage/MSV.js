@@ -11,7 +11,7 @@ function makeMSV(dataPath, fieldName) {
     //We start by making the SVG element.
     let margin = {top : 15, right : 10, bottom: 15, left: 10} //For now, hardcoded margins 
     let width = 1500; //for now, hardcoded width
-    let height = 800; //for now, hardcoded height
+    let height = 200; //for now, hardcoded height
     let textpadding = 10;
     var nodeWidthMSV = 80;
     var monthToTime = [0, 31, 59, 90, 120, 151, 181, 212, 243, 273, 304, 334];
@@ -21,6 +21,7 @@ function makeMSV(dataPath, fieldName) {
               .attr("id", "MSVID")
               .attr("width" , width)
               .attr("height" , height);
+    let upperBar = div.append("div").attr("id", "upperVisBox").attr("float", "left")
     let svg = div.append("svg")
                .attr("width" , width)
                .attr("height", height);
@@ -74,6 +75,7 @@ function makeMSV(dataPath, fieldName) {
 
         //Draw edges
         drawEdges(data, IDS,  colouring, fieldName);
+        addLegend(currentColouring, fieldName);
     }); 
 }
 
@@ -95,31 +97,32 @@ function drawEdges(data, IDS, colouring, fieldName){
     //go to function for drawing gradient
     if(colouring[0] === "fromTo"){
         colourLines(data, IDS, fieldName);
-    }
+    } else {
 
-    //draw edges and add nice animation if data set is small enough, else draw it without the animation
-    if(data.length < 3500){              
-        for(let i = 0; i < data.length; i++) {
-        lines.append('line')
-            .style("stroke",  colouring[i])
-            .style("stroke-width", 1)
-            .attr("x1", data[i].time )
-            .attr("y1", IDS[data[i].fromId] )
-            .attr("x2", data[i].time )
-            .transition()
-            .duration(2000)
-            .attr("y2", IDS[data[i].toId])
-        }
-    }
-    else{
-        for(let i = 0; i < data.length; i++) {
+        //draw edges and add nice animation if data set is small enough, else draw it without the animation
+        if(data.length < 3500){              
+            for(let i = 0; i < data.length; i++) {
             lines.append('line')
-            .style("stroke",  colouring[i])
-            .style("stroke-width", 1)
-            .attr("x1", data[i].time )
-            .attr("y1", IDS[data[i].fromId] )
-            .attr("x2", data[i].time )
-            .attr("y2", IDS[data[i].toId])
+                .style("stroke",  colouring[i])
+                .style("stroke-width", 1)
+                .attr("x1", data[i].time )
+                .attr("y1", IDS[data[i].fromId] )
+                .attr("x2", data[i].time )
+                .transition()
+                .duration(2000)
+                .attr("y2", IDS[data[i].toId])
+            }
+        }
+        else{
+            for(let i = 0; i < data.length; i++) {
+                lines.append('line')
+                .style("stroke",  colouring[i])
+                .style("stroke-width", 1)
+                .attr("x1", data[i].time )
+                .attr("y1", IDS[data[i].fromId] )
+                .attr("x2", data[i].time )
+                .attr("y2", IDS[data[i].toId])
+            }
         }
     }
 }
@@ -138,7 +141,7 @@ Returns:
 function selectType(data, IDS, colouring, currentIDS, currentColouring, fieldName){
     var types = ["Standard", "Degree", "In-degree", "Out-degree", "Activity"]
 
-    let select = d3.select(fieldName).select("#MSVID")
+    let select = d3.select(fieldName).select("#MSVID").select("#upperVisBox")
             .append("select")
             .attr('class', 'select')
             .attr('float', 'left')
@@ -172,7 +175,7 @@ Returns:
 function selectColor(data, colouring, IDS, currentIDS, currentColouring, fieldName){
     var types = ['None', 'From-To', 'Length', 'Sentiment', 'Blocks']
 
-    let selectColor = d3.select(fieldName).select("#MSVID")
+    let selectColor = d3.select(fieldName).select("#MSVID").select("#upperVisBox")
             .append("select")
             .attr('class', 'selectColor')
             .attr('float', 'left')
@@ -252,9 +255,11 @@ function updateType(selected, selectedColouring, data, IDS, colouring, currentID
     //clear MSV
     d3.select(fieldName).select("#MSVID").select("svg").selectAll("g").remove();
     d3.select(fieldName).select("#MSVID").select("svg").selectAll("defs").remove();
+    d3.select(fieldName).select("#MSVID").select("svg").selectAll("svg").remove();
 
     //draw new MSV
     drawEdges(data, currentIDS, currentColouring, fieldName);
+    addLegend(currentColouring);
 }
 
 
@@ -268,22 +273,22 @@ Returns:
 */
 function colourLines(data, IDS, fieldName) {
     let svg = d3.select(fieldName).select("#MSVID").select("svg");
-    
+    let svgHeight = parseInt(d3.select(fieldName).select("#MSVID").select("svg").style("height"));
     //draw the edges with gradient, add animation if datasetis small enough
     if(data.length < 3500) {              
         for(let i = 0; i < data.length; i++) {
             
             //look whether the edge needs to be from-to or to-from and colour/draw accordingly
             if(IDS[data[i].fromId] < IDS[data[i].toId]) {
-        
+                
                 let line =  svg
                     .append("defs").append("linearGradient")
                     .attr("id", "grad" + i + "")
                     .attr("gradientUnits", "userSpaceOnUse")
                     .attr("x1", "0%")
-                    .attr("y1", "" + IDS[data[i].fromId] / 800 * 100 + "%" )
+                    .attr("y1", "" + IDS[data[i].fromId] / svgHeight * 100 + "%" )
                     .attr("x2", "0%" )
-                    .attr("y2", "" + IDS[data[i].toId] / 800 * 100 + "%");
+                    .attr("y2", "" + IDS[data[i].toId] / svgHeight * 100 + "%");
 
                 line.append("stop")
                     .attr("offset", "0%")
@@ -295,7 +300,7 @@ function colourLines(data, IDS, fieldName) {
                     .style("stop-color", "rgb(0, 0, 255)")
                     .style("stop-opacity", 1)
             
-                    svg.select("g").append("line")
+                svg.select("g").append("line")
                     .attr("stroke", "url(#grad" + i + ")")
                     .style("stroke-width", 1)
                     .attr("x1", data[i].time )
@@ -313,9 +318,9 @@ function colourLines(data, IDS, fieldName) {
                     .attr("id", "grad" + i + "")
                     .attr("gradientUnits", "userSpaceOnUse")
                     .attr("x1", "0%")
-                    .attr("y1", "" + IDS[data[i].toId] / 800 * 100 + "%" )
+                    .attr("y1", "" + IDS[data[i].toId] / svgHeight * 100 + "%" )
                     .attr("x2", "0%" )
-                    .attr("y2", "" + IDS[data[i].fromId] / 800 * 100 + "%");
+                    .attr("y2", "" + IDS[data[i].fromId] / svgHeight * 100 + "%");
 
                 line.append("stop")
                     .attr("offset", "0%")
@@ -340,17 +345,19 @@ function colourLines(data, IDS, fieldName) {
         }
     }
     else{
-        for(let i = 0; i < data.length; i++) {  
+        for(let i = 0; i < data.length; i++) {
+            
+            //look whether the edge needs to be from-to or to-from and colour/draw accordingly
             if(IDS[data[i].fromId] < IDS[data[i].toId]) {
-
-                let line = svg
+                
+                let line =  svg
                     .append("defs").append("linearGradient")
                     .attr("id", "grad" + i + "")
                     .attr("gradientUnits", "userSpaceOnUse")
                     .attr("x1", "0%")
-                    .attr("y1", "" + IDS[data[i].fromId] / 800 * 100 + "%" )
+                    .attr("y1", "" + IDS[data[i].fromId] / svgHeight * 100 + "%" )
                     .attr("x2", "0%" )
-                    .attr("y2", "" + IDS[data[i].toId] / 800 * 100 + "%");
+                    .attr("y2", "" + IDS[data[i].toId] / svgHeight * 100 + "%");
 
                 line.append("stop")
                     .attr("offset", "0%")
@@ -373,14 +380,14 @@ function colourLines(data, IDS, fieldName) {
             } 
             else {
 
-                let line = svg
+                let line =  svg
                     .append("defs").append("linearGradient")
                     .attr("id", "grad" + i + "")
                     .attr("gradientUnits", "userSpaceOnUse")
                     .attr("x1", "0%")
-                    .attr("y1", "" + IDS[data[i].toId] / 800 * 100 + "%" )
+                    .attr("y1", "" + IDS[data[i].toId] / svgHeight * 100 + "%" )
                     .attr("x2", "0%" )
-                    .attr("y2", "" + IDS[data[i].fromId] / 800 * 100 + "%");
+                    .attr("y2", "" + IDS[data[i].fromId] / svgHeight * 100 + "%");
 
                 line.append("stop")
                     .attr("offset", "0%")
@@ -415,7 +422,7 @@ Returns:
    None
 */
 function createBlockBox( data, currentIDS, currentColouring, val, fieldName){
-    d3.select(fieldName).select("#MSVID")
+    d3.select(fieldName).select("#MSVID").select("#upperVisBox")
             .append("input")
             .attr('type', 'number')
             .attr('min', "" + 1)
@@ -426,7 +433,7 @@ function createBlockBox( data, currentIDS, currentColouring, val, fieldName){
             .on("change", function(d){ 
                 let newVal = 5;
                 //handle min, max
-                if(d3.select(fieldName).select("#MSVID").select(".blockInput").property("value") <= 0){
+                if(d3.select(fieldName).select("#MSVID").select(".blockInput").property("value") < 1){
                     newVal = 1;
                 }
                 else if(d3.select(fieldName).select("#MSVID").select(".blockInput").property("value") > currentIDS.length){
@@ -441,7 +448,44 @@ function createBlockBox( data, currentIDS, currentColouring, val, fieldName){
                 d3.select(fieldName).select("#MSVID").select("svg").selectAll("g").remove();
                 //draw new edges
                 drawEdges(data, currentIDS, currentColouring, fieldName);
+            })
+            .on("keyup", function(d){
+                if(parseInt(this.value) > parseInt(currentIDS.length) - 1){ this.value =currentIDS.length - 1; }
+                if(parseInt(this.value) < 1){ this.value =1;}
             });
+}
+
+function addLegend(currentColouring, fieldName){
+    d3.select(fieldName).select("#MSVID").select("#upperVisBox")
+            .append("input")
+            .attr('type', 'checkbox')
+            .on("change", function(d){ 
+                if(d3.select(this).property("checked")){
+					createLegend(currentColouring, fieldName);
+				} else {
+                    d3.select(fieldName).select("#legend").remove();
+				}	
+            })
+}
+
+function createLegend(currentColouring, fieldName){
+    let type = d3.select(fieldName).select('#MSVID').select(".selectColor").property("value");
+
+    if(type === "From-To"){
+        standardLegend(type, fieldName);
+    }
+    else if(type === "Length"){
+        standardLegend(type, fieldName);
+    }
+    else if(type === "Sentiment"){
+        standardLegend(type, fieldName);
+    }
+    else if(type === "Blocks"){
+        blockLegend(currentColouring, fieldName);
+    } 
+    else {
+        // ???????????????
+    }
 }
 
 /*findMinMax: Find maximum and minimum

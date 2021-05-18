@@ -257,3 +257,32 @@ function getColor(node) {
 
     return color;
 }
+
+function standardLegend(type, fieldName){
+    let mainSVG = d3.select(fieldName).select("#MSVID");
+    let legendSVG = mainSVG.append("svg")
+        .attr("id", "legend")
+
+    let LG = legendSVG.append("defs").append("linearGradient")
+        .attr("id", "myGradient")
+        
+        LG.append("stop")
+            .attr("offset", "0%")
+            .style("stop-color", "rgb(255, 140, 0)")
+            .style("stop-opacity", 1)
+                
+        LG.append("stop")
+            .attr("offset", "100%")
+            .style("stop-color", "rgb(0, 0, 255)")
+            .style("stop-opacity", 1)
+        
+    legendSVG.append("g").append("rect")
+        .attr("width",  0.2 * parseInt(d3.select(fieldName).select("#MSVID").select("svg").style("width")))
+        .attr("height",10)
+        .style("fill", "url(#myGradient)"); 
+    legendSVG.append("text")
+        .text("from")
+        .attr("font-size", 18)  
+        .attr
+    legendSVG.append("text").text("to").attr("font-size", 18)  
+}
