@@ -42,7 +42,7 @@ function degreeSortReturn(data, IDS, type){
     let degreeArray = new Array(IDS.length).fill(0);
     let returnArray = new Array(IDS.length).fill(0);
     let sortedArray = new Array(IDS.length).fill(0);
-    console.log(IDS)
+
     //create 2 dimentional array of the index and the degree
     for (let i = 0; i < IDS.length; i++) {
         degreeArray[i] = [i, 0];
@@ -199,7 +199,7 @@ Returns:
     An array that represents the colouring of the biggest edge sets
 */
 function blockColouring(data, IDS, blockNumber){
-    let colouring = new Array(data.length).fill();
+    let colouring = new Array(data.length).fill("#D4D4D4");
     var messageCount = new Array();
     var arrayBlocks = new Array();
 
@@ -225,7 +225,7 @@ function blockColouring(data, IDS, blockNumber){
     //for the desired number of edgesets, give the edges in the sets a colour corresponding to the edgeset
     for (let i = 0; i < blockNumber; i++) {
         let stringColor = arrayBlocks[i][0];
-        let color = getColor(parseInt(stringColor));
+        let color = getColor((stringColor));
         for (let j = 0; j < arrayBlocks[i][1]; j++) {
             let index = data.indexOf(arrayBlocks[i][0][j]);
             colouring[index] = color;
@@ -256,33 +256,4 @@ function getColor(node) {
     }   
 
     return color;
-}
-
-function standardLegend(type, fieldName){
-    let mainSVG = d3.select(fieldName).select("#MSVID");
-    let legendSVG = mainSVG.append("svg")
-        .attr("id", "legend")
-
-    let LG = legendSVG.append("defs").append("linearGradient")
-        .attr("id", "myGradient")
-        
-        LG.append("stop")
-            .attr("offset", "0%")
-            .style("stop-color", "rgb(255, 140, 0)")
-            .style("stop-opacity", 1)
-                
-        LG.append("stop")
-            .attr("offset", "100%")
-            .style("stop-color", "rgb(0, 0, 255)")
-            .style("stop-opacity", 1)
-        
-    legendSVG.append("g").append("rect")
-        .attr("width",  0.2 * parseInt(d3.select(fieldName).select("#MSVID").select("svg").style("width")))
-        .attr("height",10)
-        .style("fill", "url(#myGradient)"); 
-    legendSVG.append("text")
-        .text("from")
-        .attr("font-size", 18)  
-        .attr
-    legendSVG.append("text").text("to").attr("font-size", 18)  
 }
