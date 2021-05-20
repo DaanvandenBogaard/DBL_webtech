@@ -25,13 +25,13 @@ function makeSankey(dataPath , fieldName) {
   //retrieve width and height:
   var height = parseFloat( div.style("height"))- upperBoxHeight;
   var width = parseFloat( div.style("width") );
-  console.log(height,width);
-  sankeyDiv.style("height" , height)
-           .style("width" , width);
+  sankeyDiv.style("height" , height-125)
+           .style("width" , width-125);
 
   tooltip = div.append("div")
                .style("opacity", 0)
-               .style("position" , "absolute")
+               .style("position" , "fixed")
+               //.style("position" , "absolute")
                .attr("class" , "tooltip")
                .style("background-color" , "white")
                .style("border" , "solid")
@@ -57,8 +57,6 @@ function makeSankey(dataPath , fieldName) {
                //.attr("width" , width)
                //.attr("height", height)
                .attr("transform" , "translate(" + margin.left  + "," + margin.top +")");
-
-
 
   //Import sankey package as variable:
   sankey = d3.sankey()
@@ -255,8 +253,8 @@ function MakeD3(dataSet , sankey , svg , fieldName){
         }
       });
       tooltip.html(d.name + " has received " + sum + " emails.")
-             .style("left", (event.x + 70) + "px")
-             .style("top", (event.y) + "px");
+             .style("left", (event.x + event.dx + 70) + "px")
+             .style("top", (event.y + event.dy ) + "px");
     }
   }
 
