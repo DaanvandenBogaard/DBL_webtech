@@ -68,7 +68,7 @@ function makeMSV(dataPath, fieldName) {
         let colouring = new Array(data.length).fill("#0000FF");
         let currentIDS = IDS;
         let currentColouring = colouring;
-
+        //IDS = optimizeLayout(data, IDS);
         //select the type of MSV and colouring 
         selectType(data, IDS, colouring, currentIDS, currentColouring, fieldName);
         selectColor(data, colouring, IDS, currentIDS, currentColouring, fieldName);
@@ -90,7 +90,7 @@ Returns:
 */
 function drawEdges(data, IDS, colouring, fieldName){
     const max = d3.max(data, function(d) { return +d.value; });
-    let selectedColouring = d3.select(fieldName).select("#MSVID").select(".selectColor").property("value")
+    let selectedColouring = d3.select(fieldName).select("#MSVID").select(".selectColor").property("value");
     let lines = d3.select(fieldName).select("#MSVID")
                   .select("svg")
                   .append("g");
@@ -119,7 +119,7 @@ Returns:
     None
 */
 function selectType(data, IDS, colouring, currentIDS, currentColouring, fieldName){
-    var types = ["Standard", "Degree", "In-degree", "Out-degree", "Activity"]
+    var types = ["Standard", "Degree", "In-degree", "Out-degree", "Activity", "Edge Length", "Standard Deviation"]
 
     let select = d3.select(fieldName).select("#MSVID").select("#upperVisBox")
             .append("select")
@@ -209,6 +209,19 @@ function updateType(selected, selectedColouring, data, IDS, colouring, currentID
     else if(selected === "Activity"){
         currentIDS = activitySort(data, IDS);
     } 
+    else if(selected === "Edge Length"){
+        currentEdges = getEdges(data, IDS);
+        console.log(meanEdgeLength(currentEdges));
+        console.log(IDS)
+        currentIDS = optimizeLayout(data, IDS, selected)
+        currentEdges = getEdges(data, currentIDS);
+        console.log(currentIDS)
+        console.log(meanEdgeLength(currentEdges));
+        console.log(currentEdges)
+    }
+    else if(selected === "Standard Deviation"){
+        currentIDS = optimizeLayout(data, IDS, selected)
+    }
     else {
         currentIDS = IDS;
     }
@@ -237,8 +250,6 @@ function updateType(selected, selectedColouring, data, IDS, colouring, currentID
     d3.select(fieldName).select("#MSVID").select("svg").selectAll("defs").remove();
     d3.select(fieldName).select("#MSVID").select("svg").selectAll("svg").remove();
     d3.select(fieldName).select("#MSVID").select("#legendBox").remove();
-
-    
 
     //draw new MSV
     drawEdges(data, currentIDS, currentColouring, fieldName);
@@ -405,28 +416,41 @@ Returns:
 */
 function normalEdges(data, IDS, colouring, lines){
 //draw edges and add nice animation if data set is small enough, else draw it without the animation
+console.log(data)
     if(data.length < 3500){              
         for(let i = 0; i < data.length; i++) {
             lines.append('line')
                 .style("stroke",  colouring[i])
                 .style("stroke-width", 1)
                 .attr("x1", data[i].time )
-                .attr("y1", IDS[data[i].fromId] )
+                .attr("y1", IDS[data[i].fromId])
                 .attr("x2", data[i].time )
                 .transition()
                 .duration(2000)
-                .attr("y2", IDS[data[i].toId])
+                .attr("y2", IDS[data[i].toId] )
+
+/*            lines.append("text")
+                .attr("y", IDS[data[i].fromId] * 30 + 10)
+                .attr("x", data[i].time )
+                .attr("font-size", 12)
+                .text("From: " + IDS[data[i].fromId] )
+
+            lines.append("text")
+                .attr("y", IDS[data[i].toId] * 30 + 10)
+                .attr("x", data[i].time )
+                .attr("font-size", 12)
+                .text("To: " + IDS[data[i].toId]) */
         }
     }
     else{
         for(let i = 0; i < data.length; i++) {
             lines.append('line')
-                .style("stroke",  colouring[i])
+                .style("stroke",  colouring[i] )
                 .style("stroke-width", 1)
                 .attr("x1", data[i].time )
                 .attr("y1", IDS[data[i].fromId] )
                 .attr("x2", data[i].time )
-                .attr("y2", IDS[data[i].toId])
+                .attr("y2", IDS[data[i].toId] )
         }
     }
 }
@@ -451,6 +475,7 @@ function blockEdges(data, IDS, colouring, lines){
             if(colouring[i] != "#D4D4D4"){
                 blockColours[blockColours.length] = i;
             }
+            
             //draw unimportant edges
             lines.append('line')
                 .style("stroke",  "#D4D4D4")

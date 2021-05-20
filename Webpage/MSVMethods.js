@@ -214,7 +214,7 @@ function blockColouring(data, IDS, blockNumber){
             messageArr[messageArr.length] = data[i];
         }
     }
-
+    
     //create array containing the edgeset and the edgesets length
     for(let i = 0; i < messageCount.length; i++){
         arrayBlocks[arrayBlocks.length] =  [messageCount[i], messageCount[i].length];
@@ -225,13 +225,13 @@ function blockColouring(data, IDS, blockNumber){
     //for the desired number of edgesets, give the edges in the sets a colour corresponding to the edgeset
     for (let i = 0; i < blockNumber; i++) {
         let stringColor = arrayBlocks[i][0];
-        let color = getColor((stringColor));
+        let color = getColor(parseInt(stringColor));
         for (let j = 0; j < arrayBlocks[i][1]; j++) {
             let index = data.indexOf(arrayBlocks[i][0][j]);
             colouring[index] = color;
         }
     }
-    
+    console.log(colouring)
     return colouring;
 }
 
