@@ -2,6 +2,7 @@
 <html>
 
 	<head>
+		<title> dbl/visualisation </title> 
 		<meta charset="utf-8" />
 		<meta name="viewpoint" content="width=device-width, initial-scale=1.0" />
 		<link rel="stylesheet" type="text/css" href="dbl.css" />
@@ -9,7 +10,6 @@
 		<script src="https://d3js.org/d3.v6.min.js"></script>
 		<script src="https://d3js.org/d3-collection.v1.min.js"></script>
 		<script src="Webpagecode.js"></script>
-		<title> dbl/visualisation </title> 
 		<script src="D3Functions.js"></script>
 		<script src= "generalUIVis.js"></script>
 	</head>
