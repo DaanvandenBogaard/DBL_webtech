@@ -1,0 +1,682 @@
+[33mcommit 5011ab0e6ab80cbb8ea47c43a4d888ff6e849b78[m[33m ([m[1;36mHEAD -> [m[1;32mmain[m[33m, [m[1;31morigin/main[m[33m, [m[1;31morigin/HEAD[m[33m, [m[1;32mMergeMSVWithMain[m[33m)[m
+Author: Daan2001 <nautssyndicate@gmail.com>
+Date:   Thu May 20 23:00:58 2021 +0200
+
+    ?
+
+[33mcommit 4a98b8351284c91d2e3f9cea8b174dfacfca8632[m
+Merge: 89b054f d3140d6
+Author: Daan2001 <nautssyndicate@gmail.com>
+Date:   Thu May 20 20:08:46 2021 +0200
+
+    Forgot to switch brances (does not matter).
+    Updated the layout of sankeys on visualisaiton boxes.
+    Merge branch 'UpdatedMain'
+
+[33mcommit d3140d6f1ec22a5e57005ee4704c6734ab4a0938[m[33m ([m[1;31morigin/UpdatedMain[m[33m, [m[1;32mUpdatedMain[m[33m)[m
+Author: Daan2001 <nautssyndicate@gmail.com>
+Date:   Thu May 20 20:08:07 2021 +0200
+
+    Fixed some issues with the sankey in visboxes
+
+[33mcommit 89b054f9938273c79c90ac19525175af98908119[m
+Merge: 5cb012f 8dfd516
+Author: Daan2001 <nautssyndicate@gmail.com>
+Date:   Thu May 20 19:54:49 2021 +0200
+
+    ????
+    
+    Merge branch 'main' of https://github.com/DaanvandenBogaard/DBL_webtech
+
+[33mcommit 5cb012fc106f6eef8f3c33816a260adfa7a3e41d[m
+Author: Daan2001 <nautssyndicate@gmail.com>
+Date:   Thu May 20 19:54:32 2021 +0200
+
+    Changed layout of code
+
+[33mcommit 8dfd516068f80e5c6d0d4e3bbb6a94a35e2b48d9[m
+Merge: 033be10 eb98751
+Author: Daan2001 <nautssyndicate@gmail.com>
+Date:   Thu May 20 18:46:43 2021 +0200
+
+    Merged MSV with this branch
+
+[33mcommit 033be102a6b67d9a1dff5cce9d99938079dfd6e5[m
+Author: Daan2001 <nautssyndicate@gmail.com>
+Date:   Thu May 20 17:26:40 2021 +0200
+
+    Fixed layout
+
+[33mcommit 0b1573603ff1c78a8e87750c75ad1e061c6d4c13[m
+Author: Daan2001 <nautssyndicate@gmail.com>
+Date:   Thu May 20 17:07:44 2021 +0200
+
+    Fixed a bug where the pagecontent would substancially be displayed
+
+[33mcommit 9e53e648ed7cb43a9191cd6a7e90fbf1d84210fc[m
+Author: Daan2001 <nautssyndicate@gmail.com>
+Date:   Thu May 20 16:56:28 2021 +0200
+
+    Update
+
+[33mcommit eb98751b521a924e43ea1fffa487e549c453537f[m[33m ([m[1;32mMSV[m[33m)[m
+Author: MikevdAnker <mikevdanker@gmail.com>
+Date:   Wed May 19 00:47:46 2021 +0200
+
+    fixed 'features'
+
+[33mcommit d6d14585bf89cd78e2b59b9da8ec8e3c63c72784[m
+Author: MikevdAnker <mikevdanker@gmail.com>
+Date:   Mon May 17 11:31:14 2021 +0200
+
+    made MSV ready to merge
+
+[33mcommit 03d048294fe2a746625189ca50462f1e3f0e76ec[m
+Author: MikevdAnker <mikevdanker@gmail.com>
+Date:   Sun May 16 12:57:04 2021 +0200
+
+    Big MSV update with different types of MSV and colourings
+
+[33mcommit c53f5d24722945fe060d208ed6432790c56a64cb[m[33m ([m[1;31morigin/mergeMainWithHebTemp[m[33m, [m[1;32mmergeMainWithHebTemp[m[33m)[m
+Merge: aa9178b 84d0e8f
+Author: Daan2001 <nautssyndicate@gmail.com>
+Date:   Fri May 14 11:22:31 2021 +0200
+
+    Merges latest changes of HEB into this branch.
+
+[33mcommit aa9178b49a237ff726a2b85102b737d433d3f43d[m
+Author: Daan2001 <nautssyndicate@gmail.com>
+Date:   Thu May 13 14:51:01 2021 +0200
+
+    deleted the localbox as we will nog longer need this. Also fixed the sankey with respect to this.
+
+[33mcommit 68f26b742f366a43cbbe4e2412c61f35534ae39b[m
+Author: Daan2001 <nautssyndicate@gmail.com>
+Date:   Thu May 13 11:48:51 2021 +0200
+
+    Commited some generealUI changes
+
+[33mcommit 81fcc6f93799a5f27d5df1380f2e3a61a3ddb6f0[m
+Author: Daan2001 <nautssyndicate@gmail.com>
+Date:   Thu May 13 11:28:12 2021 +0200
+
+    Fixed the calling of the MAKEHEB function. Will not attempt to further the workings of the HEB with the main UI.
+
+[33mcommit a2fd709b3c6772e629fab04844b2bd42b39d8d1e[m
+Author: Daan2001 <nautssyndicate@gmail.com>
+Date:   Thu May 13 10:53:50 2021 +0200
+
+    Added the functionality to spawn in a heb. Still have to do some appending work on d3 and html.
+
+[33mcommit 8f37a09edaed3373ca69ec7e188e3e1e2825c84a[m
+Merge: 9466e10 dfb08a9
+Author: Daan2001 <nautssyndicate@gmail.com>
+Date:   Thu May 13 10:29:15 2021 +0200
+
+    Merged HEB into main.
+
+[33mcommit 9466e1086effeafa7fcffbfe7055752de40d93da[m
+Author: Daan2001 <nautssyndicate@gmail.com>
+Date:   Thu May 13 10:24:29 2021 +0200
+
+    First commit to new branch with only intention to merge the HEB branch into the main branch
+
+[33mcommit c39469bce46929271425df50260e56d8bd88ab27[m
+Author: Daan2001 <nautssyndicate@gmail.com>
+Date:   Thu May 13 10:17:29 2021 +0200
+
+    Final commit before merging heb
+
+[33mcommit e3808afb0fabdf458c98957d98e341a88801ddc8[m
+Author: Daan2001 <nautssyndicate@gmail.com>
+Date:   Wed May 12 21:50:03 2021 +0200
+
+    last minutes changes
+
+[33mcommit 45f3690e04c45bd026d681bd043dcb7862c01a38[m
+Author: Daan2001 <nautssyndicate@gmail.com>
+Date:   Wed May 12 21:42:08 2021 +0200
+
+    Moved generealUI functions from dbl_vis.php to a general js file. Added the ability to spawn new visualisations via a button in the toolbar.
+
+[33mcommit 14c71d52142d34d05c76f717d8bafb53624e9036[m
+Author: Daan2001 <nautssyndicate@gmail.com>
+Date:   Wed May 12 20:25:58 2021 +0200
+
+    Fixed the deletion of objects
+
+[33mcommit 84d0e8f61aef588cd894ff94eef90f32adaca70d[m[33m ([m[1;32mHEB[m[33m)[m
+Author: Broers <t.l.j.broers@student.tue.nl>
+Date:   Wed May 12 18:44:02 2021 +0200
+
+    small changes to hover info
+
+[33mcommit ee67c2af57b68ad35c806166f7c82623a2b42658[m
+Author: Daan2001 <nautssyndicate@gmail.com>
+Date:   Wed May 12 18:17:30 2021 +0200
+
+    push
+
+[33mcommit b9a911a30539564703a743601a8f909e3d16c8ce[m
+Author: Broers <t.l.j.broers@student.tue.nl>
+Date:   Wed May 12 18:01:42 2021 +0200
+
+    added comments and cleaned code
+
+[33mcommit 68ab848d359163317b40736ff6d4f2f760ec8931[m
+Author: Daan2001 <nautssyndicate@gmail.com>
+Date:   Wed May 12 17:17:07 2021 +0200
+
+    changed some style
+
+[33mcommit dfb08a9c64a027d7dd4803bf7b5b14d0b330d8be[m
+Author: Broers <t.l.j.broers@student.tue.nl>
+Date:   Wed May 12 16:34:55 2021 +0200
+
+    now draws all mails
+
+[33mcommit d4e79da4e0d5cbd710cf2bdcea9d0bf32fc10d10[m
+Author: Daan2001 <nautssyndicate@gmail.com>
+Date:   Wed May 12 16:21:48 2021 +0200
+
+    fixed issue with having multiple sankeys
+
+[33mcommit 63c5ee5c2aafcb23c05a5d8c26a23da353edb9fc[m
+Author: Broers <t.l.j.broers@student.tue.nl>
+Date:   Wed May 12 16:04:32 2021 +0200
+
+    back to previous
+
+[33mcommit 61c32c1115288de96169d764ea7a67620759ab15[m
+Author: Daan2001 <nautssyndicate@gmail.com>
+Date:   Wed May 12 14:34:04 2021 +0200
+
+    Added an event listener and a selector
+
+[33mcommit 87ece66b3d37e290d4ddff0ac197f409945df8fe[m
+Author: Daan2001 <nautssyndicate@gmail.com>
+Date:   Wed May 12 09:56:56 2021 +0200
+
+    Started making the general html visualisation file more general. Right now, we have 1 slot, called 'VIS1' in which you can append any visualisation you like and then call your function.
+
+[33mcommit 4bdf48470cc0357b44576ae1d84d4da0a9c185f0[m
+Author: basvanhoeflaken <b.v.hoeflaken@student.tue.nl>
+Date:   Tue May 11 23:35:39 2021 +0200
+
+    stukje terug, maar nu wel netjes
+
+[33mcommit cd0813124563cd3404bb0d0051f235f954d01eb3[m
+Author: Daan2001 <nautssyndicate@gmail.com>
+Date:   Sun May 9 17:11:05 2021 +0200
+
+    Fixed a bug where users could still drag elements off of the screen by going out of the SVG and entering it again from the sides. Added OutOfBounds global variable.
+
+[33mcommit e5bd4006379cc21c36f99a94e8f77e99709c1a2d[m
+Author: Daan2001 <nautssyndicate@gmail.com>
+Date:   Sun May 9 12:26:32 2021 +0200
+
+    fixed the location of text elements when dragging
+
+[33mcommit 7a816627c2b8e76ab5979bf65d458c6060e33f67[m
+Author: Daan2001 <nautssyndicate@gmail.com>
+Date:   Sun May 9 11:32:37 2021 +0200
+
+    Fixed a bug where users could drag the sankey nodes off screen and never get them back. Now the mouse movement will not be registered if the user goes offscreen
+
+[33mcommit 0e532894aff75531b174d3fa3e8e0b09383a08af[m
+Author: Broers <t.l.j.broers@student.tue.nl>
+Date:   Sat May 8 18:19:22 2021 +0200
+
+    working pause button
+
+[33mcommit 4a6f4b670f76f2ad80e4d110957ef31f31983e92[m
+Author: Broers <t.l.j.broers@student.tue.nl>
+Date:   Sat May 8 16:18:40 2021 +0200
+
+    figure doesn't dupe on regenerate anymore
+
+[33mcommit b00a473add4fec66402ab02770e21d9fd8181bbb[m
+Author: Broers <t.l.j.broers@student.tue.nl>
+Date:   Sat May 8 15:50:44 2021 +0200
+
+    fixed edges, added animation
+
+[33mcommit 7a72ca2ed42d12a7acceab932858369a35b3ed8d[m
+Author: Daan2001 <nautssyndicate@gmail.com>
+Date:   Fri May 7 21:30:11 2021 +0200
+
+    Added tooltips for all nodes (sources and targets) displaying their name and the total amount of mails received/stored
+
+[33mcommit a25db61ba029decb7fd12f8dc794033f3def5191[m
+Author: Daan2001 <nautssyndicate@gmail.com>
+Date:   Fri May 7 20:43:06 2021 +0200
+
+    Added a tooltip
+
+[33mcommit 4407a54cc2ee8443d242bd33d76cca30e3984761[m
+Author: Daan2001 <nautssyndicate@gmail.com>
+Date:   Fri May 7 16:49:03 2021 +0200
+
+    Fixed a bunch of bugs related to moving the nodes. This now works correctly
+
+[33mcommit d5e079e3e2e65474f10953b916b18be50c2523e2[m
+Author: Daan2001 <nautssyndicate@gmail.com>
+Date:   Fri May 7 13:59:04 2021 +0200
+
+    Added the ability to drag elements. We still have a few bugs to fix.
+
+[33mcommit 915502d14262e38c61f33e1361eea73059bd3663[m
+Author: unknown <q.j.v.eijsden@student.tue.nl>
+Date:   Fri May 7 11:19:09 2021 +0200
+
+    Optimization algorithm can work with any number ID's rather than only id's labeled 1 to n
+
+[33mcommit 4614e493d3c9b21b1d1fdd4a90de41c542ae3204[m
+Author: MikevdAnker <mikevdanker@gmail.com>
+Date:   Thu May 6 21:28:10 2021 +0200
+
+    Fixed a mistake that I made with the latest push
+
+[33mcommit d85fd1583299b518a0518d38e72248b6dfa54808[m
+Author: Broers <t.l.j.broers@student.tue.nl>
+Date:   Wed May 5 18:01:24 2021 +0200
+
+    fixed label position
+
+[33mcommit d0d43ff63ddd4c18c74a1245e903140d1ecae7b0[m
+Author: Daan2001 <nautssyndicate@gmail.com>
+Date:   Wed May 5 17:18:27 2021 +0200
+
+    Added colors to nodes
+
+[33mcommit 521f54c204510d79c40cdb625e41f1df70c0f568[m
+Author: Daan2001 <nautssyndicate@gmail.com>
+Date:   Wed May 5 16:14:49 2021 +0200
+
+    Added a slider and the ability to see what communication was like in different years
+
+[33mcommit fe970ddab1ca4acc209fb83161a0aa1081285709[m
+Author: Daan2001 <nautssyndicate@gmail.com>
+Date:   Wed May 5 11:18:08 2021 +0200
+
+    Optimized the sankey diagram by properly defining the dataset
+
+[33mcommit b092cf5d5e0a5e77621eb85107652e1bc6057209[m
+Author: basvanhoeflaken <b.v.hoeflaken@student.tue.nl>
+Date:   Tue May 4 18:30:29 2021 +0200
+
+    HEB v1.0
+
+[33mcommit c998686f873979422edbf070f99e37fe5e5483cb[m
+Author: basvanhoeflaken <b.v.hoeflaken@student.tue.nl>
+Date:   Tue May 4 17:55:15 2021 +0200
+
+    First meet-bundle
+
+[33mcommit 6435c262c77ac89edd47ab9fdc67f5a88603ab7f[m
+Author: basvanhoeflaken <b.v.hoeflaken@student.tue.nl>
+Date:   Tue May 4 16:35:18 2021 +0200
+
+    04/05/2021-16:30
+
+[33mcommit 0c90dba68552dca06e6a5df2ed4e1ca8c360f6f7[m
+Author: MikevdAnker <mikevdanker@gmail.com>
+Date:   Tue May 4 10:09:08 2021 +0200
+
+    Found nicer values voor T such that cost is more often < 20
+
+[33mcommit 125feffda0c317ca449f92db9e2919e62b1b5c57[m
+Author: basvanhoeflaken <b.v.hoeflaken@student.tue.nl>
+Date:   Tue May 4 01:19:59 2021 +0200
+
+    Actually working
+
+[33mcommit 731d0ac60979fdd38c48df26ff00731d1ecb1e34[m
+Author: basvanhoeflaken <b.v.hoeflaken@student.tue.nl>
+Date:   Tue May 4 01:01:17 2021 +0200
+
+    Auto-format update (moet toch wel leesbaar zijn ;p)
+
+[33mcommit b045024777b71b67f3fd4e277dda4375d9ba8d4a[m
+Author: basvanhoeflaken <b.v.hoeflaken@student.tue.nl>
+Date:   Tue May 4 00:54:28 2021 +0200
+
+    All mail traffic ( straight lines)
+
+[33mcommit 42d41bbca3ce0b62b10eb750ed526dd8c0edbb10[m
+Author: basvanhoeflaken <b.v.hoeflaken@student.tue.nl>
+Date:   Tue May 4 00:39:30 2021 +0200
+
+    Werkende eerste mail
+
+[33mcommit 6ed97fc56cc7e94489f86bb07d3a4f59438ead04[m
+Author: basvanhoeflaken <b.v.hoeflaken@student.tue.nl>
+Date:   Tue May 4 00:18:29 2021 +0200
+
+    enkele comments bijgevoegd
+
+[33mcommit ff21ec7cb4909633bbb842b1e5e3f7b75e4ba196[m
+Author: basvanhoeflaken <b.v.hoeflaken@student.tue.nl>
+Date:   Tue May 4 00:15:48 2021 +0200
+
+    start aan HEB vis.
+
+[33mcommit a7a4732f9fb6ce66c8029c3c84e9bb9fdd19c732[m
+Author: Broers <t.l.j.broers@student.tue.nl>
+Date:   Mon May 3 14:56:31 2021 +0200
+
+    working dataset construction
+
+[33mcommit f0a1ccc80c7be861af56ec55f27a2e2d02ca4d5f[m
+Author: Broers <t.l.j.broers@student.tue.nl>
+Date:   Mon May 3 00:59:26 2021 +0200
+
+    almost functional data selection
+
+[33mcommit 7e646fd5e5dfe0d2a3ddc0967d67cb0d613e8688[m
+Author: MikevdAnker <mikevdanker@gmail.com>
+Date:   Sun May 2 21:05:08 2021 +0200
+
+    Currently the best working SA on the stdev of the edges.
+
+[33mcommit 990e9a5725b6b506bf3507a67b1df1970bf5bbe0[m
+Author: Broers <t.l.j.broers@student.tue.nl>
+Date:   Sun May 2 20:02:59 2021 +0200
+
+    start heb
+
+[33mcommit 94d2880af77b507b9b2fb78d99ce70cee1683021[m
+Author: MikevdAnker <mikevdanker@gmail.com>
+Date:   Sat May 1 20:03:26 2021 +0200
+
+    Standard deviation of edge lenght and begin/set-up for SA added
+
+[33mcommit 571eb89b921665a412dde3a5ebf79ab1b20f7b9b[m
+Author: unknown <q.j.v.eijsden@student.tue.nl>
+Date:   Fri Apr 30 22:24:09 2021 +0200
+
+    Importing of data and implementation of time variable
+
+[33mcommit 4905539a57e7b8a87a0be286b1c48569259379ad[m
+Author: Daan2001 <nautssyndicate@gmail.com>
+Date:   Fri Apr 30 16:02:02 2021 +0200
+
+    accidently added a DIV element in the DOM to be a SVG. Fixed this mistake.
+
+[33mcommit 7448e1a51b39eb7a064a4f25b4129d2fd182c22e[m
+Author: Daan2001 <nautssyndicate@gmail.com>
+Date:   Fri Apr 30 15:29:38 2021 +0200
+
+    Made the data loadable from CSV. TODO: Add implementation of user selection for ID's, TODO fix stacking of links in the dataset
+
+[33mcommit c3f5f8c93f0cda5a62fbebdaf6c2105911116bf8[m
+Author: Daan2001 <nautssyndicate@gmail.com>
+Date:   Fri Apr 30 11:33:03 2021 +0200
+
+    Added the visualisation of the Sankey diagram using D3.js and tested it with a predefined, hardcoded dataset. TODO: load the dataset from .csv. Also added .gitnore file to ignore all the csv's
+
+[33mcommit a7005daa451683cc8d9c4541827c5dcabfe34cb7[m
+Author: Daan2001 <nautssyndicate@gmail.com>
+Date:   Wed Apr 28 20:29:43 2021 +0200
+
+    added a testing dataset which is accepted by the Sankey package. TODO: make our own dataset + implementation of the visualisation
+
+[33mcommit d1815857c6b4c13906e0f2f0bce1bad5a4e3b199[m
+Author: Daan2001 <nautssyndicate@gmail.com>
+Date:   Wed Apr 28 16:26:38 2021 +0200
+
+    Loaded the links and nodes
+
+[33mcommit 84df222f70fb7114a99340c1624a5e627e2a972b[m
+Author: Daan2001 <nautssyndicate@gmail.com>
+Date:   Wed Apr 28 14:14:06 2021 +0200
+
+    changed the MakeSankey function
+
+[33mcommit 9138fbadc86739bb6b594f53f5ed840d29ba8fae[m
+Author: Daan2001 <nautssyndicate@gmail.com>
+Date:   Wed Apr 28 13:57:42 2021 +0200
+
+    Added sankeyDiagram.js
+
+[33mcommit 290c69e7a3a9d335502b1843b97f2bafd8fd11a4[m
+Author: Broers <t.l.j.broers@student.tue.nl>
+Date:   Wed Apr 28 11:00:44 2021 +0200
+
+    added start of HEB
+
+[33mcommit 54aa40c2031bb3270a04bb3f4d0cedf59b7c9de9[m
+Author: Daan2001 <nautssyndicate@gmail.com>
+Date:   Tue Apr 27 22:43:34 2021 +0200
+
+    test on pushes with branches
+
+[33mcommit 24595d7dba69c0248b5f1cbe1da816cf21903ae6[m
+Author: Daan2001 <nautssyndicate@gmail.com>
+Date:   Tue Apr 27 22:42:57 2021 +0200
+
+    Created Sankey diagram branch
+
+[33mcommit 0062ad49b205ccb70a28570ff600bd1155d0f279[m
+Author: Daan2001 <nautssyndicate@gmail.com>
+Date:   Tue Apr 27 22:39:51 2021 +0200
+
+    Created HEB branch
+
+[33mcommit d2e2fd4db1e5d5a243155228aea34bcbd573d4c9[m
+Author: Daan2001 <nautssyndicate@gmail.com>
+Date:   Tue Apr 27 22:33:37 2021 +0200
+
+    changed ID
+
+[33mcommit 5f54926ea1d4c48eaa39f55bbccda607276c1aec[m
+Author: Daan2001 <nautssyndicate@gmail.com>
+Date:   Tue Apr 27 22:30:32 2021 +0200
+
+    First commit of MSV branch
+
+[33mcommit 31c86306108175291047560e9b2c4b5e11d63e1e[m
+Author: MikevdAnker <mikevdanker@gmail.com>
+Date:   Mon Apr 26 17:11:59 2021 +0200
+
+    Updated last page
+
+[33mcommit 99ea16a11f3726840607536f4a8a3205e58a4d7b[m
+Author: MikevdAnker <mikevdanker@gmail.com>
+Date:   Mon Apr 26 17:06:14 2021 +0200
+
+    Fixed the text (in)visibility
+
+[33mcommit 8a8178edb7785266fa6781468c29340edb040bee[m
+Author: MikevdAnker <mikevdanker@gmail.com>
+Date:   Mon Apr 26 10:10:40 2021 +0200
+
+    small fix
+
+[33mcommit de693f0ed1f494a257cb7232cd7cd247e8d1233c[m
+Author: MikevdAnker <mikevdanker@gmail.com>
+Date:   Mon Apr 26 10:08:37 2021 +0200
+
+    Updated redirect after error since dbl_vis.html is now a .php
+
+[33mcommit 86a4f7297d3e3f59b3211c4e4ec2621a11e26dc9[m
+Author: Broers <t.l.j.broers@student.tue.nl>
+Date:   Sun Apr 25 19:24:47 2021 +0200
+
+    fixed invisible sideText
+
+[33mcommit e15481eee839c60988077944ad9338ed43250029[m
+Author: Broers <t.l.j.broers@student.tue.nl>
+Date:   Sun Apr 25 17:55:33 2021 +0200
+
+    styled toolbar and added custom scrollbar
+
+[33mcommit e03c37f2c6285b1b0c1950562dcdd7f6c71136d2[m
+Author: MikevdAnker <mikevdanker@gmail.com>
+Date:   Sun Apr 25 01:13:53 2021 +0200
+
+    Functionality/frame of a tool bar, not final.
+
+[33mcommit 13d3a4e6d07b41e67d263fbc922de6cca505d637[m
+Author: Daan2001 <nautssyndicate@gmail.com>
+Date:   Sat Apr 24 22:41:00 2021 +0200
+
+    Created a new file and updated some minor things about the vis.php
+
+[33mcommit c8b0f768cf806494d025dcc024ec48c442d98d30[m
+Author: Daan2001 <nautssyndicate@gmail.com>
+Date:   Sat Apr 24 22:28:44 2021 +0200
+
+    Fixed a bug
+
+[33mcommit cca44fae91feee662a877d13ac9c11e20ce0c197[m
+Author: Daan2001 <nautssyndicate@gmail.com>
+Date:   Sat Apr 24 22:17:44 2021 +0200
+
+    Designed a system which stores in localstorage for every user the adress of the last uploaded database.
+
+[33mcommit 0cc4506aa6c4c91c5e8f98c5767c7d5bc415c0e7[m
+Author: Daan2001 <nautssyndicate@gmail.com>
+Date:   Sat Apr 24 20:51:27 2021 +0200
+
+    Fixed an issue with the uploading of files
+
+[33mcommit 387702013a66c95f2107068c6433cdd60933f4ba[m
+Author: Broers <t.l.j.broers@student.tue.nl>
+Date:   Sat Apr 24 19:06:08 2021 +0200
+
+    Updated upload button looks
+
+[33mcommit 081eb97454428870cf5becbfe8670100dc77bc59[m
+Author: MikevdAnker <mikevdanker@gmail.com>
+Date:   Sat Apr 24 16:48:34 2021 +0200
+
+    Error handling for the file upload in php got added (not yet tested, except for filetype
+
+[33mcommit 623f3ebf97af0b536594dd7a2adcbb052cbc161a[m
+Author: Daan2001 <nautssyndicate@gmail.com>
+Date:   Sat Apr 24 15:18:07 2021 +0200
+
+    Added the accept attribute to the form element
+
+[33mcommit 7af582f79f9d3bea4b779a93f3456c7aae577366[m
+Author: Daan2001 <nautssyndicate@gmail.com>
+Date:   Sat Apr 24 15:12:38 2021 +0200
+
+    Fixed the upload
+
+[33mcommit cbc1417a44f31d04ea9573bee63a3dcae4da49f6[m
+Author: Daan2001 <nautssyndicate@gmail.com>
+Date:   Fri Apr 23 22:58:41 2021 +0200
+
+    Added PHP file to upload datasets to the website
+
+[33mcommit 226307ac6ea9495bbcf469725fe3c66f58e54409[m
+Author: Daan2001 <nautssyndicate@gmail.com>
+Date:   Fri Apr 23 20:06:26 2021 +0200
+
+    Restructured some functions
+
+[33mcommit 8fc3a30d6f3c2c49036920caff74e006facf3276[m
+Author: unknown <q.j.v.eijsden@student.tue.nl>
+Date:   Fri Apr 23 12:05:06 2021 +0200
+
+    Bat file for starting the server
+
+[33mcommit 8474bb54599c3b9631a0e992ce66766c238d3261[m
+Author: Broers <t.l.j.broers@student.tue.nl>
+Date:   Thu Apr 22 18:17:08 2021 +0200
+
+    Changed webpage appearence
+
+[33mcommit 9513c6171960ac0c618568e4006be9d29b71e186[m
+Author: MikevdAnker <mikevdanker@gmail.com>
+Date:   Thu Apr 22 16:39:36 2021 +0200
+
+    Reomved unnecessary variable
+
+[33mcommit 4f372360b08b5f1bf6142174eebabb637eef8b7c[m
+Author: MikevdAnker <mikevdanker@gmail.com>
+Date:   Thu Apr 22 15:27:23 2021 +0200
+
+    Linked remaining pages to the DBLFunctionList
+
+[33mcommit 1a90a9f0aee1a3e1f3728e08fd4ced0809d40511[m
+Merge: 02611dd 44661ca
+Author: MikevdAnker <mikevdanker@gmail.com>
+Date:   Thu Apr 22 15:00:44 2021 +0200
+
+    Merge branch 'main' of https://github.com/DaanvandenBogaard/DBL_webtech into main
+
+[33mcommit 02611dd9ce95b1aa5aa9c66b11f27fa90f7ef8a8[m
+Author: MikevdAnker <mikevdanker@gmail.com>
+Date:   Thu Apr 22 14:59:13 2021 +0200
+
+    Commented on toggleSidebar function
+
+[33mcommit 44661cacdef14657ab17d5c07817f62c2a4e9d0d[m
+Author: Daan2001 <nautssyndicate@gmail.com>
+Date:   Thu Apr 22 14:55:16 2021 +0200
+
+    Test voor Mike
+
+[33mcommit b002090d1642dd552423588d9faa9bb963b88e4d[m
+Author: Daan2001 <nautssyndicate@gmail.com>
+Date:   Wed Apr 21 23:19:25 2021 +0200
+
+    Added the dataset to the files, added the function logData (see documentation). WARNING: files now contain code needing a webserver to run!
+
+[33mcommit f23e170b1cd43301b84b800f06c7c8c4414751da[m
+Author: Daan2001 <nautssyndicate@gmail.com>
+Date:   Wed Apr 21 19:56:07 2021 +0200
+
+    Made a seperate JS file to hold our functions, imported D3.js in HTML of visualisation. Please add documentation to your functions! -Daan
+
+[33mcommit 9452aeb8196366e74e4ed28bc25c9e2ce9c9e51e[m
+Author: MikevdAnker <mikevdanker@gmail.com>
+Date:   Wed Apr 21 14:45:57 2021 +0200
+
+    Minor update
+
+[33mcommit 4e2f64b08628bf686da65ddf109a8d11a28bce77[m
+Merge: a33366f cead976
+Author: MagicChan777 <mikevdanker@gmail.com>
+Date:   Wed Apr 21 13:50:09 2021 +0200
+
+    Merge branch 'main' of https://github.com/DaanvandenBogaard/DBL_webtech into main
+
+[33mcommit a33366ff451ac280675a691705569cc4cee9016e[m
+Author: MagicChan777 <mikevdanker@gmail.com>
+Date:   Wed Apr 21 13:47:51 2021 +0200
+
+    First push of the webpage
+
+[33mcommit cead976cf24acbf83dcae741e1f10ed967644670[m
+Author: Broers <t.l.j.broers@student.tue.nl>
+Date:   Mon Apr 19 15:45:41 2021 +0200
+
+    voorbeeld verwijderd
+
+[33mcommit 7f0b0bc64b92727d0bfd65655cbc15c8ac1e40f0[m
+Author: Daan2001 <nautssyndicate@gmail.com>
+Date:   Mon Apr 19 15:41:20 2021 +0200
+
+    Voorbeeld commit
+
+[33mcommit 2a3b4f61ee68bce6ff9ee8ed37061ee152a3c72f[m
+Author: Daan2001 <nautssyndicate@gmail.com>
+Date:   Mon Apr 12 11:03:57 2021 +0200
+
+    removed useless commit, test
+
+[33mcommit 4f4055133cb09ca903c7e69285bdb829772a5d4b[m
+Author: Daan2001 <nautssyndicate@gmail.com>
+Date:   Mon Apr 12 11:00:10 2021 +0200
+
+    first commit
+
+[33mcommit ae85520c6f916588c92e4ac4909091c848de10bb[m
+Author: DaanvandenBogaard <82371732+DaanvandenBogaard@users.noreply.github.com>
+Date:   Mon Apr 12 10:45:13 2021 +0200
+
+    Initial commit
