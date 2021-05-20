@@ -181,7 +181,6 @@ a:hover {
 .pageContent {
 	width: 100%;
 	height: 100%;
-	margin-left: 15%;
 	margin-top: 30px;
 	transition: var(--transition);
 	text-align: center;
