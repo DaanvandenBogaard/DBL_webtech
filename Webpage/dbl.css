@@ -276,9 +276,10 @@ button#submit_file {
 .visField {
 	border-style: solid;
 	border-color: coral;
-	width: 100%;
+	width: 90%;
 	height: 100%;
 	margin: 10px;
+	display: inline-block;
 }
 
 /* HEB */
