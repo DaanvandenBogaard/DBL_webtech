@@ -199,7 +199,7 @@ Returns:
     An array that represents the colouring of the biggest edge sets
 */
 function blockColouring(data, IDS, blockNumber){
-    let colouring = new Array(data.length).fill();
+    let colouring = new Array(data.length).fill("#D4D4D4");
     var messageCount = new Array();
     var arrayBlocks = new Array();
 

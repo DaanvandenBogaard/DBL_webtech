@@ -61,6 +61,7 @@ function OnChangeSelect(fieldName){
     d3.select("#" + fieldName).selectAll(".tooltip").remove();	
     d3.select("#" + fieldName).selectAll("#sankeyID").remove();
     d3.select("#" + fieldName).selectAll("#hebUIBox").remove();
+    d3.select("#" + fieldName).selectAll("#MSVID").remove();
 
     //Now add new visualisation:	
     selectValue = d3.select("#" + fieldName).select('select').property('value');
@@ -74,6 +75,10 @@ function OnChangeSelect(fieldName){
         (zie documentation over de general UI handling voor meer info) */
         let hebUIBox = d3.select('#' + fieldName).select("#upperbar").append('div').attr("id" , "hebUIBox");
         hebUIBox.html('<span> From (year-month) </span><input id="startYear" type="number" name="startYear" default=1998><input id="startMonth" type="number" name="startMonth" default=01><span> to (year-month) </span><input id="endYear" type="number" name="endYear" default=2002><input id="endMonth" type="number" name="endMonth" default=12><div><input id="animateToggle" type="checkbox"><label for="animateToggle"> animation </label><button id="startHEB" type="button" name="HEB" onclick="makeHEB(localStorage.getItem(' + "'DataSet'" + ') ,' + "'" + fieldName + "'"   + ' )"> Start </button></div><button id="togglePause" type="button" name="togglePause"> Play </button><label for="togglePause" id="pauseIcon" class="fa fa-play"></label><div id="HEBFigure"> </div>');
+    }
+    else if(selectValue == "MSV"){
+        console.log(fieldName)
+        makeMSV(localStorage.getItem('DataSet'), fieldName);
     }
     else {
         console.log('Sorry! We were unable to load the correct visualisation. Please submit this bug.');
