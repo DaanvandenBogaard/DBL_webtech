@@ -61,6 +61,15 @@
 				<button id="submit_file" type="submit" name="submit"> Submit </button>
 			</form>
 		</div>
+
+			<script> 
+			//Handle upload button: 
+			if (localStorage.getItem('DataSet') != 'null') {
+				var uploadHTML = d3.select("#upload");
+				uploadHTML.style("display" , "none");
+			}
+			</script>
+
 			<!--Visualisation-->
 
 			<!-- Imports Sankey -->
@@ -78,24 +87,15 @@
 			<!-- HEB -->
 			<!-- Import HEB -->
 			<script src="HEB.js"></script>
-			
-			<script> 
-			//Handle upload button: 
-			if (localStorage.getItem('DataSet') != 'null') {
-				var uploadHTML = d3.select("#upload");
-				uploadHTML.style("display" , "none");
-			}
-			</script>
-
-
+		
 			<!-- MSV: -->
-
 			<!--Visualisation-->
 			<script src="D3Functions.js"></script>
             <!--<script src="SimulatedAnnealing.js"></script>-->
 			<script src="MSVMethods.js"></script>
 			<script src="MSV.js"></script>
 			
+
 
 		</div>
 	</body>

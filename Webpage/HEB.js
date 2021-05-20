@@ -6,112 +6,114 @@ Bas van Hoeflaken (1556282)
 var usableData = [];
 var userIndex = [];
 var jobGroupIndex = [];
+var allEdges = [];
 var drawnEdges = [];
 
 //Datapath is the location of the user's dataset. 
 //fieldName is the name (id) of the visualisationBox the dataset is currently in.
 function makeHEB(dataPath , fieldName) {
 
+    //Make id
+    /*
+    hebId = Math.floor(Math.random() * 100000);
+    console.log(hebId);
+    */
+
     //Link elements in dbl_vis.php to variables
-    var startYear = document.getElementById("startYear");
-    var startMonth = document.getElementById("startMonth");
-    var endYear = document.getElementById("endYear");
-    var endMonth = document.getElementById("endMonth");
-    var animToggle = document.getElementById("animateToggle");
-    var pauseIcon = document.getElementById("pauseIcon");
-    var togglePause = document.getElementById("togglePause");
+    var startYear = d3.select("#startYear");
+    var startMonth = d3.select("#startMonth");
+    var endYear = d3.select("#endYear");
+    var endMonth = d3.select("#endMonth");
+    var animToggle = d3.select("#animateToggle");
+    var pauseIcon = d3.select("#pauseIcon");
+    var togglePause = d3.select("#togglePause");
+    var strengthSlider = d3.select("#strengthSlider");
 
     var endYearAdjust = false;
     var startDate = 0;
     var endDate = 0;
 
-    var doAnimate = animToggle.checked;
+    var doAnimate = animToggle.property("checked");
     var isPaused = true;
     var frameTime = 1000;
 
     //Check if startYear is outside of allowed values
-    if(startYear.value < 1998) {
-        startYear.value = 1998;
-    } else if(startYear.value > 2002) {
-        startYear.value = 2002;
+    if(startYear.property("value") < 1998) {
+        startYear.property("value", 1998);
+    } else if(startYear.property("value") > 2002) {
+        startYear.property("value", 2002);
     } 
 
     //Check if startMonth is outside of allowed values
-    if(startMonth.value < 1) {
-        startMonth.value = 1;
-    } else if(startMonth.value > 12) {
-        startMonth.value = 12;
+    if(startMonth.property("value") < 1) {
+        startMonth.property("value", 1);
+    } else if(startMonth.property("value") > 12) {
+        startMonth.property("value", 12);
     }
 
     //If startMonth is 1-9 add 0 in front to match date format
-    if(startMonth.value.length == 1) {
-        startMonth.value = 0 + startMonth.value;
+    if(startMonth.property("value").length == 1) {
+        startMonth.property("value", 0 + startMonth.property("value"));
     }  
 
     //Check if endYear is outside of allowed values or below startYear
-    if(endYear.value < 1998) {
-        endYear.value = 1998;
-    } else if(endYear.value > 2002) {
-        endYear.value = 2002;
-    } else if(endYear.value < startYear.value){
-        endYear.value = startYear.value;
+    if(endYear.property("value") < 1998) {
+        endYear.property("value", 1998);
+    } else if(endYear.property("value") > 2002) {
+        endYear.property("value", 2002);
+    } else if(endYear.property("value") < startYear.property("value")){
+        endYear.property("value", startYear.property("value"));
         endYearAdjust = true;
     }
 
     //Check if endMonth is outside of allowed value or if endDate is before startDate
-    if(endMonth.value < 1) {
-        endMonth.value = 1;
-    } else if(endMonth.value > 12) {
-        endMonth.value = 12;
-    } else if((endYearAdjust == true || startYear.value == endYear.value) && endMonth.value < startMonth.value) {
-        endMonth.value = startMonth.value;
+    if(endMonth.property("value") < 1) {
+        endMonth.property("value", 1);
+    } else if(endMonth.property("value") > 12) {
+        endMonth.property("value", 12);
+    } else if((endYearAdjust == true || startYear.property("value") == endYear.property("value")) && endMonth.property("value") < startMonth.property("value")) {
+        endMonth.property("value", startMonth.property("value"));
     }
 
     //If endMonth is 1-9 add 0 in front to match date format
-    if(endMonth.value.length == 1) {
-        endMonth.value = 0 + endMonth.value;
+    if(endMonth.property("value").length == 1) {
+        endMonth.property("value", 0 + endMonth.property("value"));
     }
 
     //Set dates to right format and set curDate to startDate for start of animation
-    startDate = parseInt(startYear.value + startMonth.value);
-    endDate = parseInt(endYear.value + endMonth.value);
-    var curYear = parseInt(startYear.value);
+    startDate = parseInt(startYear.property("value") + startMonth.property("value"));
+    endDate = parseInt(endYear.property("value") + endMonth.property("value"));
+    var curYear = parseInt(startYear.property("value"));
     var curDate = startDate;
 
     //Set dimensions
     let margin = { top: 15, right: 10, bottom: 15, left: 10 };
-    let figureSize = 1000;
+    let figureSize = 800;
     let diameter = 600;
     let radius = diameter / 2;
     let innerRadius = radius / 10;
 
-    //Set the strength of the line curves
-    var bundleStrength = 0.90;
+    //Variables for lines
+    var bundleStrength = strengthSlider.property("value");
+    var lineOpacity = 0.6;
 
     //Delete previous object
     d3.select("#" + fieldName).select("#HEBFigure").select("svg").remove();
 
     //Make svg object
+
     let div = d3.select("#" + fieldName).select("#HEBFigure")
+        .attr("id", "HEBdiagram")
         .attr("width", figureSize)
         .attr("height", figureSize);
     let svg = div.append("svg")
         .attr("width", figureSize)
         .attr("height", figureSize)
         .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
-
-    var tooltip;
-    var mails_amount = 0;
     
-        tooltip = div.append("div")
-        .style("opacity", 0)
-        .style("position", "absolute")
-        .attr("class", "tooltip")
-        .style("background-color", "white")
-        .style("border", "solid")
-        .style("border-width", "2px")
-        .style("border-radius", "5px")
-        .style("padding", "5px");
+    //Create tooltip
+    var tooltip = div.append("div")
+        .attr("class", "tooltip");
 
     d3.csv(dataPath).then(function (data) {
         //Since d3.csv is asynchronous (it is not loaded immediatly, but it is a request to the webserver) we need all our code from the data in here. 
@@ -148,7 +150,7 @@ function makeHEB(dataPath , fieldName) {
         var g = svg.selectAll("g")
             .data(usableData)
             .enter()
-            .append("g")
+            .append("g");
 
         var circle_clicked = false;
 
@@ -166,46 +168,64 @@ function makeHEB(dataPath , fieldName) {
                var job_code = Jobtitles_list.indexOf(d.jobtitle);
                return color_arr[job_code];
             })
-            .on("click", function (d) {
-            if (!circle_clicked) {
-                d3.select(this)
-                  .attr("", function (d) { line_class_sel = ".id" + d.id; });
-                d3.selectAll(line_class_sel)
-                  .attr("stroke-width", 5);
-                circle_clicked = true;
-            }
-            else{
-                d3.select(this)
-                  .attr("", function (d) { line_class_sel = ".id" + d.id; });
-                d3.selectAll(line_class_sel)
-                  .attr("stroke-width", 1);
-                circle_clicked = false;
-                }            
-            })
             .on("mouseover", function () {
                 d3.select(this)
+                //Create tooltip
                   .attr("", function (d) {
-                        mails_amount = 0;
-                        for (p = 0; p < d.mails.length; p++) {
-                            if ((doAnimate == false && (d.mails[p]["date"] >= startDate && d.mails[p]["date"] <= endDate)) ||
-                                (doAnimate == true && d.mails[p]["date"] == curDate)) {
-                                    var goto_id = d.mails[k]["from"];
-                                    if (notDrawn(d["id"], goto_id)) {
-                                        mails_amount++;
-                                    }
-                            }
-                        }
-                        tooltip_string = d.id + " is a(n) " + d.jobtitle + " has recieved mails from " + mails_amount + " people in this period.";
+                    //Set incoming and outcoming class
+                    incoming = ".to" + d.id;
+                    outgoing = ".from" + d.id;
+                    tooltip_string = d.id + " is a(n) " + d.jobtitle + "\n Recieved mails from " + d3.selectAll(incoming).size() + " people \n Sent mails to " + d3.selectAll(outgoing).size() + " people";
                     });
                 tooltip.html(tooltip_string)
                        .style("left", (event.x + 5) + "px")
                        .style("top", (event.y) + "px");
-                tooltip.style("opacity", 1);
-                d3.select(this).raise().attr("stroke", "#5c5c5c");
+                tooltip.style("opacity", 1)
+                d3.select(this).raise().attr("stroke", "#5c5c5c")
+
+                .attr("", function(d) {
+                    console.log(d3.selectAll("paths").classList);
+                })
+
+                //Change width color and opacity for incoming selected mails
+                d3.selectAll(incoming)
+                  .style("opacity", 1)
+                  .attr("stroke", "#eb4034")
+                  .attr("stroke-width", 2);
+                //Change width color and opacity for outgoing selected mails
+                d3.selectAll(outgoing)
+                  .style("opacity", 1)
+                  .attr("stroke", "#4254f5")
+                  .attr("stroke-width", 2);
+                d3.selectAll(".twoWay")
+                  .style("opacity", 1)
+                  .attr("stroke", "#eb9834")
+                  .attr("stroke-width", 2);
+                //Place selected paths on top of others
+                if (d3.selectAll(incoming))
+                d3.select(this.parentNode).raise();
+                circle_clicked = true;
             })
             .on("mouseleave", function (d) {
+                //Remove tooltip
                 tooltip.style("opacity", 0);
-                d3.select(this).attr("stroke", null);
+                d3.select(this).attr("stroke", null)
+
+                //Return selected lines to normal
+                .attr("", function (d) { 
+                    incoming = ".to" + d.id; 
+                    outgoing = ".from" + d.id; 
+                });
+                //Reset previously selected paths to normal
+                d3.selectAll(incoming)
+                  .style("opacity", lineOpacity)
+                  .attr("stroke", "black")
+                  .attr("stroke-width", 1);
+                d3.selectAll(outgoing)
+                  .style("opacity", lineOpacity)
+                  .attr("stroke", "black")
+                  .attr("stroke-width", 1);
+                circle_clicked = false;
             });
 
         //Creates the text for ids
@@ -218,7 +238,7 @@ function makeHEB(dataPath , fieldName) {
                     var angle = angleStep * i * 180 / Math.PI;
                 }
                 //Translate it on the circle with small increase in radius as to not overlap node circles, rotate in the same "transform"
-                return "translate(" + (320 + (radius + 6) * (Math.cos(((2 * Math.PI) / 149) * i))) + ", " + (500 + (radius + 6) * (Math.sin(((2 * Math.PI) / 149) * i))) + ") rotate(" + angle + ")"
+                return "translate(" + (350 + (radius + 6) * (Math.cos(((2 * Math.PI) / 149) * i))) + ", " + (350 + (radius + 6) * (Math.sin(((2 * Math.PI) / 149) * i))) + ") rotate(" + angle + ")"
             })
             .attr("text-anchor", function(d, i) {
                 //Check if achor needs to be left or right depending on if the text has been flipped
@@ -228,7 +248,7 @@ function makeHEB(dataPath , fieldName) {
                     return "start";
                 }
             })
-            .attr("font-size", "10px")
+            .attr("font-size", "8pt")
             .attr("dominant-baseline", "central")
             .text(function (d, i) { return d.id; });
         
@@ -243,7 +263,7 @@ function makeHEB(dataPath , fieldName) {
         var colors = ["#4334eb", "#eb9834"];
         var colorPicker = d3.scaleLinear().range(colors).domain([1, 2]);
 
-        //Make gradient
+        //Make gradient (Not functional yet)
         var linearGradient = svg.append("defs")
                                 .append("linearGradient")
                                 .attr("id", "linear_gradient");
@@ -263,10 +283,12 @@ function makeHEB(dataPath , fieldName) {
 
         //Function that can generate the edges based on mail traffic
         function generateEdges() {
-        
-        //Make a path for each node
-        var edges = g.append("path")
-                     .attr("d", function(d,i) {
+
+            allEdges = [];
+       
+            //Make a path for each node
+            var edges = g.selectAll("path")
+                    .data(function(d,i) {
                     
             //Empty drawnEdges
             drawnEdges = [];
@@ -278,18 +300,18 @@ function makeHEB(dataPath , fieldName) {
             for (k = 0; k < d.mails.length; k++) { 
 
                 //If animation is not selected check for mails between dates, if animation is selected check for mails in specific month
-                if ((doAnimate == false && (d.mails[k]["date"] >= startDate && d.mails[k]["date"] <= endDate)) ||
-                    (doAnimate == true  && d.mails[k]["date"] == curDate)) {
-                    var goto_id = d.mails[k]["from"];
+                if ((!doAnimate && (d.mails[k]["date"] >= startDate && d.mails[k]["date"] <= endDate)) ||
+                    (doAnimate && d.mails[k]["date"] == curDate)) {
+                    var fromId = d.mails[k]["from"];
 
                     //Check if the same edges (but in a different month) has already been drawn
-                    if (notDrawn(d["id"], goto_id)) {
-
+                    if (notDrawn(d["id"], fromId)) {
                         //Add adresses to drawnEdges so the same path does not get drawn twice
-                        drawnEdges.push([d["id"], goto_id]);
+                        drawnEdges.push([d["id"], fromId]);
+                        allEdges.push([d["id"], fromId]);
 
                         //Find the job for sender
-                        targetJob = findJobtitle(goto_id);
+                        targetJob = findJobtitle(fromId);
 
                         //Find coordinates of source of path
                         x_source  = circ_x(radius, i);
@@ -312,8 +334,12 @@ function makeHEB(dataPath , fieldName) {
                         y_4 = circ_y(radius/2, findJobIndex(targetJob));
 
                         //Find coordinates of target
-                        x_target = circ_x(radius, unique_ids.indexOf(goto_id));
-                        y_target = circ_y(radius, unique_ids.indexOf(goto_id));
+                        x_target = circ_x(radius, unique_ids.indexOf(fromId));
+                        y_target = circ_y(radius, unique_ids.indexOf(fromId));
+
+                        //Find coordinates of jobtitle group point if both have the same job
+                        x_s = circ_x(radius - 100, findJobIndex(d["jobtitle"]));
+                        y_s = circ_y(radius - 100, findJobIndex(d["jobtitle"]));
 
                         //Save coordinates in array
                         var coords = [{"xcoord": x_source, "ycoord": y_source},
@@ -322,6 +348,10 @@ function makeHEB(dataPath , fieldName) {
                                       {"xcoord": x_3, "ycoord": y_3},
                                       {"xcoord": x_4, "ycoord": y_4},
                                       {"xcoord": x_target, "ycoord": y_target}];
+                                    
+                        var shortCoords = [{"xcoord": x_source, "ycoord": y_source},
+                                           {"xcoord": x_s, "ycoord": y_s},
+                                           {"xcoord": x_target, "ycoord": y_target}];
 
                         //Make line with x and y mapped to the coordinates
                         var line = d3.line()
@@ -330,9 +360,12 @@ function makeHEB(dataPath , fieldName) {
                                      //Add a curve to the line, curve depends on bundleStrength
                                      .curve(d3.curveBundle.beta(bundleStrength));
 
-                        //Add lines to array that gets added to the data of the <path> per node
-                        mail_lines.push(line(coords));
-                        
+                        //Add lines to array that gets added to the data of the <path> per node and push to incoming of reciever
+                        if(d["jobtitle"] == targetJob) {
+                            mail_lines.push({"from": fromId, "to": d["id"], "path": line(shortCoords)});
+                        } else {
+                            mail_lines.push({"from": fromId, "to": d["id"], "path": line(coords)});
+                        }
                     } 
                 }
             }
@@ -341,39 +374,80 @@ function makeHEB(dataPath , fieldName) {
             return mail_lines;
 
                     })
-                    .attr("id", "path")
-                    .attr("stroke", "url(#linear_gradient)")
+                    .enter()
+                    .append("path")
+                    .attr("d", function(d) { return d.path;})
+                    .attr("stroke", "black")
                     .attr("fill", "none")
                     .attr("stroke-width", 1)
-                    .style("opacity", 0.75)
-                    //Make line wide when selected
-                    .attr("class", function (d) {
-                        line_class = "id" + d.id;
-                        return line_class;
+                    .style("opacity", lineOpacity)
+                    .attr("class", function(d){
+                        return "from" + d.from + " to" + d.to;
                     });
-
         }
 
+        //Make array for legend content
+        let legendContent = [{"item": "incoming", "color": "#eb4034"}, {"item": "outgoing (w.i.p.)", "color": "#4254f5"}, {"item": "two-way (w.i.p.)", "color": "#4b00bf"}];
+
+        //Create legend
+        var legend = svg.selectAll("entries")
+                        .data(legendContent)
+                        .enter() 
+                        .append("g");
+                        
+                        //Example line for item
+                        legend.append("line")
+                        .attr("x1", 10)
+                        .attr("x2", 35)
+                        .attr("y1", function(d, i) {
+                            return 12 + 18 * i;
+                        })
+                        .attr("y2", function(d, i) {
+                            return 12 + 18 * i;
+                        })
+                        .attr("stroke", function(d){
+                            return d.color;
+                        })
+                        .attr("stroke-width", 2);
+
+                        //Text for item
+                        legend.append("text")
+                        .attr("font-size", "11pt")
+                        .attr("x", 40)
+                        .attr("y", function(d, i) {
+                            return 15 + 18 * i;
+                        })
+                        .text(function(d) {
+                            return d.item;
+                        });
+
         //Check if pausebutton has been clicked 
-        togglePause.addEventListener("click", function() {
-            if (isPaused == false) {
+        togglePause.on("click", function() {
+            if (!isPaused && doAnimate) {
                 isPaused = true;
-                pauseIcon.className = "fa fa-play";
-                togglePause.innerHTML = "Play";
+                pauseIcon.attr("class", "fa fa-play");
+                togglePause.text("Play");
                 clearTimeout(animTimer);
-            } else {
+            } else if (isPaused && doAnimate) {
                 isPaused = false;
-                pauseIcon.className = "fa fa-pause";
-                togglePause.innerHTML = "Pause";
+                pauseIcon.attr("class", "fa fa-pause");
+                togglePause.text("Pause");
                 //Draw next frame when unpaused
                 nextFrame();
             }
         })
 
+        //Event handler that changes the bundlestrength when changed at slider
+        strengthSlider.on("input", function() {
+            bundleStrength = strengthSlider.property("value");
+            d3.selectAll("#path").remove();
+            generateEdges();
+        })
+
         var animTimer;
 
         //If animation is selected and not paused on first pass, draw next frame
-        if (doAnimate == true && isPaused == false) {
+        if (doAnimate && !isPaused) {
             animTimer = setTimeout(function(){ nextFrame() }, frameTime);
             animTimer;
         }
@@ -382,7 +456,7 @@ function makeHEB(dataPath , fieldName) {
         function nextFrame() {
 
             //If animation has not reached the endDate, go to next month
-            if (curDate != endDate && isPaused != true){ 
+            if (curDate != endDate && !isPaused){ 
                 if (curDate % 100 < 12) {
                     curDate++;
                 } else {
@@ -395,17 +469,12 @@ function makeHEB(dataPath , fieldName) {
                 generateEdges();
 
                 //If animation has not been paused, wait set time and load next frame
-                if (isPaused != true) {
+                if (!isPaused) {
                     animTimer = setTimeout(function(){ nextFrame() }, frameTime);
                 }
             }            
         }
-
-        //Testing logs
-        console.log(usableData);
-        console.log(usableData.length);
-        console.log(Jobtitles_list);
-        console.log(counter);
+   
     });
 
 }
@@ -430,12 +499,12 @@ function dateFormat(date) {
 
 //Function for placement on HEB (X)
 function circ_x(radius, index){
-    return 320 + radius * (Math.cos(((2 * Math.PI) / 149) * index));
+    return 350 + radius * (Math.cos(((2 * Math.PI) / 149) * index));
 }
 
 //Function for placement on HEB (Y)
 function circ_y(radius, index) {
-    return 500 + radius * (Math.sin(((2 * Math.PI) / 149) * index));
+    return 350 + radius * (Math.sin(((2 * Math.PI) / 149) * index));
 } 
 
 //Function that finds the index of the first or last job that has the searched for jobtitle depending on the direction selected
@@ -478,6 +547,16 @@ function notDrawn(from, to) {
     for(i = 0; i < drawnEdges.length; i++) {
         if(drawnEdges[i][0] == from &&
            drawnEdges[i][1] == to) {
+               return false;
+           }
+    }
+    return true;
+}
+
+function isTwoWay(from, to) {
+    for(i = 0; i < allEdges.length; i++) {
+        if(allEdges[i][0] == to &&
+           allEdges[i][1] == from) {
                return false;
            }
     }
