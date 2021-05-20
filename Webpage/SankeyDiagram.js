@@ -13,17 +13,19 @@ function makeSankey(dataPath , fieldName) {
   let idNums = JSON.parse("[" + idInput + "]");
   //We start by making the SVG element.
   let margin = {top : 15, right : 10, bottom: 15, left: 10} //For now, hardcoded margins 
-  var width = 1500; //for now, hardcoded width
-  var height = 1000; //for now, hardcoded height*/
+  //var width = 1500; //for now, hardcoded width
+  //var height = 1000; //for now, hardcoded height*/
 
   var nodeWidthSankey = 80;
   let div = d3.select("#" + fieldName);
   let sankeyDiv = div.append("div").attr("id" , "sankeyID");
-  //retrieve width and height:
-  console.log(parseFloat( div.style("height") ));
-  //var height = parseFloat( d3.select("#pageContent").style("height") );
-  //var width = parseFloat( d3.select("#pageContent").style("width") );
+  //Retrieve height upperbox:
+  var upperBoxHeight = parseFloat(div.select("#upperbar").style("height"))
 
+  //retrieve width and height:
+  var height = parseFloat( div.style("height"))- upperBoxHeight;
+  var width = parseFloat( div.style("width") );
+  console.log(height,width);
   sankeyDiv.style("height" , height)
            .style("width" , width);
 
@@ -49,8 +51,8 @@ function makeSankey(dataPath , fieldName) {
                            
   let svg = sankeyDiv.append("svg")
                      .attr("id" , "visualisation")
-                     .attr("width" , width + 50)
-                     .attr("height", height + 50);
+                     .attr("width" , width /*+ 50*/)
+                     .attr("height", height /*+ 50*/);
   let g =   svg.append("g")
                //.attr("width" , width)
                //.attr("height", height)

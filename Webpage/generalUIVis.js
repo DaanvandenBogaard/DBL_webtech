@@ -13,7 +13,8 @@ function AddVisualisationBlock(){
     let mainBlock = d3.select("#pageContent");
     let newVisBlock = mainBlock.append("div")
                                .attr("id" , "vis" + index)
-                               .attr("class" , "visField");
+                               .attr("class" , "visField")
+                               .style("height" , "750px");
     CreateVisField("vis" + index); 
            
     index += 1;                
