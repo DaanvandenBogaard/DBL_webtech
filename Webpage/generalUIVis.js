@@ -2,6 +2,23 @@
 var visualisations = ["Sankey" , "HEB" , "MSV" , "Gestalt"];
 var index = 0;
 
+function AddVisualisationBlock(){
+    //Check if dataset is loaded (only works because this file is directely loaded into dbl_vis.php!!!)
+    if (localStorage.getItem('DataSet') == 'null') {
+        console.log("Please load a dataset first!");
+        return
+    }
+
+    console.log("add new block! name = vis" + index);
+    let mainBlock = d3.select("#pageContent");
+    let newVisBlock = mainBlock.append("div")
+                               .attr("id" , "vis" + index)
+                               .attr("class" , "visField");
+    CreateVisField("vis" + index); 
+           
+    index += 1;                
+}
+
 //A function handling the creationg of new visualisation fields:
 			//Input:
 			//Changes:
@@ -18,7 +35,7 @@ function CreateVisField(fieldName){
     let select = upperbar.append("select")
 						 .attr("id" , "selector" + fieldName)				 
 						 .attr("class" , "selectorUI")
-						 .attr("onchange" , "onChangeSelect("+ "'"  + fieldName + "'" +")");
+						 .attr("onchange" , "OnChangeSelect("+ "'"  + fieldName + "'" +")");
 	
     //Must be defined again as we define it here as a DOM element!
     var selector = document.getElementById("selector" + fieldName);
@@ -37,12 +54,7 @@ function CreateVisField(fieldName){
 }
 
 //A function handling the change of option for visualisations.
-function onChangeSelect(fieldName){
-    //Check if dataset is loaded (only works because this file is directely loaded into dbl_vis.php!!!)
-    if (localStorage.getItem('DataSet') == 'null') {
-        console.log("Please load a dataset first!");
-        return
-    }
+function OnChangeSelect(fieldName){
     
     //First clean html:
     d3.select("#" + fieldName).selectAll("svg").remove();
@@ -68,13 +80,3 @@ function onChangeSelect(fieldName){
     }
 }
 
-function AddVisualisationBlock(){
-    console.log("add new block! name = vis" + index);
-    let mainBlock = d3.select("#pageContent");
-    let newVisBlock = mainBlock.append("div")
-                               .attr("id" , "vis" + index)
-                               .attr("class" , "visField");
-    CreateVisField("vis" + index); 
-           
-    index += 1;                
-}
