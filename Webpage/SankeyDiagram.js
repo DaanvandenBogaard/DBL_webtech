@@ -29,15 +29,9 @@ function makeSankey(dataPath , fieldName) {
            .style("width" , width-125);
 
   tooltip = div.append("div")
-               .style("opacity", 0)
-               .style("position" , "fixed")
                //.style("position" , "absolute")
                .attr("class" , "tooltip")
-               .style("background-color" , "white")
-               .style("border" , "solid")
-               .style("border-width" , "2px")
-               .style("border-radius" , "5px")
-               .style("padding" , "5px");
+   
 
   let sliderHTML = div.select("#upperbar")
                       .append('svg')
