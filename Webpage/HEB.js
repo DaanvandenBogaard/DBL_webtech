@@ -20,14 +20,14 @@ function makeHEB(dataPath , fieldName) {
     */
 
     //Link elements in dbl_vis.php to variables
-    var startYear = d3.select("#startYear");
-    var startMonth = d3.select("#startMonth");
-    var endYear = d3.select("#endYear");
-    var endMonth = d3.select("#endMonth");
-    var animToggle = d3.select("#animateToggle");
-    var pauseIcon = d3.select("#pauseIcon");
-    var togglePause = d3.select("#togglePause");
-    var strengthSlider = d3.select("#strengthSlider");
+    var startYear = d3.select("#" + fieldName).select("#startYear");
+    var startMonth = d3.select("#" + fieldName).select("#startMonth");
+    var endYear = d3.select("#" + fieldName).select("#endYear");
+    var endMonth = d3.select("#" + fieldName).select("#endMonth");
+    var animToggle = d3.select("#" + fieldName).select("#animateToggle");
+    var pauseIcon = d3.select("#" + fieldName).select("#pauseIcon");
+    var togglePause = d3.select("#" + fieldName).select("#togglePause");
+    var strengthSlider = d3.select("#" + fieldName).select("#strengthSlider");
 
     var endYearAdjust = false;
     var startDate = 0;
@@ -184,7 +184,7 @@ function makeHEB(dataPath , fieldName) {
                 d3.select(this).raise().attr("stroke", "#5c5c5c")
 
                 .attr("", function(d) {
-                    console.log(d3.selectAll("paths").classList);
+                    console.log(d3.select("#" + fieldName).selectAll("paths").classList);
                 })
 
                 //Change width color and opacity for incoming selected mails
