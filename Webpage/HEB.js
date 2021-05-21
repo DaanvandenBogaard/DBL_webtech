@@ -88,7 +88,7 @@ function makeHEB(dataPath , fieldName) {
 
     //Set dimensions
     let margin = { top: 15, right: 10, bottom: 15, left: 10 };
-    let figureSize = 800;
+    let figureSize = 690; //changed this because it was too big for the current fieldsize, but ultimately this should not be hardcoded -Daan
     let diameter = 600;
     let radius = diameter / 2;
     let innerRadius = radius / 10;
