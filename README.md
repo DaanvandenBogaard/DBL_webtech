@@ -2,6 +2,14 @@
 TUE student project year 2020-2021, Q4. Course 2IOA0
 We provide a quick overview on how to use this tool.
 
+* Team 2
+	* Daan van den Bogaard
+	* Myrte van Ginkel
+	* Mike van den Anker
+	* Quinten van Eijsden
+	* Bas van Hoeflaken
+	* Thomas Broers
+
 # Provided link
 We provide you with a link to our running webserver: "http://86.88.232.235:8080/Webpage/dbl_home.html".
 This links leads to the server hosted on the personal network of one of our team members. We cannot guarantee at this point that the server will always be accessible (as this pc might not always be running). 
