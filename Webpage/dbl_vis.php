@@ -71,7 +71,6 @@
 			</script>
 
 			<!--Visualisation-->
-
 			<!-- Imports Sankey -->
 			<script src="https://unpkg.com/d3-array@1"></script>
 			<script src="https://unpkg.com/d3-collection@1"></script>
