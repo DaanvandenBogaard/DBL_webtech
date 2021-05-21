@@ -10,8 +10,8 @@ Should this link not be accessible, then we refer to the "Webserver setup" parag
 
 # Webserver setup
 We use the Apache webserver to run our tool. Furthermore, we also use PHP for the uploading of datasets to the server. For this, a PHP plugin must be installed.
-Link to Apachelounge: "https://www.apachelounge.com/download/" (here you can download the webserver).
-Link to an article discussing how to get PHP working on a appache webserver: "https://danielarancibia.wordpress.com/2015/09/27/installing-apache-2-4-and-php-7-for-development-on-windows/".
+[Link to Apachelounge] (https://www.apachelounge.com/download/) (here you can download the webserver).
+[Link to an article discussing how to get PHP working on a appache webserver] (https://danielarancibia.wordpress.com/2015/09/27/installing-apache-2-4-and-php-7-for-development-on-windows/).
 
 Should installing this lead to any difficulity, please contact us so we can make sure the webserver is running.
 Contact: Name: Daan van den Bogaard
@@ -43,10 +43,10 @@ You must enter numbers for this to work. Note, that there are a couple of things
 For example, entering the same number twice will cause issues. 
 
 We list a few possible combinations that we have often used while testing:
-12,15
-1,2,3,4,5,6,7,8,9
-96
-18,19
+*12,15
+*1,2,3,4,5,6,7,8,9
+*96
+*18,19
 
 We will now list a few features of the Sankey visualisation:
 Highlighting: Upon hovering over a link, this link will get a darker colour than the rest of the links. A tooltip is also displayed giving more information on this link. Hovering over the nodes (the coloured blocks) will also give you more information on these nodes.
@@ -66,7 +66,7 @@ namely the MSV type selector:
 - In-degree: Same as degree but only takes in-degree into account
 - Out-degree: Same as degree but only takes out-degree into account
 - Activity: Orders the nodes in terms of activity, nodes that are more active at the start at the top and nodes that
-	    are more active at the end are placed at the bottom. Nodes that are active troughout are places in the middle.
+	    are more active at the end are placed at the bottom. Nodes that are active throughout are places in the middle.
 
 and the MSV colour selector:
 
