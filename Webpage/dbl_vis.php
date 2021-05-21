@@ -95,7 +95,11 @@
 			<script src="MSVMethods.js"></script>
 			<script src="MSV.js"></script>
 			
-
+			<!--Here we make the first two visualisation blocks:-->
+			<script>
+			AddVisualisationBlock();
+			AddVisualisationBlock();
+			</script>
 
 		</div>
 	</body>
