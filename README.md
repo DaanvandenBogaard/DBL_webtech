@@ -16,9 +16,10 @@ We use the Apache webserver to run our tool. Furthermore, we also use PHP for th
 [Link to an article discussing how to get PHP working on a appache webserver](https://danielarancibia.wordpress.com/2015/09/27/installing-apache-2-4-and-php-7-for-development-on-windows/).
 
 Should installing this lead to any difficulity, please contact us so we can make sure the webserver is running.
-Contact: Name: Daan van den Bogaard
-         StudentID: 1534173 
-         Email: d.c.l.v.d.bogaard@student.tue.nl
+Contact: 
+* Name: Daan van den Bogaard
+* StudentID: 1534173 
+* Email: d.c.l.v.d.bogaard@student.tue.nl
 
 # General use
 On loading the website, users will find themself on our home-page. 
