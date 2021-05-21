@@ -98,7 +98,7 @@ function makeHEB(dataPath , fieldName) {
     var lineOpacity = 0.6;
 
     //Delete previous object
-    d3.select("#" + fieldName).select("#HEBFigure").select("svg").remove();
+    d3.select("#" + fieldName).select("#HEBFigure").selectAll("#HEBdiagram").remove();
 
     //Make svg object
 
@@ -150,24 +150,7 @@ function makeHEB(dataPath , fieldName) {
         var g = svg.selectAll("g")
             .data(usableData)
             .enter()
-            .append("g");
-
-        var circle_clicked = false;
-
-        //creates circles for all working persons
-        var circle = g.append("circle")
-            .attr("cx", function(d,i){
-                return circ_x(300,i);
-            })
-            .attr("cy", function(d,i){
-                return circ_y(300,i);
-            })
-            .attr("r", 5)
-            //Fills the circles according to jobtitle
-            .attr("fill", function (d) {
-               var job_code = Jobtitles_list.indexOf(d.jobtitle);
-               return color_arr[job_code];
-            })
+            .append("g")
             .on("mouseover", function () {
                 d3.select(this)
                 //Create tooltip
@@ -182,10 +165,6 @@ function makeHEB(dataPath , fieldName) {
                        .style("top", (event.y) + "px");
                 tooltip.style("opacity", 1)
                 d3.select(this).raise().attr("stroke", "#5c5c5c")
-
-                .attr("", function(d) {
-                    console.log(d3.select("#" + fieldName).selectAll("paths").classList);
-                })
 
                 //Change width color and opacity for incoming selected mails
                 d3.selectAll(incoming)
@@ -203,8 +182,8 @@ function makeHEB(dataPath , fieldName) {
                   .attr("stroke-width", 2);
                 //Place selected paths on top of others
                 if (d3.selectAll(incoming))
-                d3.select(this.parentNode).raise();
-                circle_clicked = true;
+                d3.select(this).raise();
+                d3.select(tooltip).raise();
             })
             .on("mouseleave", function (d) {
                 //Remove tooltip
@@ -225,9 +204,23 @@ function makeHEB(dataPath , fieldName) {
                   .style("opacity", lineOpacity)
                   .attr("stroke", "black")
                   .attr("stroke-width", 1);
-                circle_clicked = false;
             });
 
+        //creates circles for all working persons
+        var circle = g.append("circle")
+            .attr("cx", function(d,i){
+                return circ_x(300,i);
+            })
+            .attr("cy", function(d,i){
+                return circ_y(300,i);
+            })
+            .attr("r", 5)
+            //Fills the circles according to jobtitle
+            .attr("fill", function (d) {
+               var job_code = Jobtitles_list.indexOf(d.jobtitle);
+               return color_arr[job_code];
+            });
+            
         //Creates the text for ids
         var id_text = g.append("text")
             .attr("transform", function(d, i) {
@@ -381,6 +374,7 @@ function makeHEB(dataPath , fieldName) {
                     .attr("fill", "none")
                     .attr("stroke-width", 1)
                     .style("opacity", lineOpacity)
+                    .attr("id", "path")
                     .attr("class", function(d){
                         return "from" + d.from + " to" + d.to;
                     });
@@ -440,6 +434,7 @@ function makeHEB(dataPath , fieldName) {
         //Event handler that changes the bundlestrength when changed at slider
         strengthSlider.on("input", function() {
             bundleStrength = strengthSlider.property("value");
+            console.log(bundleStrength);
             d3.select("#" + fieldName).selectAll("#path").remove();
             generateEdges();
         })
