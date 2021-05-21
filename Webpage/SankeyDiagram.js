@@ -29,15 +29,7 @@ function makeSankey(dataPath , fieldName) {
            .style("width" , width-125);
 
   tooltip = div.append("div")
-               .style("opacity", 0)
-               .style("position" , "fixed")
-               //.style("position" , "absolute")
-               .attr("class" , "tooltip")
-               .style("background-color" , "white")
-               .style("border" , "solid")
-               .style("border-width" , "2px")
-               .style("border-radius" , "5px")
-               .style("padding" , "5px");
+               .attr("class" , "tooltip");
 
   let sliderHTML = div.select("#upperbar")
                       .append('svg')
@@ -112,8 +104,6 @@ function makeSankey(dataPath , fieldName) {
     //Define sankey data by sankey.js
     dataSet = constrDataSet(data , idNums , sliderVal);
     MakeD3(dataSet , sankey , d3.select("#" + fieldName).select("#sankeyID").select('#visualisation') , fieldName);
-
-
   }); 
 }
 
@@ -219,6 +209,7 @@ function MakeD3(dataSet , sankey , svg , fieldName){
   
   //Set functions for hover over tooltip:
   var mouseover = function(d) {
+    tooltip = d3.select("#" + fieldName).select(".tooltip");
     tooltip.style("opacity", 1);
     d3.select(this).attr("stroke", d => d3.color(d.color) || "#BBBBBB");
   }
