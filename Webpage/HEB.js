@@ -440,7 +440,7 @@ function makeHEB(dataPath , fieldName) {
         //Event handler that changes the bundlestrength when changed at slider
         strengthSlider.on("input", function() {
             bundleStrength = strengthSlider.property("value");
-            d3.selectAll("#path").remove();
+            d3.select("#" + fieldName).selectAll("#path").remove();
             generateEdges();
         })
 
