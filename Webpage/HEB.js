@@ -384,7 +384,7 @@ function makeHEB(dataPath) {
         }
 
         //Make array for legend content
-        let legendContent = [{"item": "incoming", "color": "#eb4034"}, {"item": "outgoing (w.i.p.)", "color": "#4254f5"}, {"item": "two-way (w.i.p.)", "color": "#4b00bf"}];
+        let legendContent = [{"item": "incoming", "color": "#eb4034"}, {"item": "outgoing", "color": "#4254f5"}, {"item": "two-way", "color": "#4b00bf"}];
 
         //Create legend
         var legend = svg.selectAll("entries")
@@ -417,7 +417,7 @@ function makeHEB(dataPath) {
                         .text(function(d) {
                             return d.item;
                         });
-
+                        
         //Check if pausebutton has been clicked 
         togglePause.on("click", function() {
             if (!isPaused && doAnimate) {
