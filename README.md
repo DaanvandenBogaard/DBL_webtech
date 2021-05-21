@@ -10,8 +10,8 @@ Should this link not be accessible, then we refer to the "Webserver setup" parag
 
 # Webserver setup
 We use the Apache webserver to run our tool. Furthermore, we also use PHP for the uploading of datasets to the server. For this, a PHP plugin must be installed.
-[Link to Apachelounge] (https://www.apachelounge.com/download/) (here you can download the webserver).
-[Link to an article discussing how to get PHP working on a appache webserver] (https://danielarancibia.wordpress.com/2015/09/27/installing-apache-2-4-and-php-7-for-development-on-windows/).
+[Link to Apachelounge](https://www.apachelounge.com/download/) (here you can download the webserver).
+[Link to an article discussing how to get PHP working on a appache webserver](https://danielarancibia.wordpress.com/2015/09/27/installing-apache-2-4-and-php-7-for-development-on-windows/).
 
 Should installing this lead to any difficulity, please contact us so we can make sure the webserver is running.
 Contact: Name: Daan van den Bogaard
