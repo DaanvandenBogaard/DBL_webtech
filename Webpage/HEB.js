@@ -13,12 +13,6 @@ var drawnEdges = [];
 //fieldName is the name (id) of the visualisationBox the dataset is currently in.
 function makeHEB(dataPath , fieldName) {
 
-    //Make id
-    /*
-    hebId = Math.floor(Math.random() * 100000);
-    console.log(hebId);
-    */
-
     //Link elements in dbl_vis.php to variables
     var startYear = d3.select("#" + fieldName).select("#startYear");
     var startMonth = d3.select("#" + fieldName).select("#startMonth");
@@ -100,8 +94,7 @@ function makeHEB(dataPath , fieldName) {
     //Delete previous object
     d3.select("#" + fieldName).select("#HEBFigure").selectAll("#HEBdiagram").remove();
 
-    //Make svg object
-
+    //Make div and svg object
     let div = d3.select("#" + fieldName).select("#HEBFigure")
         .attr("id", "HEBdiagram")
         .attr("width", figureSize)
@@ -381,7 +374,7 @@ function makeHEB(dataPath , fieldName) {
         }
 
         //Make array for legend content
-        let legendContent = [{"item": "incoming", "color": "#eb4034"}, {"item": "outgoing", "color": "#4254f5"}, {"item": "two-way", "color": "#4b00bf"}];
+        let legendContent = [{"item": "incoming", "color": "#eb4034"}, {"item": "outgoing", "color": "#4254f5"}, {"item": "two-way", "color": "#eb9834"}];
 
         //Create legend
         var legend = svg.selectAll("entries")
