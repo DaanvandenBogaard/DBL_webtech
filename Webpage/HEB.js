@@ -9,7 +9,9 @@ var jobGroupIndex = [];
 var allEdges = [];
 var drawnEdges = [];
 
-function makeHEB(dataPath) {
+//Datapath is the location of the user's dataset. 
+//fieldName is the name (id) of the visualisationBox the dataset is currently in.
+function makeHEB(dataPath , fieldName) {
 
     //Make id
     /*
@@ -18,14 +20,14 @@ function makeHEB(dataPath) {
     */
 
     //Link elements in dbl_vis.php to variables
-    var startYear = d3.select("#startYear");
-    var startMonth = d3.select("#startMonth");
-    var endYear = d3.select("#endYear");
-    var endMonth = d3.select("#endMonth");
-    var animToggle = d3.select("#animateToggle");
-    var pauseIcon = d3.select("#pauseIcon");
-    var togglePause = d3.select("#togglePause");
-    var strengthSlider = d3.select("#strengthSlider");
+    var startYear = d3.select("#" + fieldName).select("#startYear");
+    var startMonth = d3.select("#" + fieldName).select("#startMonth");
+    var endYear = d3.select("#" + fieldName).select("#endYear");
+    var endMonth = d3.select("#" + fieldName).select("#endMonth");
+    var animToggle = d3.select("#" + fieldName).select("#animateToggle");
+    var pauseIcon = d3.select("#" + fieldName).select("#pauseIcon");
+    var togglePause = d3.select("#" + fieldName).select("#togglePause");
+    var strengthSlider = d3.select("#" + fieldName).select("#strengthSlider");
 
     var endYearAdjust = false;
     var startDate = 0;
@@ -86,7 +88,7 @@ function makeHEB(dataPath) {
 
     //Set dimensions
     let margin = { top: 15, right: 10, bottom: 15, left: 10 };
-    let figureSize = 800;
+    let figureSize = 690; //changed this because it was too big for the current fieldsize, but ultimately this should not be hardcoded -Daan
     let diameter = 600;
     let radius = diameter / 2;
     let innerRadius = radius / 10;
@@ -96,10 +98,11 @@ function makeHEB(dataPath) {
     var lineOpacity = 0.6;
 
     //Delete previous object
-    d3.select("#HEBFigure").select("svg").remove();
+    d3.select("#" + fieldName).select("#HEBFigure").selectAll("#HEBdiagram").remove();
 
     //Make svg object
-    let div = d3.select("#HEBFigure")
+
+    let div = d3.select("#" + fieldName).select("#HEBFigure")
         .attr("id", "HEBdiagram")
         .attr("width", figureSize)
         .attr("height", figureSize);
@@ -147,24 +150,7 @@ function makeHEB(dataPath) {
         var g = svg.selectAll("g")
             .data(usableData)
             .enter()
-            .append("g");
-
-        var circle_clicked = false;
-
-        //creates circles for all working persons
-        var circle = g.append("circle")
-            .attr("cx", function(d,i){
-                return circ_x(300,i);
-            })
-            .attr("cy", function(d,i){
-                return circ_y(300,i);
-            })
-            .attr("r", 5)
-            //Fills the circles according to jobtitle
-            .attr("fill", function (d) {
-               var job_code = Jobtitles_list.indexOf(d.jobtitle);
-               return color_arr[job_code];
-            })
+            .append("g")
             .on("mouseover", function () {
                 d3.select(this)
                 //Create tooltip
@@ -179,10 +165,6 @@ function makeHEB(dataPath) {
                        .style("top", (event.y) + "px");
                 tooltip.style("opacity", 1)
                 d3.select(this).raise().attr("stroke", "#5c5c5c")
-
-                .attr("", function(d) {
-                    console.log(d3.selectAll("paths").classList);
-                })
 
                 //Change width color and opacity for incoming selected mails
                 d3.selectAll(incoming)
@@ -200,8 +182,8 @@ function makeHEB(dataPath) {
                   .attr("stroke-width", 2);
                 //Place selected paths on top of others
                 if (d3.selectAll(incoming))
-                d3.select(this.parentNode).raise();
-                circle_clicked = true;
+                d3.select(this).raise();
+                d3.select(tooltip).raise();
             })
             .on("mouseleave", function (d) {
                 //Remove tooltip
@@ -222,9 +204,23 @@ function makeHEB(dataPath) {
                   .style("opacity", lineOpacity)
                   .attr("stroke", "black")
                   .attr("stroke-width", 1);
-                circle_clicked = false;
             });
 
+        //creates circles for all working persons
+        var circle = g.append("circle")
+            .attr("cx", function(d,i){
+                return circ_x(300,i);
+            })
+            .attr("cy", function(d,i){
+                return circ_y(300,i);
+            })
+            .attr("r", 5)
+            //Fills the circles according to jobtitle
+            .attr("fill", function (d) {
+               var job_code = Jobtitles_list.indexOf(d.jobtitle);
+               return color_arr[job_code];
+            });
+            
         //Creates the text for ids
         var id_text = g.append("text")
             .attr("transform", function(d, i) {
@@ -378,6 +374,7 @@ function makeHEB(dataPath) {
                     .attr("fill", "none")
                     .attr("stroke-width", 1)
                     .style("opacity", lineOpacity)
+                    .attr("id", "path")
                     .attr("class", function(d){
                         return "from" + d.from + " to" + d.to;
                     });
@@ -437,7 +434,7 @@ function makeHEB(dataPath) {
         //Event handler that changes the bundlestrength when changed at slider
         strengthSlider.on("input", function() {
             bundleStrength = strengthSlider.property("value");
-            d3.selectAll("#path").remove();
+            d3.select("#" + fieldName).selectAll("#path").remove();
             generateEdges();
         })
 
@@ -461,8 +458,8 @@ function makeHEB(dataPath) {
                     curDate = parseInt(curYear.toString() + "01", 10);
                 }
 
-                //Remove all paths from previous month and draw new paths of current month
-                d3.selectAll("#path").remove();
+                d3.select("#" + fieldName).selectAll("#path").remove();
+
                 generateEdges();
 
                 //If animation has not been paused, wait set time and load next frame

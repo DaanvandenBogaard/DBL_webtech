@@ -1,6 +1,8 @@
 <!DOCTYPE html>
 <html>
+
 	<head>
+		<title> dbl/visualisation </title> 
 		<meta charset="utf-8" />
 		<meta name="viewpoint" content="width=device-width, initial-scale=1.0" />
 		<link rel="stylesheet" type="text/css" href="dbl.css" />
@@ -8,8 +10,8 @@
 		<script src="https://d3js.org/d3.v6.min.js"></script>
 		<script src="https://d3js.org/d3-collection.v1.min.js"></script>
 		<script src="Webpagecode.js"></script>
-		<title> dbl/visualisation </title> 
-		
+		<script src="D3Functions.js"></script>
+		<script src= "generalUIVis.js"></script>
 	</head>
 	<body>	
 	
@@ -21,21 +23,22 @@
         echo "<script type='text/javascript'>  
         localStorage.setItem('DataSet', '".$filename."'); 
         </script>";
-    }
+    } 
     ?>
 
 		<!--Sidebar-->
 		<div id="sidebar", class="sidebar">
 			<div class="fa fa-bars" id=toggle style="font-size: 36px;" onclick="toggleSidebar()">  </div>
 			<hr class="line" id="line">
-			<a href="dbl_home.html" class="fa fa-home" style="font-size:36px;"> <span class="sideText" id="sideTextHome" style="visibility: hidden;"> Home </span> </a>
+			<a href="dbl_home.html" class="fa fa-home" style="font-size:36px;" display = "block"> <span class="sideText" id="sideTextHome" style="visibility: hidden;"> Home </span> </a>
 			<a href="dbl_vis.php" class="fa fa-pie-chart" id="selected" style="font-size:36px;"> <span class="sideText" id="sideTextVis" style="visibility: hidden;"> Visualisation </span> </a>
 			<a href="dbl_about.html" class="fa fa-info-circle" style="font-size:36px;"> <span class="sideText" id="sideTextAbout" style="visibility: hidden;"> About </span> </a>
 		</div>
 		
 		<!--Toolbox-->
 		<div id="toolbar" class="toolbar">
-			<button> test </button>
+			<!--Function definition in generalUIVis.js: -->
+			<button onclick="AddVisualisationBlock()"> Add visualisation block </button>
 		</div>
 		<div class="fa fa-angle-down" id="tooltoggle" onclick="toggleToolbar()"> <span class="tooltext"> Toolbar </span> </div>	
 
@@ -43,6 +46,7 @@
 		<div id="pageContent" class="pageContent">
 
 			<!--temp text-->
+		<div id = "upload">
 			<p class="title">Visualisation</p>
 			<p>Upload a dataset to start the visualisation</p>
 
@@ -56,28 +60,46 @@
 				<span id="file_chosen"> Choose a file (.csv) </span>
 				<button id="submit_file" type="submit" name="submit"> Submit </button>
 			</form>
+		</div>
+
+			<script> 
+			//Handle upload button: 
+			if (localStorage.getItem('DataSet') != 'null') {
+				var uploadHTML = d3.select("#upload");
+				uploadHTML.style("display" , "none");
+			}
+			</script>
 
 			<!--Visualisation-->
-			<script src="D3Functions.js"></script>
-
+			<!-- Imports Sankey -->
+			<script src="https://unpkg.com/d3-array@1"></script>
+			<script src="https://unpkg.com/d3-collection@1"></script>
+			<script src="https://unpkg.com/d3-path@1"></script>
+			<script src="https://unpkg.com/d3-shape@1"></script>
+			<script src="https://unpkg.com/d3-sankey@0"></script>
+			<script src="https://unpkg.com/d3-simple-slider"></script>
+			<script src="https://d3js.org/d3-dispatch.v2.min.js"></script>
+			<script src="https://d3js.org/d3-selection.v2.min.js"></script>
+			<script src="https://d3js.org/d3-drag.v2.min.js"></script>
+			<script src= "SankeyDiagram.js"></script>
+			
 			<!-- HEB -->
+			<!-- Import HEB -->
 			<script src="HEB.js"></script>
-			<span> From (year-month) </span>
-			<input id="startYear" type="number" name="startYear" default=1998>
-			<input id="startMonth" type="number" name="startMonth" default=01>
-			<span> to (year-month) </span>
-			<input id="endYear" type="number" name="endYear" default=2002>
-			<input id="endMonth" type="number" name="endMonth" default=12>
-			<div>
-				<input id="animateToggle" type="checkbox">
-				<label for="animateToggle"> animation </label>
-				<button id="startHEB" type="button" name="HEB" onclick="makeHEB(localStorage.getItem('DataSet'))"> Start </button>
-			</div>
-			<button id="togglePause" type="button" name="togglePause"> Play </button>
-			<label for="togglePause" id="pauseIcon" class="fa fa-play"></label>
-			<input id="strengthSlider" type="range" name="strengthSlider" min="0.00" max="1.00" value="0.85" step="0.05">
-			<label for="strengthSlider"> Bundle strength </label>
-			<div id="HEBFigure"> </div>
+		
+			<!-- MSV: -->
+			<!--Visualisation-->
+			<script src="D3Functions.js"></script>
+            <!--<script src="SimulatedAnnealing.js"></script>-->
+			<script src="MSVMethods.js"></script>
+			<script src="MSV.js"></script>
+			
+			<!--Here we make the first two visualisation blocks:-->
+			<script>
+			AddVisualisationBlock();
+			AddVisualisationBlock();
+			</script>
+
 		</div>
 	</body>
 </html>

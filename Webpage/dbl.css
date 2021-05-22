@@ -179,9 +179,8 @@ a:hover {
 /* PageContent */
 
 .pageContent {
-	width:70%;
+	width: 100%;
 	height: 100%;
-	margin-left: 15%;
 	margin-top: 30px;
 	transition: var(--transition);
 	text-align: center;
@@ -256,9 +255,65 @@ button#submit_file {
 }
 
 .methodDesc {
-	color: var(--smallText);
+	max-width: 70%;
+	word-wrap: break-word;
+	display: inline-block;
 }
 
+.methodDescSankey {
+	max-width: 70%;
+	word-wrap: break-word;
+	display: inline-block;
+	position: relative;
+	top: -120px;
+}
+
+.methodDescHEB {
+	max-width: 70%;
+	word-wrap: break-word;
+	display: inline-block;
+	position: relative;
+	top: -120px;
+}
+
+.methodDescMSV {
+	max-width: 70%;
+	word-wrap: break-word;
+	display: inline-block;
+	position: relative;
+	top: -140px;
+}
+
+.aboutImage {
+	width: 300px;
+	margin-right: 0;
+}
+
+/* Visualisation UI */
+.upperVisBox {
+	display: flex;
+	align-items: center;
+	justify-content: center; 
+}
+
+/*.upperVisBox > select*/ .selectorUI {
+	background-color: #f1f1f1;
+	margin: 10px;
+	padding: 20px;
+	font-size: 30px;
+	align-items: center;
+}
+
+.visField {
+	border-style: solid;
+	border-color: coral;
+	width: 90%;
+	height: 100%;
+	margin: 10px;
+	display: inline-block;
+}
+
+/* HEB */
 #HEBFigure {
 	font-family: var(--font);
 	font-size: 10pt;
@@ -270,6 +325,7 @@ button#submit_file {
 
 .tooltip {
 	padding: 3px;
+	width: 200px;
 	opacity: 0;
 	position: fixed;
 	background-color: var(--hover);
@@ -281,4 +337,9 @@ button#submit_file {
 	border-radius: 3px;
 	text-align: left;
 	white-space: pre-wrap;
+}
+
+#aboutContent {
+	width: 70%;
+	margin-left: 15%;
 }
