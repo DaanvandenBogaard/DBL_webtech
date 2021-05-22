@@ -142,12 +142,13 @@ function makeHEB(dataPath, fieldName) {
             }
         });
 
+
         //Sort array by jobtitle
         usableData.sort((a, b) => d3.ascending(a.jobtitle, b.jobtitle) || d3.ascending(a.toId, b.toId));
         var angleStep = Math.PI * 2 / usableData.length;
 
-        //Get unique ids
-        let unique_ids = [...new Set(usableData.map(ids => ids.id))];
+        console.log(usableData);  //TESTING PURPOSES
+
 
         //Get unique jobtitles
         let Jobtitles_list = [...new Set(usableData.map(ids => ids.jobtitle))];
@@ -159,6 +160,15 @@ function makeHEB(dataPath, fieldName) {
             jobGroupIndex.push([d, startIndex + ((endIndex - startIndex) / 2)]);
         })
 
+        //Filtering UsableData on the jobtitles selected.
+        usableData = usableData.filter(function (item) {
+            return !wrong_Jobtitles.includes(item.jobtitle);
+        })
+
+        //Get unique ids
+        let unique_ids = [...new Set(usableData.map(ids => ids.id))];
+
+        
 
         //CREATION OF HEB
         //CREATION OF HEB
@@ -281,7 +291,7 @@ function makeHEB(dataPath, fieldName) {
                     var angle = angleStep * i * 180 / Math.PI;
                 }
                 //Translate it on the circle with small increase in radius as to not overlap node circles, rotate in the same "transform"
-                return "translate(" + (350 + (radius + 6) * (Math.cos(((2 * Math.PI) / 149) * i))) + ", " + (350 + (radius + 6) * (Math.sin(((2 * Math.PI) / 149) * i))) + ") rotate(" + angle + ")"
+                return "translate(" + (350 + (radius + 6) * (Math.cos(((2 * Math.PI) / usableData.length) * i))) + ", " + (350 + (radius + 6) * (Math.sin(((2 * Math.PI) / usableData.length) * i))) + ") rotate(" + angle + ")"
             })
             .attr("text-anchor", function (d, i) {
                 //Check if achor needs to be left or right depending on if the text has been flipped
@@ -295,64 +305,6 @@ function makeHEB(dataPath, fieldName) {
             .attr("dominant-baseline", "central")
             .text(function (d, i) { return d.id; });
 
-
-
-
-//Creates second grouping element, used for the legend.
-        var g2 = svg.selectAll("g")
-            .data(Jobtitles_list)
-            .append("g")
-            .attr("id", "group2")
-            .on("click", function (d) {
-                //When clicking on the legend circles the jobtitle is removed or added back again.
-                d3.select(this).attr("", function(d){
-                    if(!wrong_Jobtitles.includes(d)){
-                        //If it was not removed, it will be removed
-                    wrong_Jobtitles.push(d);
-                    }
-                    else{
-                        //If it was removed, it will be added back
-                        wrong_Jobtitles.splice(wrong_Jobtitles.indexOf(d), 1);
-                    }
-                    console.log(wrong_Jobtitles);
-                })
-                d3.select(this).select("text").attr("text-decoration", function(d){
-                    //Puts a line through when jobtitle is removed.
-                    if(wrong_Jobtitles.includes(d)){
-                        return "line-through";
-                    }
-                    else {return "";}
-
-                })
-                
-            })
-//Creates the circles for the legend
-        var job_circle = g2.append("circle")
-            .attr("cx", 720)
-            .attr("cy", function (d, i) {
-                return 150 + 25 * i;
-            })
-            .attr("r", 10)
-            //Fills the circles according to jobtitle
-            .attr("fill", function (d, i) {
-                return color_arr[i];
-            });
-//Creates the text for the jobtitles for the legend.
-        var job_text = g2.append('text').attr("font-size", "12pt")
-            .attr("dominant-baseline", "central")
-            .attr("x", 740)
-            .attr("y", function (d, i) {
-                return 150 + 25 * i;
-            })
-            .text(function (d, i) { return d; })
-            .attr("text-decoration", function(d){
-                //Puts a line through when jobtitle is removed.
-                if(wrong_Jobtitles.includes(d)){
-                    return "line-through";
-                }
-                else {return "";}
-
-            });
 
 
 
@@ -523,6 +475,66 @@ function makeHEB(dataPath, fieldName) {
                 return d.item;
             });
 
+
+
+
+        //Creates second grouping element, used for the legend.
+        var g2 = svg.selectAll("g")
+            .data(Jobtitles_list)
+            .append("g")
+            .attr("id", "group2")
+            .on("click", function (d) {
+                //When clicking on the legend circles the jobtitle is removed or added back again.
+                d3.select(this).attr("", function (d) {
+                    if (!wrong_Jobtitles.includes(d)) {
+                        //If it was not removed, it will be removed
+                        wrong_Jobtitles.push(d);
+                    }
+                    else {
+                        //If it was removed, it will be added back
+                        wrong_Jobtitles.splice(wrong_Jobtitles.indexOf(d), 1);
+                    }
+                    console.log(wrong_Jobtitles);
+                })
+                d3.select(this).select("text").attr("text-decoration", function (d) {
+                    //Puts a line through when jobtitle is removed.
+                    if (wrong_Jobtitles.includes(d)) {
+                        return "line-through";
+                    }
+                    else { return ""; }
+
+                })
+
+            })
+        //Creates the circles for the legend
+        var job_circle = g2.append("circle")
+            .attr("cx", 720)
+            .attr("cy", function (d, i) {
+                return 150 + 25 * i;
+            })
+            .attr("r", 10)
+            //Fills the circles according to jobtitle
+            .attr("fill", function (d, i) {
+                return color_arr[i];
+            });
+        //Creates the text for the jobtitles for the legend.
+        var job_text = g2.append('text').attr("font-size", "12pt")
+            .attr("dominant-baseline", "central")
+            .attr("x", 740)
+            .attr("y", function (d, i) {
+                return 150 + 25 * i;
+            })
+            .text(function (d, i) { return d; })
+            .attr("text-decoration", function (d) {
+                //Puts a line through when jobtitle is removed.
+                if (wrong_Jobtitles.includes(d)) {
+                    return "line-through";
+                }
+                else { return ""; }
+
+            });
+
+
         //Check if pausebutton has been clicked 
         togglePause.on("click", function () {
             if (!isPaused && doAnimate) {
@@ -601,12 +613,12 @@ function dateFormat(date) {
 
 //Function for placement on HEB (X)
 function circ_x(radius, index) {
-    return 350 + radius * (Math.cos(((2 * Math.PI) / 149) * index));
+    return 350 + radius * (Math.cos(((2 * Math.PI) / usableData.length) * index));
 }
 
 //Function for placement on HEB (Y)
 function circ_y(radius, index) {
-    return 350 + radius * (Math.sin(((2 * Math.PI) / 149) * index));
+    return 350 + radius * (Math.sin(((2 * Math.PI) / usableData.length) * index));
 }
 
 //Function that finds the index of the first or last job that has the searched for jobtitle depending on the direction selected
