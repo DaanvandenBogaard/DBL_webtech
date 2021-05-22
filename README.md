@@ -36,6 +36,8 @@ When you first log into the site, you will be asked to upload a dataset.
 We do not have a feature to upload a new dataset (yet).
 
 Should you want to upload another dataset, we have the following procedure:
+* First go back to the home-page.
+* Now, go back to the visualisation-page through the menu.
 * Hit "F12" and go to "Console"
 * Type "localStorage.setItem('DataSet', null);". This will remove any reference to the old dataset.
 * Refresh the webpage.
