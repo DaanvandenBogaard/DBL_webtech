@@ -283,12 +283,12 @@ function makeHEB(dataPath , fieldName) {
             var mail_lines = [];
             
             //Do checks for each mail in mailbox of reciever
-            for (k = 0; k < d.mails.length; k++) { 
+            for (i = 0; i < d.mails.length; i++) { 
 
                 //If animation is not selected check for mails between dates, if animation is selected check for mails in specific month
-                if ((!doAnimate && (d.mails[k]["date"] >= startDate && d.mails[k]["date"] <= endDate)) ||
-                    (doAnimate && d.mails[k]["date"] == curDate)) {
-                    var fromId = d.mails[k]["from"];
+                if ((!doAnimate && (d.mails[i]["date"] >= startDate && d.mails[i]["date"] <= endDate)) ||
+                    (doAnimate && d.mails[i]["date"] == curDate)) {
+                    var fromId = d.mails[i]["from"];
 
                     //Check if the same edges (but in a different month) has already been drawn
                     if (notDrawn(d["id"], fromId)) {
