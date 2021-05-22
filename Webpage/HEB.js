@@ -8,21 +8,30 @@ var userIndex = [];
 var jobGroupIndex = [];
 var allEdges = [];
 var drawnEdges = [];
+var wrong_Jobtitles = [];
 
 
 //Datapath is the location of the user's dataset. 
 //fieldName is the name (id) of the visualisationBox the dataset is currently in.
-function restartHEB(dataPath, fieldName){
-//Delete previous object
-d3.selectAll("#HEBdiagram").remove();
-console.log("restartung");
+function restartHEB(dataPath, fieldName) {
+    //Delete previous object
+    d3.select("#" + fieldName).selectAll("#HEBdiagram").remove();
+    console.log("restartung");
 }
 
 function makeHEB(dataPath, fieldName) {
+    //Make id
+    /*
+    hebId = Math.floor(Math.random() * 100000);
+    console.log(hebId);
+    */
 
-    d3.select("#" + fieldName).select("#HEBdiagram");
+    d3.select("#" + fieldName).selectAll("#HEBdiagram").remove();
 
-    //Variables
+
+    //VARIABLES AND SUCH
+    //VARIABLES AND SUCH
+    //VARIABLES AND SUCH
 
     //Link elements in dbl_vis.php to variables
     var startYear = d3.select("#" + fieldName).select("#startYear");
@@ -44,7 +53,7 @@ function makeHEB(dataPath, fieldName) {
 
     //Set dimensions
     let margin = { top: 15, right: 10, bottom: 15, left: 10 };
-    let figureSize = 690; //changed this because it was too big for the current fieldsize, but ultimately this should not be hardcoded -Daan
+    let figureSize = 900; //changed this because it was too big for the current fieldsize, but ultimately this should not be hardcoded -Daan
     let diameter = 600;
     let radius = diameter / 2;
     let innerRadius = radius / 10;
@@ -52,11 +61,15 @@ function makeHEB(dataPath, fieldName) {
     //Creating color array
     const color_arr = ["green", "blue", "chartreuse", "cyan", "darkmagenta", "deeppink", "gold", "lightseagreen", "mediumpurple", "olive", "orchid", "seagreen", "grey", "blue", "green", "blue", "green", "blue",];
 
+
+    //INPUT DATA PROCESSING
+    //INPUT DATA PROCESSING
+    //INPUT DATA PROCESSING
+
+
     //Variables for lines
     var bundleStrength = strengthSlider.property("value");
     var lineOpacity = 0.6;
-
-    //Input data processing
 
     //Check if startYear is outside of allowed values
     if (startYear.property("value") < 1998) {
@@ -107,7 +120,9 @@ function makeHEB(dataPath, fieldName) {
     var curYear = parseInt(startYear.property("value"));
     var curDate = startDate;
 
-    //Processing data
+    //PROCESSING DATA
+    //PROCESSING DATA
+    //PROCESSING DATA
 
     d3.csv(dataPath).then(function (data) {
         //Since d3.csv is asynchronous (it is not loaded immediatly, but it is a request to the webserver) we need all our code from the data in here. 
@@ -137,7 +152,19 @@ function makeHEB(dataPath, fieldName) {
         //Get unique jobtitles
         let Jobtitles_list = [...new Set(usableData.map(ids => ids.jobtitle))];
 
-        //Creation HEB
+        //Make an array with its "index" in the middle of all circles so the paths can group in the center
+        Jobtitles_list.forEach(function (d) {
+            startIndex = findIndex(usableData, d, "front");
+            endIndex = findIndex(usableData, d, "back");
+            jobGroupIndex.push([d, startIndex + ((endIndex - startIndex) / 2)]);
+        })
+
+
+        //CREATION OF HEB
+        //CREATION OF HEB
+        //CREATION OF HEB
+
+
 
         //Make svg object
         let div = d3.select("#" + fieldName).select("#HEBFigure")
@@ -154,49 +181,64 @@ function makeHEB(dataPath, fieldName) {
         var tooltip = div.append("div")
             .attr("class", "tooltip");
 
+
         //Creates the group object for all rows in the usableData set
         var g = svg.selectAll("g")
             .data(usableData)
             .enter()
             .append("g")
-            .on("mouseover", function () {
-                d3.select(this)
-                    //Create tooltip
-                    .attr("", function (d) {
-                        //Set incoming and outcoming class
-                        incoming = ".to" + d.id;
-                        outgoing = ".from" + d.id;
-                        tooltip_string = d.id + " is a(n) " + d.jobtitle + "\n Recieved mails from " + d3.selectAll(incoming).size() + " people \n Sent mails to " + d3.selectAll(outgoing).size() + " people";
-                    });
-                tooltip.html(tooltip_string)
-                    .style("left", (event.x + 5) + "px")
-                    .style("top", (event.y) + "px");
-                tooltip.style("opacity", 1)
-                d3.select(this).raise().attr("stroke", "#5c5c5c")
+            .attr("id", "group1")
 
-                //Change width color and opacity for incoming selected mails
-                d3.selectAll(incoming)
-                    .style("opacity", 1)
-                    .attr("stroke", "#eb4034")
-                    .attr("stroke-width", 2);
-                //Change width color and opacity for outgoing selected mails
-                d3.selectAll(outgoing)
-                    .style("opacity", 1)
-                    .attr("stroke", "#4254f5")
-                    .attr("stroke-width", 2);
-                d3.selectAll(".twoWay")
-                    .style("opacity", 1)
-                    .attr("stroke", "#eb9834")
-                    .attr("stroke-width", 2);
-                //Place selected paths on top of others
-                if (d3.selectAll(incoming))
-                    d3.select(this).raise();
-                d3.select(tooltip).raise();
+        d3.selectAll("#group1").on("mouseover", function () {
+            d3.select(this)
+                //Create tooltip
+                .attr("", function (d) {
+                    //Set incoming and outcoming class
+                    incoming = ".to" + d.id;
+                    outgoing = ".from" + d.id;
+                    tooltip_string = d.id + " is a(n) " + d.jobtitle + "\n Recieved mails from " + d3.selectAll(incoming).size() + " people \n Sent mails to " + d3.selectAll(outgoing).size() + " people";
+                });
+            tooltip.html(tooltip_string)
+                .style("left", (event.x + 5) + "px")
+                .style("top", (event.y) + "px");
+
+
+            d3.select(this).attr("", function (d) {
+                if (d.id > 0 && d.id < 200) {
+                    tooltip.style("opacity", 1);
+
+                    d3.select(this).raise().attr("stroke", "#5c5c5c")
+                }
+                else {
+                    d3.select(this).selectAll("#group2").raise().attr("stroke", "#5c5c5c")
+
+                }
             })
+
+            //Change width color and opacity for incoming selected mails
+            d3.selectAll(incoming)
+                .style("opacity", 1)
+                .attr("stroke", "#eb4034")
+                .attr("stroke-width", 2);
+            //Change width color and opacity for outgoing selected mails
+            d3.selectAll(outgoing)
+                .style("opacity", 1)
+                .attr("stroke", "#4254f5")
+                .attr("stroke-width", 2);
+            d3.selectAll(".twoWay")
+                .style("opacity", 1)
+                .attr("stroke", "#eb9834")
+                .attr("stroke-width", 2);
+            //Place selected paths on top of others
+            if (d3.selectAll(incoming))
+                d3.select(this).raise();
+            d3.select(tooltip).raise();
+        })
             .on("mouseleave", function (d) {
                 //Remove tooltip
                 tooltip.style("opacity", 0);
                 d3.select(this).attr("stroke", null)
+                d3.select(this).selectAll("#group2").raise().attr("stroke", null)
 
                     //Return selected lines to normal
                     .attr("", function (d) {
@@ -220,10 +262,8 @@ function makeHEB(dataPath, fieldName) {
                 return circ_x(300, i);
             })
             .attr("cy", function (d, i) {
-                console.log("sgianguinaoudg");
                 return circ_y(300, i);
             })
-            .attr("id", "HEBdiagram")
             .attr("r", 5)
             //Fills the circles according to jobtitle
             .attr("fill", function (d) {
@@ -255,12 +295,66 @@ function makeHEB(dataPath, fieldName) {
             .attr("dominant-baseline", "central")
             .text(function (d, i) { return d.id; });
 
-        //Make an array with its "index" in the middle of all circles so the paths can group in the center
-        Jobtitles_list.forEach(function (d) {
-            startIndex = findIndex(usableData, d, "front");
-            endIndex = findIndex(usableData, d, "back");
-            jobGroupIndex.push([d, startIndex + ((endIndex - startIndex) / 2)]);
-        })
+
+
+
+//Creates second grouping element, used for the legend.
+        var g2 = svg.selectAll("g")
+            .data(Jobtitles_list)
+            .append("g")
+            .attr("id", "group2")
+            .on("click", function (d) {
+                //When clicking on the legend circles the jobtitle is removed or added back again.
+                d3.select(this).attr("", function(d){
+                    if(!wrong_Jobtitles.includes(d)){
+                        //If it was not removed, it will be removed
+                    wrong_Jobtitles.push(d);
+                    }
+                    else{
+                        //If it was removed, it will be added back
+                        wrong_Jobtitles.splice(wrong_Jobtitles.indexOf(d), 1);
+                    }
+                    console.log(wrong_Jobtitles);
+                })
+                d3.select(this).select("text").attr("text-decoration", function(d){
+                    //Puts a line through when jobtitle is removed.
+                    if(wrong_Jobtitles.includes(d)){
+                        return "line-through";
+                    }
+                    else {return "";}
+
+                })
+                
+            })
+//Creates the circles for the legend
+        var job_circle = g2.append("circle")
+            .attr("cx", 720)
+            .attr("cy", function (d, i) {
+                return 150 + 25 * i;
+            })
+            .attr("r", 10)
+            //Fills the circles according to jobtitle
+            .attr("fill", function (d, i) {
+                return color_arr[i];
+            });
+//Creates the text for the jobtitles for the legend.
+        var job_text = g2.append('text').attr("font-size", "12pt")
+            .attr("dominant-baseline", "central")
+            .attr("x", 740)
+            .attr("y", function (d, i) {
+                return 150 + 25 * i;
+            })
+            .text(function (d, i) { return d; })
+            .attr("text-decoration", function(d){
+                //Puts a line through when jobtitle is removed.
+                if(wrong_Jobtitles.includes(d)){
+                    return "line-through";
+                }
+                else {return "";}
+
+            });
+
+
 
         //Set color scale for gradient
         var colors = ["#4334eb", "#eb9834"];
@@ -390,6 +484,10 @@ function makeHEB(dataPath, fieldName) {
                 });
         }
 
+        //EVENT HANDLERS
+        //EVENT HANDLERS
+        //EVENT HANDLERS
+
         //Make array for legend content
         let legendContent = [{ "item": "incoming", "color": "#eb4034" }, { "item": "outgoing (w.i.p.)", "color": "#4254f5" }, { "item": "two-way (w.i.p.)", "color": "#4b00bf" }];
 
@@ -478,7 +576,9 @@ function makeHEB(dataPath, fieldName) {
                 }
             }
         }
+
     });
+
 }
 
 //Function for checking if a mail from the same person in the same month is already in the mails array of the reciever
