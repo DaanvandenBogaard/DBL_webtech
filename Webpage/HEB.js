@@ -20,6 +20,8 @@ console.log("restartung");
 
 function makeHEB(dataPath, fieldName) {
 
+    d3.select("#" + fieldName).select("#HEBdiagram");
+
     //Variables
 
     //Link elements in dbl_vis.php to variables
