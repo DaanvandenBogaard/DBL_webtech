@@ -20,8 +20,6 @@ console.log("restartung");
 
 function makeHEB(dataPath, fieldName) {
 
-    d3.select("#" + fieldName).select("#HEBdiagram");
-
     //Variables
 
     //Link elements in dbl_vis.php to variables
@@ -220,7 +218,6 @@ function makeHEB(dataPath, fieldName) {
                 return circ_x(300, i);
             })
             .attr("cy", function (d, i) {
-                console.log("sgianguinaoudg");
                 return circ_y(300, i);
             })
             .attr("id", "HEBdiagram")

@@ -10,7 +10,7 @@ function AddVisualisationBlock(){
     }
 
     console.log("add new block! name = vis" + index);
-    let mainBlock = d3.select("#pageContent");
+    let mainBlock = d3.select("#visContent");
     let newVisBlock = mainBlock.append("div")
                                .attr("id" , "vis" + index)
                                .attr("class" , "visField")

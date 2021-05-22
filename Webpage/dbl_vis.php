@@ -8,7 +8,6 @@
 		<link rel="stylesheet" type="text/css" href="dbl.css" />
 		<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
 		<script src="https://d3js.org/d3.v6.min.js"></script>
-		<script src="https://d3js.org/d3-collection.v1.min.js"></script>
 		<script src="Webpagecode.js"></script>
 		<script src="D3Functions.js"></script>
 		<script src= "generalUIVis.js"></script>
@@ -43,7 +42,7 @@
 		<div class="fa fa-angle-down" id="tooltoggle" onclick="toggleToolbar()"> <span class="tooltext"> Toolbar </span> </div>	
 
 		<!--pagecontent-->
-		<div id="pageContent" class="pageContent">
+		<div id="visContent" class="visContent">
 
 			<!--temp text-->
 		<div id = "upload">
@@ -53,7 +52,7 @@
 			<!--Upload/replace dataset: -->
 			<form action="upload.php" method="POST" enctype="multipart/form-data" >
 				<input id="file_input" type="file" name="dataset" accept=".csv" onchange="changeFile()">
-				<label id="upload_button" for="file_input">
+				<label id="largeButton" for="file_input">
 					<i class="fa fa-upload" id="upload_icon" style="font-size: 20px;"></i>
 					Upload dataset
 				</label>

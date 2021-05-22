@@ -36,7 +36,7 @@ function toggleToolbar() {
     document.getElementById("toolbar").classList.toggle('toolsActive');
     document.getElementById("tooltoggle").classList.toggle('fa-angle-down');
     document.getElementById("tooltoggle").classList.toggle('fa-angle-up');
-    document.getElementById("pageContent").classList.toggle('expanded');
+    document.getElementById("visContent").classList.toggle('expanded');
 
     if (visToolbar == 'visible') {
         toolbar.style.visibility = 'hidden';
