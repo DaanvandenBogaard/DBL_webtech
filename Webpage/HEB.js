@@ -600,7 +600,7 @@ function makeHEB(dataPath, fieldName) {
                     curDate = parseInt(curYear.toString() + "01", 10);
                 }
 
-                d3.select("#" + fieldName).selectAll("#path").remove();
+                d3.select("#" + fieldName).selectAll("path").remove();
 
                 generateEdges();
 
