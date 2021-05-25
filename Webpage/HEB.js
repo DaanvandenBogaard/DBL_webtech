@@ -16,6 +16,7 @@ wrong_Jobtitles[2] = [];
 wrong_Jobtitles[3] = [];
 wrong_Jobtitles[4] = [];
 wrong_Jobtitles[5] = [];
+var colorswitch = true;
 
 
 //Datapath is the location of the user's dataset. 
@@ -50,16 +51,19 @@ function makeHEB(dataPath, fieldName) {
     var togglePause = d3.select("#" + fieldName).select("#togglePause");
     var strengthSlider = d3.select("#" + fieldName).select("#strengthSlider");
 
+    //Date variables
     var endYearAdjust = false;
     var startDate = 0;
     var endDate = 0;
 
+    //The number of the HEB
     var HEB_nr = fieldName.match(/(\d+)/)[0];
-    console.log(HEB_nr);
 
+    //Animation variables
     var doAnimate = animToggle.property("checked");
     var isPaused = true;
     var frameTime = 1000;
+
 
     //Set dimensions
     let margin = { top: 15, right: 10, bottom: 15, left: 10 };
@@ -144,13 +148,13 @@ function makeHEB(dataPath, fieldName) {
         data.forEach(function (d) {
             //Check wheter the toId is already an object, if not create object with first found fromId
             if (!usableData.some(code => code.id == d.toId)) {
-                usableData.push({ "id": d.toId, "jobtitle": d.toJobtitle, "mails": [{ "from": d.fromId, "date": dateFormat(d.date) }] });
+                usableData.push({ "id": d.toId, "jobtitle": d.toJobtitle, "mails": [{ "from": d.fromId, "date": dateFormat(d.date), "sent": d.sentiment }] });
                 userIndex.push(d.toId);
             }
             //Check wheter fromId is already in mails array, if not add it
             if (notInMails(d.fromId, d.toId, dateFormat(d.date))) {
                 var indexOfUser = userIndex.indexOf(d.toId);
-                usableData[indexOfUser]["mails"].push({ "from": d.fromId, "date": dateFormat(d.date) });
+                usableData[indexOfUser]["mails"].push({ "from": d.fromId, "date": dateFormat(d.date), "sent": d.sentiment });
             }
         });
 
@@ -221,7 +225,67 @@ function makeHEB(dataPath, fieldName) {
         var tooltip = div.append("div")
             .attr("class", "tooltip");
 
+        //Creates switch for coloring edges 1
+        svg.append('rect')
+            .attr('x', 720)
+            .attr('y', 420)
+            .attr("rx", 10)
+            .attr("ry", 10)
+            .attr('width', 60)
+            .attr('height', 40)
+            .attr('stroke', '#1aff1a')
+            .attr('fill', 'blue')
+            .style("opacity", 1)
+            .attr("id", "switch1")
+            .on("click", function () {
+                if (colorswitch == false) {
+                    d3.select(this)
+                        .attr('stroke', '#1aff1a')
+                        .style("opacity", 1)
+                    d3.selectAll("#switch2")
+                        .attr('stroke', 'black')
+                        .style("opacity", 0.5)
+                    colorswitch = true;
+                    change_edgeColor();
+                }
+            });
+        //Creates switch for coloring edges 1
+        svg.append('rect')
+            .attr('x', 720)
+            .attr('y', 465)
+            .attr("rx", 10)
+            .attr("ry", 10)
+            .attr('width', 60)
+            .attr('height', 40)
+            .attr('stroke', 'black')
+            .attr('fill', 'blue')
+            .style("opacity", 0.5)
+            .attr("id", "switch2")
+            .on("click", function () {
+                if (colorswitch) {
+                    d3.select(this)
+                        .attr('stroke', '#1aff1a')
+                        .style("opacity", 1)
+                    d3.selectAll("#switch1")
+                        .attr('stroke', 'black')
+                        .style("opacity", 0.5)
+                    colorswitch = false;
+                    change_edgeColor();
 
+                }
+
+            });
+            console.log("TETSTATSTST")
+        
+        //Checks if the color switch was still turned on
+        if (colorswitch == false) {
+            d3.select("#switch2")
+            .attr('stroke', '#1aff1a')
+            .style("opacity", 1)
+        d3.selectAll("#switch1")
+            .attr('stroke', 'black')
+            .style("opacity", 0.5)
+        }
         //Creates the group object for all rows in the usableData set
         var g = svg.selectAll("#group1")
             .data(usableData)
@@ -380,6 +444,7 @@ function makeHEB(dataPath, fieldName) {
                         if ((!doAnimate && (d.mails[k]["date"] >= startDate && d.mails[k]["date"] <= endDate)) ||
                             (doAnimate && d.mails[k]["date"] == curDate)) {
                             var fromId = d.mails[k]["from"];
+                            var senti = d.mails[k]["sent"];
 
                             //Check if the same edges (but in a different month) has already been drawn
                             if (notDrawn(d["id"], fromId)) {
@@ -439,9 +504,9 @@ function makeHEB(dataPath, fieldName) {
 
                                 //Add lines to array that gets added to the data of the <path> per node and push to incoming of reciever
                                 if (d["jobtitle"] == targetJob) {
-                                    mail_lines.push({ "from": fromId, "to": d["id"], "path": line(shortCoords) });
+                                    mail_lines.push({ "from": fromId, "to": d["id"], "path": line(shortCoords), "sent": senti });
                                 } else {
-                                    mail_lines.push({ "from": fromId, "to": d["id"], "path": line(coords) });
+                                    mail_lines.push({ "from": fromId, "to": d["id"], "path": line(coords), "sent": senti });
                                 }
                             }
                         }
@@ -712,5 +777,17 @@ function isTwoWay(from, to) {
     return true;
 }
 
+function change_edgeColor() {
+    if (colorswitch) { }
+    else {
+        d3.selectAll('path')
+            .attr("stroke", function (d, i) {
+                if (d.sent < 0) {
+                    return "rgb("+(122.5-d.sent*255)+", "+ (122.5+(d.sent*255)) +", 0)";
+                }
+                else { return"rgb("+(122.5-(d.sent*255))+", "+ (122.5+d.sent*255) +", 0)"; }
+            })
+    }
 
+}
 
