@@ -13,6 +13,7 @@ function AddVisualisationBlock(){
     let newVisBlock = mainBlock.append("div")
                                .attr("id" , "vis" + index)
                                .attr("class" , "visField" + index)
+                               
                                .style("height" , "800px");
     CreateVisField("vis" + index); 
       

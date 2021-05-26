@@ -314,7 +314,7 @@ div[class^='visField'], div[class*=' visField'] {
 	padding: 0.5em;
 	margin: 10px;
 	background: #ddd;
-	position: relative;
+	position: absolute;
 }
 
 /* HEB */
