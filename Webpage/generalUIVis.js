@@ -9,14 +9,25 @@ function AddVisualisationBlock(){
         return
     }
 
-    console.log("add new block! name = vis" + index);
     let mainBlock = d3.select("#pageContent");
     let newVisBlock = mainBlock.append("div")
                                .attr("id" , "vis" + index)
-                               .attr("class" , "visField")
+                               .attr("class" , "visField" + index)
                                .style("height" , "800px");
     CreateVisField("vis" + index); 
-           
+      
+    //Use JQuery to have the blocks be draggable:
+    console.log("added UI JQuery!");
+    
+    $( function() {
+        $( "#vis" + index ).draggable({snap: true});
+      } ); 
+
+    //Add the resizeable effect:
+    $( function() {
+        $( "#vis" + index ).resizable();
+      } );
+
     index += 1;                
 }
 

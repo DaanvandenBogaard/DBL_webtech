@@ -7,11 +7,45 @@
 		<meta name="viewpoint" content="width=device-width, initial-scale=1.0" />
 		<link rel="stylesheet" type="text/css" href="dbl.css" />
 		<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+
+		<link rel="stylesheet" type="text/css" 
+		href="http://ajax.googleapis.com/ajax/libs/jqueryui/1.7.1/themes/base/jquery-ui.css"/>
+
+		<!-- Import D3 -->
 		<script src="https://d3js.org/d3.v6.min.js"></script>
 		<script src="https://d3js.org/d3-collection.v1.min.js"></script>
+
+		<!-- Import Jquery -->
+		<script src="https://code.jquery.com/jquery-1.12.4.js"></script>
+  		<script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
+
+		<!-- Import custom scripts -->
 		<script src="Webpagecode.js"></script>
 		<script src="D3Functions.js"></script>
 		<script src= "generalUIVis.js"></script>
+
+		<!-- Imports Sankey -->
+		<script src="https://unpkg.com/d3-array@1"></script>
+		<script src="https://unpkg.com/d3-collection@1"></script>
+		<script src="https://unpkg.com/d3-path@1"></script>
+		<script src="https://unpkg.com/d3-shape@1"></script>
+		<script src="https://unpkg.com/d3-sankey@0"></script>
+		<script src="https://unpkg.com/d3-simple-slider"></script>
+		<script src="https://d3js.org/d3-dispatch.v2.min.js"></script>
+		<script src="https://d3js.org/d3-selection.v2.min.js"></script>
+		<script src="https://d3js.org/d3-drag.v2.min.js"></script>
+		<script src= "SankeyDiagram.js"></script>
+		
+		<!-- Import HEB -->
+		<script src="HEB.js"></script>
+
+		<!-- MSV: -->
+		<!--Visualisation-->
+		<script src="D3Functions.js"></script>
+        <!--<script src="SimulatedAnnealing.js"></script>-->
+		<script src="MSVMethods.js"></script>
+		<script src="MSV.js"></script>
+		
 	</head>
 	<body>	
 	
@@ -61,7 +95,6 @@
 				<button id="submit_file" type="submit" name="submit"> Submit </button>
 			</form>
 		</div>
-
 			<script> 
 			//Handle upload button: 
 			if (localStorage.getItem('DataSet') != 'null') {
@@ -69,36 +102,7 @@
 				uploadHTML.style("display" , "none");
 			}
 			</script>
-
-			<!--Visualisation-->
-			<!-- Imports Sankey -->
-			<script src="https://unpkg.com/d3-array@1"></script>
-			<script src="https://unpkg.com/d3-collection@1"></script>
-			<script src="https://unpkg.com/d3-path@1"></script>
-			<script src="https://unpkg.com/d3-shape@1"></script>
-			<script src="https://unpkg.com/d3-sankey@0"></script>
-			<script src="https://unpkg.com/d3-simple-slider"></script>
-			<script src="https://d3js.org/d3-dispatch.v2.min.js"></script>
-			<script src="https://d3js.org/d3-selection.v2.min.js"></script>
-			<script src="https://d3js.org/d3-drag.v2.min.js"></script>
-			<script src= "SankeyDiagram.js"></script>
 			
-			<!-- HEB -->
-			<!-- Import HEB -->
-			<script src="HEB.js"></script>
-		
-			<!-- MSV: -->
-			<!--Visualisation-->
-			<script src="D3Functions.js"></script>
-            <!--<script src="SimulatedAnnealing.js"></script>-->
-			<script src="MSVMethods.js"></script>
-			<script src="MSV.js"></script>
-			
-			<!--Here we make the first two visualisation blocks:-->
-			<script>
-			AddVisualisationBlock();
-			AddVisualisationBlock();
-			</script>
 
 		</div>
 	</body>
