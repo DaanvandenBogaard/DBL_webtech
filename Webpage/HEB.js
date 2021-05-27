@@ -18,16 +18,11 @@ wrong_Jobtitles[4] = [];
 wrong_Jobtitles[5] = [];
 var colorswitch = true;
 
-
 //Datapath is the location of the user's dataset. 
 //fieldName is the name (id) of the visualisationBox the dataset is currently in.
-function restartHEB(dataPath, fieldName){
-//Delete previous object
-d3.selectAll("#HEBdiagram").remove();
-console.log("restartung");
-}
-
 function makeHEB(dataPath, fieldName) {
+
+    d3.select("#" + fieldName).select("#HEBFigure").select("#HEBdiagram").remove();
 
     //Variables
 
@@ -57,7 +52,8 @@ function makeHEB(dataPath, fieldName) {
 
     //Set dimensions
     let margin = { top: 15, right: 10, bottom: 15, left: 10 };
-    let figureSize = 690; //changed this because it was too big for the current fieldsize, but ultimately this should not be hardcoded -Daan
+    let figureHeight = 690; //changed this because it was too big for the current fieldsize, but ultimately this should not be hardcoded -Daan
+    let figureWidth = 800; //changed this because it was too big for the current fieldsize, but ultimately this should not be hardcoded -Daan
     let diameter = 600;
     let radius = diameter / 2;
     let innerRadius = radius / 10;
@@ -69,7 +65,7 @@ function makeHEB(dataPath, fieldName) {
 
     //Variables for lines
     var bundleStrength = strengthSlider.property("value");
-    var lineOpacity = 0.6;
+    var lineOpacity = 1;
 
     //Input data processing
 
@@ -128,7 +124,6 @@ function makeHEB(dataPath, fieldName) {
         //Since d3.csv is asynchronous (it is not loaded immediatly, but it is a request to the webserver) we need all our code from the data in here. 
 
         //Construct array with data in a usable order 
-
         data.forEach(function (d) {
             //Check wheter the toId is already an object, if not create object with first found fromId
             if (!usableData.some(code => code.id == d.toId)) {
@@ -158,17 +153,18 @@ function makeHEB(dataPath, fieldName) {
         let div = d3.select("#" + fieldName).select("#HEBFigure")
             .append("div")
             .attr("id", "HEBdiagram")
-            .attr("width", figureSize)
-            .attr("height", figureSize);
+            .attr("width", figureWidth)
+            .attr("height", figureHeight);
         let svg = div.append("svg")
-            .attr("width", figureSize)
-            .attr("height", figureSize)
+            .attr("width", figureWidth)
+            .attr("height", figureHeight)
             .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
 
         //Create tooltip
         var tooltip = div.append("div")
             .attr("class", "tooltip");
-
+        
+        /*
         //Creates switch for coloring edges 1
         svg.append('rect')
             .attr('x', 720)
@@ -219,7 +215,6 @@ function makeHEB(dataPath, fieldName) {
                 }
 
             });
-            console.log("TETSTATSTST")
         
         //Checks if the color switch was still turned on
         if (colorswitch == false) {
@@ -230,14 +225,15 @@ function makeHEB(dataPath, fieldName) {
             .attr('stroke', 'black')
             .style("opacity", 0.5)
         }
+        */
+
         //Creates the group object for all rows in the usableData set
-        var g = svg.selectAll("#group1")
+        var g = svg.selectAll("g")
             .data(usableData)
             .enter()
-            .append("g")
-            .attr("id", "group1")
+            .append("g");
 
-        d3.selectAll("#group1").on("mouseover", function () {
+        g.on("mouseover", function () {
             d3.select(this)
                 //Create tooltip
                 .attr("", function (d) {
@@ -290,11 +286,11 @@ function makeHEB(dataPath, fieldName) {
                 //Reset previously selected paths to normal
                 d3.selectAll(incoming)
                     .style("opacity", lineOpacity)
-                    .attr("stroke", "black")
+                    .attr("stroke", function(d) { return d3.select(this).attr("id"); })
                     .attr("stroke-width", 1);
                 d3.selectAll(outgoing)
                     .style("opacity", lineOpacity)
-                    .attr("stroke", "black")
+                    .attr("stroke", function(d) { return d3.select(this).attr("id"); })
                     .attr("stroke-width", 1);
             });
 
@@ -349,21 +345,6 @@ function makeHEB(dataPath, fieldName) {
         var colors = ["#4334eb", "#eb9834"];
         var colorPicker = d3.scaleLinear().range(colors).domain([1, 2]);
 
-        //Make gradient (Not functional yet)
-        var linearGradient = svg.append("defs")
-            .append("linearGradient")
-            .attr("id", "linear_gradient");
-
-        //Set first color of gradient
-        linearGradient.append("stop")
-            .attr("offset", "0%")
-            .attr("stop-color", colorPicker(1));
-
-        //Set last color of gradient
-        linearGradient.append("stop")
-            .attr("offset", "100%")
-            .attr("stop-color", colorPicker(2));
-
         //Edges need to be generated on first pass but need to be able to be redrawn later for animation
         generateEdges();
 
@@ -390,6 +371,7 @@ function makeHEB(dataPath, fieldName) {
                         if ((!doAnimate && (d.mails[k]["date"] >= startDate && d.mails[k]["date"] <= endDate)) ||
                             (doAnimate && d.mails[k]["date"] == curDate)) {
                             var fromId = d.mails[k]["from"];
+                            var toId = d["id"];
                             var senti = d.mails[k]["sent"];
 
                             //Check if the same edges (but in a different month) has already been drawn
@@ -454,6 +436,26 @@ function makeHEB(dataPath, fieldName) {
                                 } else {
                                     mail_lines.push({ "from": fromId, "to": d["id"], "path": line(coords), "sent": senti });
                                 }
+                                
+                                //Make gradient (Not functional yet)
+                                var linearGradient = svg.append("defs")
+                                .append("linearGradient")
+                                .attr("id", function(d) {
+                                    return "gradient_" + fromId + "_" + toId;
+                                })
+                                .attr("gradientTransform", function(d) {
+                                    return "rotate("+ Math.atan2(y_target - y_source, x_target - x_source) * 180 / Math.PI + ")";
+                                })
+
+                                //Set first color of gradient
+                                linearGradient.append("stop")
+                                .attr("offset", "0%")
+                                .attr("stop-color", colorPicker(1))
+
+                                //Set last color of gradient
+                                linearGradient.append("stop")
+                                .attr("offset", "100%")
+                                .attr("stop-color", colorPicker(2));
                             }
                         }
                     }
@@ -465,7 +467,12 @@ function makeHEB(dataPath, fieldName) {
                 .enter()
                 .append("path")
                 .attr("d", function (d) { return d.path; })
-                .attr("stroke", "black")
+                .attr("stroke", function(d) {
+                    return "url(#gradient_" + d.from + "_" + d.to + ")";
+                })
+                .attr("id", function(d) {
+                    return "url(#gradient_" + d.from + "_" + d.to + ")";
+                })
                 .attr("fill", "none")
                 .attr("stroke-width", 1)
                 .style("opacity", lineOpacity)
@@ -475,16 +482,16 @@ function makeHEB(dataPath, fieldName) {
         }
 
         //Make array for legend content
-        let legendContent = [{ "item": "incoming", "color": "#eb4034" }, { "item": "outgoing (w.i.p.)", "color": "#4254f5" }, { "item": "two-way (w.i.p.)", "color": "#4b00bf" }];
+        let edgeLegendContent = [{ "item": "incoming", "color": "#eb4034" }, { "item": "outgoing (w.i.p.)", "color": "#4254f5" }, { "item": "two-way (w.i.p.)", "color": "#4b00bf" }];
 
-        //Create legend
-        var legend = svg.selectAll("entries")
-            .data(legendContent)
+        //Create edge legend
+        var edgeLegend = svg.selectAll("entries")
+            .data(edgeLegendContent)
             .enter()
             .append("g");
 
         //Example line for item
-        legend.append("line")
+        edgeLegend.append("line")
             .attr("x1", 10)
             .attr("x2", 35)
             .attr("y1", function (d, i) {
@@ -499,7 +506,7 @@ function makeHEB(dataPath, fieldName) {
             .attr("stroke-width", 2);
 
         //Text for item
-        legend.append("text")
+        edgeLegend.append("text")
             .attr("font-size", "11pt")
             .attr("x", 40)
             .attr("y", function (d, i) {
@@ -509,13 +516,13 @@ function makeHEB(dataPath, fieldName) {
                 return d.item;
             });
 
-        //Creates second grouping element, used for the legend.
-        var g2 = svg.selectAll("#group2")
+        //Create jobs legend
+        var jobLegend = svg.selectAll("entries")
             .data(Jobtitles_list)
             .enter()
             .append("g")
-            .attr("id", "group2")
-            .on("click", function (d) {
+            .attr("style", "cursor: pointer;")
+            .on("click", function(d) {
                 //When clicking on the legend circles the jobtitle is removed or added back again.
                 d3.select(this).attr("", function (d) {
                     if (!wrong_Jobtitles[HEB_nr].includes(d)) {
@@ -534,28 +541,34 @@ function makeHEB(dataPath, fieldName) {
                         return "line-through";
                     }
                     else { return ""; }
-
                 })
-
             })
+            .on("mouseover", function(d) {
+                d3.select(this).raise().attr("stroke", "#5c5c5c");
+            })
+            .on("mouseleave", function(d) {
+                d3.select(this).attr("stroke", null);
+            });
 
-        //Creates the circles for the legend
-        var job_circle = g2.append("circle")
-            .attr("cx", 720)
+        //Example line for item
+        jobLegend.append("circle")
+            .attr("cx", figureWidth - 150)
             .attr("cy", function (d, i) {
-                return 150 + 25 * i;
+                return 12 + 18 * i;
             })
-            .attr("r", 10)
+            .attr("r", 5)
             //Fills the circles according to jobtitle
             .attr("fill", function (d, i) {
                 return color_arr[i];
             });
-        //Creates the text for the jobtitles for the legend.
-        var job_text = g2.append('text').attr("font-size", "12pt")
-            .attr("dominant-baseline", "central")
-            .attr("x", 740)
+
+
+        //Text for item
+        jobLegend.append("text")
+            .attr("font-size", "11pt")
+            .attr("x", figureWidth - 140)
             .attr("y", function (d, i) {
-                return 150 + 25 * i;
+                return 15 + 18 * i;
             })
             .text(function (d, i) { return d; })
             .attr("text-decoration", function (d) {
@@ -564,14 +577,7 @@ function makeHEB(dataPath, fieldName) {
                     return "line-through";
                 }
                 else { return ""; }
-
             });
-
-        d3.selectAll("#group2").on("mouseover", function (d, i) {
-            d3.select(this).raise().attr("stroke", "#5c5c5c");
-        }).on("mouseleave", function (d, i) {
-            d3.select(this).raise().attr("stroke", null);
-        });
 
         //Check if pausebutton has been clicked 
         togglePause.on("click", function () {
