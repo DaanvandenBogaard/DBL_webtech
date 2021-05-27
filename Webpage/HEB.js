@@ -5,9 +5,18 @@ Bas van Hoeflaken (1556282)
 
 var usableData = [];
 var userIndex = [];
-var jobGroupIndex = [];
 var allEdges = [];
 var drawnEdges = [];
+var wrong_Jobtitles = [];
+var jobGroupIndex = [];
+
+wrong_Jobtitles[0] = [];
+wrong_Jobtitles[1] = [];
+wrong_Jobtitles[2] = [];
+wrong_Jobtitles[3] = [];
+wrong_Jobtitles[4] = [];
+wrong_Jobtitles[5] = [];
+var colorswitch = true;
 
 
 //Datapath is the location of the user's dataset. 
@@ -32,13 +41,19 @@ function makeHEB(dataPath, fieldName) {
     var togglePause = d3.select("#" + fieldName).select("#togglePause");
     var strengthSlider = d3.select("#" + fieldName).select("#strengthSlider");
 
+    //Date variables
     var endYearAdjust = false;
     var startDate = 0;
     var endDate = 0;
 
+    //The number of the HEB
+    var HEB_nr = fieldName.match(/(\d+)/)[0];
+
+    //Animation variables
     var doAnimate = animToggle.property("checked");
     var isPaused = true;
     var frameTime = 1000;
+
 
     //Set dimensions
     let margin = { top: 15, right: 10, bottom: 15, left: 10 };
@@ -46,6 +61,8 @@ function makeHEB(dataPath, fieldName) {
     let diameter = 600;
     let radius = diameter / 2;
     let innerRadius = radius / 10;
+
+    jobGroupIndex = [];
 
     //Creating color array
     const color_arr = ["green", "blue", "chartreuse", "cyan", "darkmagenta", "deeppink", "gold", "lightseagreen", "mediumpurple", "olive", "orchid", "seagreen", "grey", "blue", "green", "blue", "green", "blue",];
@@ -115,13 +132,13 @@ function makeHEB(dataPath, fieldName) {
         data.forEach(function (d) {
             //Check wheter the toId is already an object, if not create object with first found fromId
             if (!usableData.some(code => code.id == d.toId)) {
-                usableData.push({ "id": d.toId, "jobtitle": d.toJobtitle, "mails": [{ "from": d.fromId, "date": dateFormat(d.date) }] });
+                usableData.push({ "id": d.toId, "jobtitle": d.toJobtitle, "mails": [{ "from": d.fromId, "date": dateFormat(d.date), "sent": d.sentiment }] });
                 userIndex.push(d.toId);
             }
             //Check wheter fromId is already in mails array, if not add it
             if (notInMails(d.fromId, d.toId, dateFormat(d.date))) {
                 var indexOfUser = userIndex.indexOf(d.toId);
-                usableData[indexOfUser]["mails"].push({ "from": d.fromId, "date": dateFormat(d.date) });
+                usableData[indexOfUser]["mails"].push({ "from": d.fromId, "date": dateFormat(d.date), "sent": d.sentiment });
             }
         });
 
@@ -152,26 +169,91 @@ function makeHEB(dataPath, fieldName) {
         var tooltip = div.append("div")
             .attr("class", "tooltip");
 
+        //Creates switch for coloring edges 1
+        svg.append('rect')
+            .attr('x', 720)
+            .attr('y', 420)
+            .attr("rx", 10)
+            .attr("ry", 10)
+            .attr('width', 60)
+            .attr('height', 40)
+            .attr('stroke', '#1aff1a')
+            .attr('fill', 'blue')
+            .style("opacity", 1)
+            .attr("id", "switch1")
+            .on("click", function () {
+                if (colorswitch == false) {
+                    d3.select(this)
+                        .attr('stroke', '#1aff1a')
+                        .style("opacity", 1)
+                    d3.selectAll("#switch2")
+                        .attr('stroke', 'black')
+                        .style("opacity", 0.5)
+                    colorswitch = true;
+                    change_edgeColor();
+                }
+            });
+        //Creates switch for coloring edges 1
+        svg.append('rect')
+            .attr('x', 720)
+            .attr('y', 465)
+            .attr("rx", 10)
+            .attr("ry", 10)
+            .attr('width', 60)
+            .attr('height', 40)
+            .attr('stroke', 'black')
+            .attr('fill', 'blue')
+            .style("opacity", 0.5)
+            .attr("id", "switch2")
+            .on("click", function () {
+                if (colorswitch) {
+                    d3.select(this)
+                        .attr('stroke', '#1aff1a')
+                        .style("opacity", 1)
+                    d3.selectAll("#switch1")
+                        .attr('stroke', 'black')
+                        .style("opacity", 0.5)
+                    colorswitch = false;
+                    change_edgeColor();
+
+                }
+
+            });
+            console.log("TETSTATSTST")
+        
+        //Checks if the color switch was still turned on
+        if (colorswitch == false) {
+            d3.select("#switch2")
+            .attr('stroke', '#1aff1a')
+            .style("opacity", 1)
+        d3.selectAll("#switch1")
+            .attr('stroke', 'black')
+            .style("opacity", 0.5)
+        }
         //Creates the group object for all rows in the usableData set
-        var g = svg.selectAll("g")
+        var g = svg.selectAll("#group1")
             .data(usableData)
             .enter()
             .append("g")
-            .on("mouseover", function () {
-                d3.select(this)
-                    //Create tooltip
-                    .attr("", function (d) {
-                        //Set incoming and outcoming class
-                        incoming = ".to" + d.id;
-                        outgoing = ".from" + d.id;
-                        tooltip_string = d.id + " is a(n) " + d.jobtitle + "\n Recieved mails from " + d3.selectAll(incoming).size() + " people \n Sent mails to " + d3.selectAll(outgoing).size() + " people";
-                    });
-                tooltip.html(tooltip_string)
-                    .style("left", (event.x + 5) + "px")
-                    .style("top", (event.y) + "px");
-                tooltip.style("opacity", 1)
-                d3.select(this).raise().attr("stroke", "#5c5c5c")
+            .attr("id", "group1")
 
+        d3.selectAll("#group1").on("mouseover", function () {
+            d3.select(this)
+                //Create tooltip
+                .attr("", function (d) {
+                    //Set incoming and outcoming class
+                    incoming = ".to" + d.id;
+                    outgoing = ".from" + d.id;
+                    tooltip_string = d.id + " is a(n) " + d.jobtitle + "\n Recieved mails from " + d3.selectAll(incoming).size() + " people \n Sent mails to " + d3.selectAll(outgoing).size() + " people";
+                });
+            tooltip.html(tooltip_string)
+                .style("left", (event.x + 5) + "px")
+                .style("top", (event.y) + "px");
+
+
+            d3.select(this).attr("", function (d) {
+
+                tooltip.style("opacity", 1);
                 //Change width color and opacity for incoming selected mails
                 d3.selectAll(incoming)
                     .style("opacity", 1)
@@ -187,10 +269,14 @@ function makeHEB(dataPath, fieldName) {
                     .attr("stroke", "#eb9834")
                     .attr("stroke-width", 2);
                 //Place selected paths on top of others
-                if (d3.selectAll(incoming))
-                    d3.select(this).raise();
+                d3.select(this).raise();
                 d3.select(tooltip).raise();
+
+                d3.select(this).raise().attr("stroke", "#5c5c5c")
+
             })
+
+        })
             .on("mouseleave", function (d) {
                 //Remove tooltip
                 tooltip.style("opacity", 0);
@@ -283,7 +369,8 @@ function makeHEB(dataPath, fieldName) {
 
         //Function that can generate the edges based on mail traffic
         function generateEdges() {
-
+            svg.selectAll("g")
+                .data(usableData)
             allEdges = [];
 
             //Make a path for each node
@@ -303,6 +390,7 @@ function makeHEB(dataPath, fieldName) {
                         if ((!doAnimate && (d.mails[k]["date"] >= startDate && d.mails[k]["date"] <= endDate)) ||
                             (doAnimate && d.mails[k]["date"] == curDate)) {
                             var fromId = d.mails[k]["from"];
+                            var senti = d.mails[k]["sent"];
 
                             //Check if the same edges (but in a different month) has already been drawn
                             if (notDrawn(d["id"], fromId)) {
@@ -362,9 +450,9 @@ function makeHEB(dataPath, fieldName) {
 
                                 //Add lines to array that gets added to the data of the <path> per node and push to incoming of reciever
                                 if (d["jobtitle"] == targetJob) {
-                                    mail_lines.push({ "from": fromId, "to": d["id"], "path": line(shortCoords) });
+                                    mail_lines.push({ "from": fromId, "to": d["id"], "path": line(shortCoords), "sent": senti });
                                 } else {
-                                    mail_lines.push({ "from": fromId, "to": d["id"], "path": line(coords) });
+                                    mail_lines.push({ "from": fromId, "to": d["id"], "path": line(coords), "sent": senti });
                                 }
                             }
                         }
@@ -381,7 +469,6 @@ function makeHEB(dataPath, fieldName) {
                 .attr("fill", "none")
                 .attr("stroke-width", 1)
                 .style("opacity", lineOpacity)
-                .attr("id", "path")
                 .attr("class", function (d) {
                     return "from" + d.from + " to" + d.to;
                 });
@@ -422,6 +509,70 @@ function makeHEB(dataPath, fieldName) {
                 return d.item;
             });
 
+        //Creates second grouping element, used for the legend.
+        var g2 = svg.selectAll("#group2")
+            .data(Jobtitles_list)
+            .enter()
+            .append("g")
+            .attr("id", "group2")
+            .on("click", function (d) {
+                //When clicking on the legend circles the jobtitle is removed or added back again.
+                d3.select(this).attr("", function (d) {
+                    if (!wrong_Jobtitles[HEB_nr].includes(d)) {
+                        //If it was not removed, it will be removed
+                        wrong_Jobtitles[HEB_nr].push(d);
+                    }
+                    else {
+                        //If it was removed, it will be added back
+                        wrong_Jobtitles[HEB_nr].splice(wrong_Jobtitles[HEB_nr].indexOf(d), 1);
+                    }
+                    console.log(wrong_Jobtitles[HEB_nr]);
+                })
+                d3.select(this).select("text").attr("text-decoration", function (d) {
+                    //Puts a line through when jobtitle is removed.
+                    if (wrong_Jobtitles[HEB_nr].includes(d)) {
+                        return "line-through";
+                    }
+                    else { return ""; }
+
+                })
+
+            })
+
+        //Creates the circles for the legend
+        var job_circle = g2.append("circle")
+            .attr("cx", 720)
+            .attr("cy", function (d, i) {
+                return 150 + 25 * i;
+            })
+            .attr("r", 10)
+            //Fills the circles according to jobtitle
+            .attr("fill", function (d, i) {
+                return color_arr[i];
+            });
+        //Creates the text for the jobtitles for the legend.
+        var job_text = g2.append('text').attr("font-size", "12pt")
+            .attr("dominant-baseline", "central")
+            .attr("x", 740)
+            .attr("y", function (d, i) {
+                return 150 + 25 * i;
+            })
+            .text(function (d, i) { return d; })
+            .attr("text-decoration", function (d) {
+                //Puts a line through when jobtitle is removed.
+                if (wrong_Jobtitles[HEB_nr].includes(d)) {
+                    return "line-through";
+                }
+                else { return ""; }
+
+            });
+
+        d3.selectAll("#group2").on("mouseover", function (d, i) {
+            d3.select(this).raise().attr("stroke", "#5c5c5c");
+        }).on("mouseleave", function (d, i) {
+            d3.select(this).raise().attr("stroke", null);
+        });
+
         //Check if pausebutton has been clicked 
         togglePause.on("click", function () {
             if (!isPaused && doAnimate) {
@@ -441,7 +592,8 @@ function makeHEB(dataPath, fieldName) {
         //Event handler that changes the bundlestrength when changed at slider
         strengthSlider.on("input", function () {
             bundleStrength = strengthSlider.property("value");
-            d3.select("#" + fieldName).selectAll("#path").remove();
+            d3.select("#" + fieldName).selectAll("path").remove();
+            console.log("sliderTEST")
             generateEdges();
         })
 
@@ -465,7 +617,7 @@ function makeHEB(dataPath, fieldName) {
                     curDate = parseInt(curYear.toString() + "01", 10);
                 }
 
-                d3.select("#" + fieldName).selectAll("#path").remove();
+                d3.select("#" + fieldName).selectAll("path").remove();
 
                 generateEdges();
 
@@ -561,3 +713,18 @@ function isTwoWay(from, to) {
     }
     return true;
 }
+
+function change_edgeColor() {
+    if (colorswitch) { }
+    else {
+        d3.selectAll('path')
+            .attr("stroke", function (d, i) {
+                if (d.sent < 0) {
+                    return "rgb("+(122.5-d.sent*255)+", "+ (122.5+(d.sent*255)) +", 0)";
+                }
+                else { return"rgb("+(122.5-(d.sent*255))+", "+ (122.5+d.sent*255) +", 0)"; }
+            })
+    }
+
+}
+
