@@ -54,7 +54,7 @@ function AddVisualisationBlock() {
     let mainBlock = d3.select("#pageContent");
     let newVisBlock = mainBlock.append("div")
                                .attr("id" , "vis" + index)
-                               .attr("class" , "visField" + index)
+                               .attr("class" , "visField")
                                
                                .style("height" , "800px");
     CreateVisField("vis" + index); 
@@ -63,7 +63,7 @@ function AddVisualisationBlock() {
     console.log("added UI JQuery!");
     
     $( function() {
-        $( "#vis" + index ).draggable({snap: true});
+        $( "#vis" + index ).draggable({snap: true , stack: ".visField"});
       } ); 
 
     //Add the resizeable effect:
