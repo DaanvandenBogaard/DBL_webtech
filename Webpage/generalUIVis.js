@@ -39,6 +39,11 @@ function OnChangeDataSetSelector() {
     DataSetSwitch(document.getElementById("DataSetSelector").value);
 }
 
+//Changelisterner of close buttons:
+function changeListenerFunction(name){
+    d3.select("#" + name).remove();
+}
+
 function AddVisualisationBlock() {
     //Check if dataset is loaded (only works because this file is directely loaded into dbl_vis.php!!!)
     if (localStorage.getItem('DataSet') == 'null') {
@@ -77,9 +82,16 @@ function CreateVisField(fieldName){
 	var vis = d3.select("#" + fieldName);
 							
 	var upperbar = vis.append("div")
-						   .attr("class" , "upperVisBox")
-						   .attr("float" , "left")
-						   .attr("id" , "upperbar");
+					  .attr("class" , "upperVisBox")
+					  .attr("float" , "left")
+					  .attr("id" , "upperbar");
+
+    //Add close button to upperbar:
+    var closeButton = upperbar.append("button")
+                              .style("width" , "50px")
+                              .style("height" , "50px")
+                              .attr("onclick" , "changeListenerFunction('"+fieldName +"')"
+                              );
 
 	//define ('hardcode') the possible visualisations:	
     let select = upperbar.append("select")
