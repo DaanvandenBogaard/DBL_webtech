@@ -760,4 +760,3 @@ function change_edgeColor() {
             })
     }
 
-
