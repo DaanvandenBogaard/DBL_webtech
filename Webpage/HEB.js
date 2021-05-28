@@ -5,21 +5,20 @@ Bas van Hoeflaken (1556282)
 
 var usableData = [];
 var userIndex = [];
+var jobGroupIndex = [];
 var allEdges = [];
 var drawnEdges = [];
 var wrong_Jobtitles = [];
-var jobGroupIndex = [];
 
-wrong_Jobtitles[0] = [];
-wrong_Jobtitles[1] = [];
-wrong_Jobtitles[2] = [];
-wrong_Jobtitles[3] = [];
-wrong_Jobtitles[4] = [];
-wrong_Jobtitles[5] = [];
-var colorswitch = true;
 
 //Datapath is the location of the user's dataset. 
 //fieldName is the name (id) of the visualisationBox the dataset is currently in.
+function restartHEB(dataPath, fieldName) {
+    //Delete previous object
+    d3.select("#" + fieldName).selectAll("#HEBdiagram").remove();
+    console.log("restartung");
+}
+
 function makeHEB(dataPath, fieldName) {
 
     d3.select("#" + fieldName).select("#HEBFigure").select("#HEBdiagram").remove();
@@ -41,10 +40,6 @@ function makeHEB(dataPath, fieldName) {
     var startDate = 0;
     var endDate = 0;
 
-    //The number of the HEB
-    var HEB_nr = fieldName.match(/(\d+)/)[0];
-
-    //Animation variables
     var doAnimate = animToggle.property("checked");
     var isPaused = true;
     var frameTime = 1000;
@@ -57,8 +52,6 @@ function makeHEB(dataPath, fieldName) {
     let diameter = 600;
     let radius = diameter / 2;
     let innerRadius = radius / 10;
-
-    jobGroupIndex = [];
 
     //Creating color array
     const color_arr = ["green", "blue", "chartreuse", "cyan", "darkmagenta", "deeppink", "gold", "lightseagreen", "mediumpurple", "olive", "orchid", "seagreen", "grey", "blue", "green", "blue", "green", "blue",];
@@ -141,6 +134,41 @@ function makeHEB(dataPath, fieldName) {
         usableData.sort((a, b) => d3.ascending(a.jobtitle, b.jobtitle) || d3.ascending(a.toId, b.toId));
         var angleStep = Math.PI * 2 / usableData.length;
 
+        //Get unique jobtitles
+        let Jobtitles_list = [...new Set(usableData.map(ids => ids.jobtitle))];
+
+        //Make an array with its "index" in the middle of all circles so the paths can group in the center
+        Jobtitles_list.forEach(function (d) {
+            startIndex = findIndex(usableData, d, "front");
+            endIndex = findIndex(usableData, d, "back");
+            jobGroupIndex.push([d, startIndex + ((endIndex - startIndex) / 2)]);
+        })
+
+
+
+
+        //Deleting all incoming mails from jobtitles that arent included.
+        for (k = 0; k < usableData.length; k++) {
+            for (j = 0; j < usableData[k].mails.length; j++) {
+                var job_offf = findJobtitle(usableData[k].mails[j].from);
+                if (wrong_Jobtitles.includes(job_offf)) {
+                    (usableData[k].mails).splice(j, 1);
+                    // console.log(wrong_Jobtitles.includes(job_offf));
+                    j--;
+                }
+            }
+        }
+        //Deleting all rows for which the recipients jobtitle is not included.
+        for (k = 0; k < usableData.length; k++) {
+            if (wrong_Jobtitles.includes(usableData[k].jobtitle)) {
+                usableData.splice(k, 1);
+                k--;
+            }
+
+
+        }
+
+        console.log(usableData);  //TESTING PURPOSES
         //Get unique ids
         let unique_ids = [...new Set(usableData.map(ids => ids.id))];
 
@@ -525,19 +553,19 @@ function makeHEB(dataPath, fieldName) {
             .on("click", function(d) {
                 //When clicking on the legend circles the jobtitle is removed or added back again.
                 d3.select(this).attr("", function (d) {
-                    if (!wrong_Jobtitles[HEB_nr].includes(d)) {
+                    if (!wrong_Jobtitles.includes(d)) {
                         //If it was not removed, it will be removed
-                        wrong_Jobtitles[HEB_nr].push(d);
+                        wrong_Jobtitles.push(d);
                     }
                     else {
                         //If it was removed, it will be added back
-                        wrong_Jobtitles[HEB_nr].splice(wrong_Jobtitles[HEB_nr].indexOf(d), 1);
+                        wrong_Jobtitles.splice(wrong_Jobtitles.indexOf(d), 1);
                     }
-                    console.log(wrong_Jobtitles[HEB_nr]);
+                    console.log(wrong_Jobtitles);
                 })
                 d3.select(this).select("text").attr("text-decoration", function (d) {
                     //Puts a line through when jobtitle is removed.
-                    if (wrong_Jobtitles[HEB_nr].includes(d)) {
+                    if (wrong_Jobtitles.includes(d)) {
                         return "line-through";
                     }
                     else { return ""; }
@@ -573,7 +601,7 @@ function makeHEB(dataPath, fieldName) {
             .text(function (d, i) { return d; })
             .attr("text-decoration", function (d) {
                 //Puts a line through when jobtitle is removed.
-                if (wrong_Jobtitles[HEB_nr].includes(d)) {
+                if (wrong_Jobtitles.includes(d)) {
                     return "line-through";
                 }
                 else { return ""; }
@@ -732,5 +760,4 @@ function change_edgeColor() {
             })
     }
 
-}
 
