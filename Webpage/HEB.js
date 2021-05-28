@@ -748,15 +748,4 @@ function isTwoWay(from, to) {
     return true;
 }
 
-function change_edgeColor() {
-    if (colorswitch) { }
-    else {
-        d3.selectAll('path')
-            .attr("stroke", function (d, i) {
-                if (d.sent < 0) {
-                    return "rgb("+(122.5-d.sent*255)+", "+ (122.5+(d.sent*255)) +", 0)";
-                }
-                else { return"rgb("+(122.5-(d.sent*255))+", "+ (122.5+d.sent*255) +", 0)"; }
-            })
-    }
 
