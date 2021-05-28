@@ -57,6 +57,7 @@ function AddVisualisationBlock() {
                                .attr("class" , "visField")
                                
                                .style("height" , "800px");
+    newVisBlock.style("position","absolute").attr("x", 0).attr("y",0);
     CreateVisField("vis" + index); 
       
     //Use JQuery to have the blocks be draggable:

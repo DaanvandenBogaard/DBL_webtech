@@ -130,7 +130,7 @@ a:hover {
 	color: var(--white);
 	background-color: var(--grey);
 	transition: var(--transition);
-	z-index: 10;
+	z-index: 110;
 	border-radius: 0 0 5px 5px;
 	cursor: pointer;
 }
