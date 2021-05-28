@@ -3,22 +3,19 @@ Thomas Broers (1538705)
 Bas van Hoeflaken (1556282)
 */
 
+//Global arrays
 var usableData = [];
 var userIndex = [];
-var jobGroupIndex = [];
 var allEdges = [];
 var drawnEdges = [];
 var wrong_Jobtitles = [];
+var jobGroupIndex = [];
 
+//Global booleans
+var colorswitch = true;
 
 //Datapath is the location of the user's dataset. 
-//fieldName is the name (id) of the visualisationBox the dataset is currently in.
-function restartHEB(dataPath, fieldName) {
-    //Delete previous object
-    d3.select("#" + fieldName).selectAll("#HEBdiagram").remove();
-    console.log("restartung");
-}
-
+//FieldName is the name (id) of the visualisationBox the dataset is currently in.
 function makeHEB(dataPath, fieldName) {
 
     d3.select("#" + fieldName).select("#HEBFigure").select("#HEBdiagram").remove();
@@ -40,10 +37,18 @@ function makeHEB(dataPath, fieldName) {
     var startDate = 0;
     var endDate = 0;
 
+    //The number of the HEB
+    var HEB_nr = fieldName.match(/(\d+)/)[0];
+
+    console.log(wrong_Jobtitles);
+    if (wrong_Jobtitles.length < (parseInt(HEB_nr) + 1)) {
+        wrong_Jobtitles[HEB_nr] = [];
+    }
+
+    //Animation variables
     var doAnimate = animToggle.property("checked");
     var isPaused = true;
     var frameTime = 1000;
-
 
     //Set dimensions
     let margin = { top: 15, right: 10, bottom: 15, left: 10 };
@@ -52,6 +57,8 @@ function makeHEB(dataPath, fieldName) {
     let diameter = 600;
     let radius = diameter / 2;
     let innerRadius = radius / 10;
+
+    jobGroupIndex = [];
 
     //Creating color array
     const color_arr = ["green", "blue", "chartreuse", "cyan", "darkmagenta", "deeppink", "gold", "lightseagreen", "mediumpurple", "olive", "orchid", "seagreen", "grey", "blue", "green", "blue", "green", "blue",];
@@ -132,48 +139,34 @@ function makeHEB(dataPath, fieldName) {
 
         //Sort array by jobtitle
         usableData.sort((a, b) => d3.ascending(a.jobtitle, b.jobtitle) || d3.ascending(a.toId, b.toId));
-        var angleStep = Math.PI * 2 / usableData.length;
 
         //Get unique jobtitles
         let Jobtitles_list = [...new Set(usableData.map(ids => ids.jobtitle))];
-
-        //Make an array with its "index" in the middle of all circles so the paths can group in the center
-        Jobtitles_list.forEach(function (d) {
-            startIndex = findIndex(usableData, d, "front");
-            endIndex = findIndex(usableData, d, "back");
-            jobGroupIndex.push([d, startIndex + ((endIndex - startIndex) / 2)]);
-        })
-
-
-
 
         //Deleting all incoming mails from jobtitles that arent included.
         for (k = 0; k < usableData.length; k++) {
             for (j = 0; j < usableData[k].mails.length; j++) {
                 var job_offf = findJobtitle(usableData[k].mails[j].from);
-                if (wrong_Jobtitles.includes(job_offf)) {
+                if (wrong_Jobtitles[HEB_nr].includes(job_offf)) {
                     (usableData[k].mails).splice(j, 1);
-                    // console.log(wrong_Jobtitles.includes(job_offf));
                     j--;
                 }
             }
         }
-        //Deleting all rows for which the recipients jobtitle is not included.
+
+        //Deleting all users with jobtitles that arent included.
         for (k = 0; k < usableData.length; k++) {
-            if (wrong_Jobtitles.includes(usableData[k].jobtitle)) {
+            if (wrong_Jobtitles[HEB_nr].includes(usableData[k].jobtitle)) {
                 usableData.splice(k, 1);
                 k--;
             }
-
-
         }
 
-        console.log(usableData);  //TESTING PURPOSES
+        //Set angle step
+        var angleStep = Math.PI * 2 / usableData.length;
+
         //Get unique ids
         let unique_ids = [...new Set(usableData.map(ids => ids.id))];
-
-        //Get unique jobtitles
-        let Jobtitles_list = [...new Set(usableData.map(ids => ids.jobtitle))];
 
         //Creation HEB
 
@@ -348,7 +341,7 @@ function makeHEB(dataPath, fieldName) {
                     var angle = angleStep * i * 180 / Math.PI;
                 }
                 //Translate it on the circle with small increase in radius as to not overlap node circles, rotate in the same "transform"
-                return "translate(" + (350 + (radius + 6) * (Math.cos(((2 * Math.PI) / 149) * i))) + ", " + (350 + (radius + 6) * (Math.sin(((2 * Math.PI) / 149) * i))) + ") rotate(" + angle + ")"
+                return "translate(" + (350 + (radius + 6) * (Math.cos(((2 * Math.PI) / usableData.length) * i))) + ", " + (350 + (radius + 6) * (Math.sin(((2 * Math.PI) / usableData.length) * i))) + ") rotate(" + angle + ")"
             })
             .attr("text-anchor", function (d, i) {
                 //Check if achor needs to be left or right depending on if the text has been flipped
@@ -553,19 +546,18 @@ function makeHEB(dataPath, fieldName) {
             .on("click", function(d) {
                 //When clicking on the legend circles the jobtitle is removed or added back again.
                 d3.select(this).attr("", function (d) {
-                    if (!wrong_Jobtitles.includes(d)) {
+                    if (!wrong_Jobtitles[HEB_nr].includes(d)) {
                         //If it was not removed, it will be removed
-                        wrong_Jobtitles.push(d);
+                        wrong_Jobtitles[HEB_nr].push(d);
                     }
                     else {
                         //If it was removed, it will be added back
-                        wrong_Jobtitles.splice(wrong_Jobtitles.indexOf(d), 1);
+                        wrong_Jobtitles[HEB_nr].splice(wrong_Jobtitles[HEB_nr].indexOf(d), 1);
                     }
-                    console.log(wrong_Jobtitles);
                 })
                 d3.select(this).select("text").attr("text-decoration", function (d) {
                     //Puts a line through when jobtitle is removed.
-                    if (wrong_Jobtitles.includes(d)) {
+                    if (wrong_Jobtitles[HEB_nr].includes(d)) {
                         return "line-through";
                     }
                     else { return ""; }
@@ -601,7 +593,7 @@ function makeHEB(dataPath, fieldName) {
             .text(function (d, i) { return d; })
             .attr("text-decoration", function (d) {
                 //Puts a line through when jobtitle is removed.
-                if (wrong_Jobtitles.includes(d)) {
+                if (wrong_Jobtitles[HEB_nr].includes(d)) {
                     return "line-through";
                 }
                 else { return ""; }
@@ -627,7 +619,6 @@ function makeHEB(dataPath, fieldName) {
         strengthSlider.on("input", function () {
             bundleStrength = strengthSlider.property("value");
             d3.select("#" + fieldName).selectAll("path").remove();
-            console.log("sliderTEST")
             generateEdges();
         })
 
@@ -661,6 +652,8 @@ function makeHEB(dataPath, fieldName) {
                 }
             }
         }
+
+        console.log(wrong_Jobtitles);
     });
 }
 
@@ -684,12 +677,12 @@ function dateFormat(date) {
 
 //Function for placement on HEB (X)
 function circ_x(radius, index) {
-    return 350 + radius * (Math.cos(((2 * Math.PI) / 149) * index));
+    return 350 + radius * (Math.cos(((2 * Math.PI) / usableData.length) * index));
 }
 
 //Function for placement on HEB (Y)
 function circ_y(radius, index) {
-    return 350 + radius * (Math.sin(((2 * Math.PI) / 149) * index));
+    return 350 + radius * (Math.sin(((2 * Math.PI) / usableData.length) * index));
 }
 
 //Function that finds the index of the first or last job that has the searched for jobtitle depending on the direction selected
@@ -748,4 +741,17 @@ function isTwoWay(from, to) {
     return true;
 }
 
+function change_edgeColor() {
+    if (colorswitch) { }
+    else {
+        d3.selectAll('path')
+            .attr("stroke", function (d, i) {
+                if (d.sent < 0) {
+                    return "rgb("+(122.5-d.sent*255)+", "+ (122.5+(d.sent*255)) +", 0)";
+                }
+                else { return"rgb("+(122.5-(d.sent*255))+", "+ (122.5+d.sent*255) +", 0)"; }
+            })
+    }
+
+}
 
