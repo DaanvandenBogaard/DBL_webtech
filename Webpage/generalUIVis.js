@@ -2,7 +2,44 @@
 var visualisations = ["Sankey" , "HEB" , "MSV" , "Gestalt"];
 var index = 0;
 
-function AddVisualisationBlock(){
+//A function to handle the choosing of uploaded datasets:
+//Input: JSON string of the datasets
+//Output: A button appended to the toolbar.
+function MakeDataSetSelector(dataSets) {
+    //Retrieve info on user datasets:
+    dataSets = JSON.parse(dataSets);
+    
+    //First, we check whether there is a curdataset, if not, we select one:
+    if (RetrieveLocalStorage("CurDataSet") == "null") {
+        ChangeLocalStorage("CurDataSet", dataSets[0]);
+    }
+
+    let select = d3.select("#toolbar")
+                   .append("select")
+                   .attr("id" , "DataSetSelector")
+                   .attr("onchange" , "OnChangeDataSetSelector()");
+                   
+    //Append options:
+    var selector = document.getElementById("DataSetSelector");
+    let newOption = document.createElement("option");
+    newOption.text = RetrieveLocalStorage("CurDataSet");
+    selector.add(newOption);
+    dataSets.forEach(function(d){ 
+        if(d != RetrieveLocalStorage("CurDataSet")){
+            let newOption = document.createElement("option");
+            newOption.text = d;
+            selector.add(newOption);
+        }
+    }); 
+}
+
+//ActionListener for DataSetSelector:
+function OnChangeDataSetSelector() {
+    //Call function in main file to change this value as we are not allowed to edit this form this file!
+    DataSetSwitch(document.getElementById("DataSetSelector").value);
+}
+
+function AddVisualisationBlock() {
     //Check if dataset is loaded (only works because this file is directely loaded into dbl_vis.php!!!)
     if (localStorage.getItem('DataSet') == 'null') {
         console.log("Please load a dataset first!");
@@ -79,7 +116,7 @@ function OnChangeSelect(fieldName){
     //Now add new visualisation:	
     selectValue = d3.select("#" + fieldName).select('select').property('value');
     if (selectValue == "Sankey") {
-        makeSankey(localStorage.getItem('DataSet') , fieldName);
+        makeSankey(localStorage.getItem('CurDataSet') , fieldName);
     } 
     else if (selectValue == "HEB") {
         /*TO THOMAS&BAS: hier zetten wij jullie UI weg, wil je deze later weghalen uit het bestand, aanpassen, of iets aan toevoegen? Doe dat hier!
@@ -91,14 +128,14 @@ function OnChangeSelect(fieldName){
         let hebUIBox = d3.select('#' + fieldName).select("#upperbar").append('div').attr("id" , "hebUIBox");
         hebUIBox.html('<span> From (year-month) </span><input id="startYear" type="number" name="startYear" default=1998><input id="startMonth" type="number" name="startMonth" default=01><span>'+
         ' to (year-month) </span><input id="endYear" type="number" name="endYear" default=2002><input id="endMonth" type="number" name="endMonth" default=12><div><input id="animateToggle" '+
-        ' type="checkbox"><label for="animateToggle"> animation </label><button id="startHEB" type="button" name="HEB" onclick="makeHEB(localStorage.getItem(' + "'DataSet'" + ') ,' + 
-        "'" + fieldName + "'"   + ' )"> Start </button><button id="restartHEB" type="button" name="RESTARTHEB" onclick="restartHEB(localStorage.getItem(' + "'DataSet'" + ') ,' + 
+        ' type="checkbox"><label for="animateToggle"> animation </label><button id="startHEB" type="button" name="HEB" onclick="makeHEB(localStorage.getItem(' + "'CurDataSet'" + ') ,' + 
+        "'" + fieldName + "'"   + ' )"> Start </button><button id="restartHEB" type="button" name="RESTARTHEB" onclick="restartHEB(localStorage.getItem(' + "'CurDataSet'" + ') ,' + 
         "'" + fieldName + "'"   + ' )"> Restart </button></div><button id="togglePause" type="button" name="togglePause"> Play </button><label for="togglePause" id="pauseIcon" '+
         'class="fa fa-play"></label><input id="strengthSlider" type="range" name="strengthSlider" min="0.00" max="1.00" value="0.85" step="0.05"><label for="strengthSlider"> Bundle strength </label>');
     } 
     else if(selectValue == "MSV"){
         console.log(fieldName)
-        makeMSV(localStorage.getItem('DataSet'), fieldName);
+        makeMSV(localStorage.getItem('CurDataSet'), fieldName);
     }
     else {
         console.log('Sorry! We were unable to load the correct visualisation. Please submit this bug.');

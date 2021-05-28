@@ -51,12 +51,28 @@
 	
     <?php 
     #Load localstorage:
-    if (isset($_GET["DataSet"])){
+    if (isset($_GET["DataSet"])) {
 		$filename = $_GET["DataSet"];
-        #Set file name into local storage (needs to happen in JS):
-        echo "<script type='text/javascript'>  
-        localStorage.setItem('DataSet', '".$filename."'); 
-        </script>";
+		$newArray = [];
+		#We make a case distinction:
+		$curDataSets = $_GET["oldFiles"];
+		if ($curDataSets == 'null') { 
+			#Make new array with first element this dataSet:
+			$newArray[] = $filename;
+		}
+		else {
+			$curDataSets = json_decode($curDataSets);
+			#Append element to array and upload to localstorage:
+			$newArray = $curDataSets;
+			$newArray[] = $filename;
+		}
+		#encode in JSON:
+		$newArray = json_encode($newArray);
+
+		#Set file name into local storage (needs to happen in JS):
+		echo "<script type='text/javascript'>  
+		localStorage.setItem('DataSet', '".$newArray."'); 
+		</script>";	
     } 
     ?>
 
@@ -86,6 +102,7 @@
 
 			<!--Upload/replace dataset: -->
 			<form action="upload.php" method="POST" enctype="multipart/form-data" >
+				<input id="oldDataSetsInput" type="text" name="testName" value = "temp" hidden>
 				<input id="file_input" type="file" name="dataset" accept=".csv" onchange="changeFile()">
 				<label id="upload_button" for="file_input">
 					<i class="fa fa-upload" id="upload_icon" style="font-size: 20px;"></i>
@@ -95,15 +112,42 @@
 				<button id="submit_file" type="submit" name="submit"> Submit </button>
 			</form>
 		</div>
-			<script> 
+	
+				
+		</div>
+
+		<!-- Functions -->
+		<script>
+			//A function handling the change of curent dataSet switch:
+			function DataSetSwitch(newDataSet) {
+				localStorage.setItem("CurDataSet",newDataSet);
+				console.log("Changed dataset to: " + localStorage.getItem("CurDataSet"));
+				//For now we reload the site!
+				location.reload();
+			}
+
+			//A function handling the retrieval of localStorage elements:
+			function RetrieveLocalStorage(varName){
+				return localStorage.getItem(varName)
+			}
+
+			//A function handling the change of LocalStorage values:
+			function ChangeLocalStorage(varName, newVal) {
+				localStorage.setItem(varName, newVal);
+			}
+		</script>
+
+		<script> 
+			//Set value of old dataSets:
+			let HiddenInputDocuments = document.getElementById("oldDataSetsInput");
+			HiddenInputDocuments.value = localStorage.getItem('DataSet');
+
 			//Handle upload button: 
 			if (localStorage.getItem('DataSet') != 'null') {
 				var uploadHTML = d3.select("#upload");
-				uploadHTML.style("display" , "none");
+				//uploadHTML.style("display" , "none");	
+				MakeDataSetSelector(localStorage.getItem('DataSet'));
 			}
-			</script>
-			
-
-		</div>
+		</script>
 	</body>
 </html>

@@ -4,6 +4,7 @@
 if (isset($_POST['submit'])) {
     #Set file variables:
     $file = $_FILES['dataset'];
+    $oldFiles = $_POST["testName"];
     
     $fileName = basename($file['name']); 
     $fileTmpName = $file['tmp_name'];
@@ -31,9 +32,8 @@ if (isset($_POST['submit'])) {
 
             #move the file:
             move_uploaded_file($fileTmpName , $newFilePath);
-
             #return to html page:
-            header("location: dbl_vis.php?DataSet=".$newFilePath);
+            header("location: dbl_vis.php?DataSet=".$newFilePath."&oldFiles=".$oldFiles);
 
         } else if ($fileError === 1){
             #File size error (from php.ini)
