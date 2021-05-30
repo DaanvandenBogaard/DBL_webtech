@@ -40,7 +40,6 @@ function makeHEB(dataPath, fieldName) {
     //The number of the HEB
     var HEB_nr = fieldName.match(/(\d+)/)[0];
 
-    console.log(wrong_Jobtitles);
     if (wrong_Jobtitles.length < (parseInt(HEB_nr) + 1)) {
         wrong_Jobtitles[HEB_nr] = [];
     }
