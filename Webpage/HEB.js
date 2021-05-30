@@ -29,6 +29,7 @@ function makeHEB(dataPath, fieldName) {
     var endMonth = d3.select("#" + fieldName).select("#endMonth");
     var animToggle = d3.select("#" + fieldName).select("#animateToggle");
     var pauseIcon = d3.select("#" + fieldName).select("#pauseIcon");
+    var pauseText = d3.select("#" + fieldName).select(".pauseButton");
     var togglePause = d3.select("#" + fieldName).select("#togglePause");
     var strengthSlider = d3.select("#" + fieldName).select("#strengthSlider");
     var edgeColor = d3.select("#" + fieldName).select("#edgeColor");
@@ -224,7 +225,7 @@ function makeHEB(dataPath, fieldName) {
                     .attr("stroke-width", 2)
                 d3.selectAll(".twoWay")
                     .style("opacity", 1)
-                    .attr("stroke", "#eb9834")
+                    .attr("stroke", "#fa8072")
                     .attr("stroke-width", 2);
                 //Place selected paths on top of others
                 d3.select(this).raise().attr("stroke", "#5c5c5c");
@@ -300,14 +301,12 @@ function makeHEB(dataPath, fieldName) {
         })
 
         //Set colors for gradient
-        var colors = ["#4334eb", "#eb9834"];
-        var colorPicker = d3.scaleLinear().range(colors).domain([1, 2]);
+        var gradientColors = ["#4334eb", "#eb9834"];
+        var gradientPicker = d3.scaleLinear().range(gradientColors).domain([1, 2]);
 
-        //Make array of options for colors for paths
-        var colorOptions = [];
-        unique_ids.forEach(function(d) {
-            colorOptions.push({"none": "black", "gradient": [], "sentiment": []})
-        })
+        //Set colors for sentiment legend
+        var sentColors = ["red", "green"];
+        var sentPicker = d3.scaleLinear().range(sentColors).domain([1, 2]);
 
         //Edges need to be generated on first pass but need to be able to be redrawn later for animation
         generateEdges();
@@ -416,12 +415,12 @@ function makeHEB(dataPath, fieldName) {
                                 //Set first color of gradient
                                 linearGradient.append("stop")
                                 .attr("offset", "0%")
-                                .attr("stop-color", colorPicker(1));
+                                .attr("stop-color", gradientPicker(1));
 
                                 //Set last color of gradient
                                 linearGradient.append("stop")
-                                    .attr("offset", "100%")
-                                    .attr("stop-color", colorPicker(2));
+                                .attr("offset", "100%")
+                                .attr("stop-color", gradientPicker(2));
                             }
                         }
                     }
@@ -448,13 +447,14 @@ function makeHEB(dataPath, fieldName) {
         }
 
         //Make array for legend content
-        let edgeLegendContent = [{ "item": "incoming", "color": "#eb4034" }, { "item": "outgoing (w.i.p.)", "color": "#40c7d6" }, { "item": "two-way (w.i.p.)", "color": "#4b00bf" }];
+        let edgeLegendContent = [{ "item": "incoming", "color": "#eb4034" }, { "item": "outgoing (w.i.p.)", "color": "#40c7d6" }, { "item": "two-way (w.i.p.)", "color": "#fa8072" }];
 
         //Create edge legend
         var edgeLegend = svg.selectAll("entries")
             .data(edgeLegendContent)
             .enter()
-            .append("g");
+            .append("g")
+            .attr("id", "edgeLegend");
 
         //Example line for item
         edgeLegend.append("line")
@@ -487,6 +487,7 @@ function makeHEB(dataPath, fieldName) {
             .data(Jobtitles_list)
             .enter()
             .append("g")
+            .attr("id", "jobLegend")
             .attr("style", "cursor: pointer;")
             .on("click", function (d) {
                 //When clicking on the legend circles the jobtitle is removed or added back again.
@@ -550,11 +551,13 @@ function makeHEB(dataPath, fieldName) {
                 isPaused = true;
                 pauseIcon.attr("class", "fa fa-play");
                 togglePause.text("Play");
+                pauseText.text("Play");
                 clearTimeout(animTimer);
             } else if (isPaused && doAnimate) {
                 isPaused = false;
                 pauseIcon.attr("class", "fa fa-pause");
                 togglePause.text("Pause");
+                pauseText.text("Pause");
                 //Draw next frame when unpaused
                 nextFrame();
             }
@@ -567,11 +570,87 @@ function makeHEB(dataPath, fieldName) {
             generateEdges();
         });
 
+        //Make gradient legend gradient
+        var linearGradient = svg.append("defs")
+        .append("linearGradient")
+        .attr("id", "linearGradient");
+        //Set first color of gradient
+        linearGradient.append("stop")
+        .attr("offset", "0%")
+        .attr("stop-color", gradientPicker(1));
+        //Set last color of gradient
+        linearGradient.append("stop")
+        .attr("offset", "100%")
+        .attr("stop-color", gradientPicker(2));
+
+        //Make sentiment legend gradient
+        var sentGradient = svg.append("defs")
+        .append("linearGradient")
+        .attr("id", "sentGradient");
+        //Set first color of gradient
+        sentGradient.append("stop")
+        .attr("offset", "0%")
+        .attr("stop-color", sentPicker(1));
+        //Set last color of gradient
+        sentGradient.append("stop")
+        .attr("offset", "100%")
+        .attr("stop-color", sentPicker(2));
+
+        //Event handler for the selected edge color
         edgeColor.on("change", function() {
             colorSelected = edgeColor.property("value");
             d3.select("#" + fieldName)
               .selectAll("path")
               .attr("stroke", function (d) { return getStroke(d); });
+
+            //Remove previous legend
+            d3.select("#" + fieldName).selectAll("#colorLegend").remove();
+
+            //Draw legend for selected coloring method
+            var colorLegend = svg.append("g")   
+            .attr("id", "colorLegend")
+            .attr("font-size", "11pt");                          
+            
+            colorLegend.append("text")
+            .attr("y", figureHeight - 4)
+            .attr("x", function() {
+                if (colorSelected == "gradient") {
+                    return 163;
+                } else if (colorSelected == "sentiment") {
+                    return 182;
+                }
+            })
+            .text(function() {
+                if (colorSelected == "gradient") {
+                    return "From";
+                } else if (colorSelected == "sentiment") {
+                    return "-1";
+                }
+            });
+
+            colorLegend.append("rect")
+            .attr("y", figureHeight - 15)
+            .attr("x", 200)
+            .attr("width", 300)
+            .attr("height", 15)
+            .attr("fill", function() {
+                if (colorSelected == "gradient") {
+                    return "url(#linearGradient)";
+                } else if (colorSelected == "sentiment") {
+                    return "url(#sentGradient)";
+                }
+            });
+
+            colorLegend.append("text")
+            .attr("y", figureHeight - 4)
+            .attr("x", 505)
+            .text(function() {
+                if (colorSelected == "gradient") {
+                    return "To";
+                } else if (colorSelected == "sentiment") {
+                    return "1";
+                }
+            });
         });
 
         var animTimer;
@@ -681,6 +760,7 @@ function notDrawn(from, to) {
     return true;
 }
 
+//Function to check if two nodes have two-way mail traffic (non functional yet)
 function isTwoWay(from, to) {
     for (i = 0; i < allEdges.length; i++) {
         if (allEdges[i][0] == to &&
@@ -691,17 +771,21 @@ function isTwoWay(from, to) {
     return true;
 }
 
+//Function to determine what stroke to use based on the edgeColor selecter
 function getStroke(d) {
     if (colorSelected == "gradient") {
+        //Set stroke to link to fitting gradient
         return "url(#gradient_" + d.from + "_" + d.to + ")";
     } else if (colorSelected == "sentiment"){
+        //Calculate what color to give stroke based on sentiment
         if (d.sent < 0) {
-            return "rgb(" + (122.5 - Math.sqrt(-d.sent) * 255) + ", " + (122.5 + (Math.sqrt(-d.sent) * 255)) + ", 0)";
+            return "rgb(" + (122.5 - Math.sqrt(-d.sent) * 122.5) + ", " + (122.5 + (Math.sqrt(-d.sent) * 122.5)) + ", 0)";
         }
         else { 
-            return "rgb(" + (122.5 - (Math.sqrt(d.sent) * 255)) + ", " + (122.5 + Math.sqrt(-d.sent) * 255) + ", 0)"; 
+            return "rgb(" + (122.5 - (Math.sqrt(d.sent) * 122.5)) + ", " + (122.5 + Math.sqrt(-d.sent) * 122.5) + ", 0)"; 
         }
     } else {
+        //If none match set stroke to black
         return "black"
     }
 }
