@@ -51,7 +51,10 @@ function AddVisualisationBlock() {
         return
     }
 
-    let mainBlock = d3.select("#pageContent");
+
+    console.log("add new block! name = vis" + index);
+    let mainBlock = d3.select("#visContent");
+
     let newVisBlock = mainBlock.append("div")
                                .attr("id" , "vis" + index)
                                .attr("class" , "visField")
@@ -139,13 +142,30 @@ function OnChangeSelect(fieldName){
         console.log("test");
         d3.select("#" + fieldName).append('div').attr("id", "HEBFigure");
         let hebUIBox = d3.select('#' + fieldName).select("#upperbar").append('div').attr("id" , "hebUIBox");
-        hebUIBox.html('<span> From (year-month) </span><input id="startYear" type="number" name="startYear" default=1998><input id="startMonth" type="number" name="startMonth" default=01><span>'+
-        ' to (year-month) </span><input id="endYear" type="number" name="endYear" default=2002><input id="endMonth" type="number" name="endMonth" default=12><div><input id="animateToggle" '+
-        ' type="checkbox"><label for="animateToggle"> animation </label><button id="startHEB" type="button" name="HEB" onclick="makeHEB(localStorage.getItem(' + "'CurDataSet'" + ') ,' + 
-        "'" + fieldName + "'"   + ' )"> Start </button><button id="restartHEB" type="button" name="RESTARTHEB" onclick="restartHEB(localStorage.getItem(' + "'CurDataSet'" + ') ,' + 
-        "'" + fieldName + "'"   + ' )"> Restart </button></div><button id="togglePause" type="button" name="togglePause"> Play </button><label for="togglePause" id="pauseIcon" '+
-        'class="fa fa-play"></label><input id="strengthSlider" type="range" name="strengthSlider" min="0.00" max="1.00" value="0.85" step="0.05"><label for="strengthSlider"> Bundle strength </label>');
-    } 
+
+        hebUIBox.html('<span> From (year-month) </span>' +
+                      '<input id="startYear" type="number" name="startYear" default=1998>' + 
+                      '<input id="startMonth" type="number" name="startMonth" default=01>' +
+                      '<span> to (year-month) </span>' + 
+                      '<input id="endYear" type="number" name="endYear" default=2002>' + 
+                      '<input id="endMonth" type="number" name="endMonth" default=12>' + 
+                      '<div>' +
+                        '<input id="animateToggle" type="checkbox">' +
+                        '<label for="animateToggle"> animation </label>' +
+                        '<button id="startHEB" type="button" name="HEB" onclick="makeHEB(localStorage.getItem(' + "'DataSet'" + ') ,' + "'" + fieldName + "'"   + ' )"> Start </button>' + 
+                      '</div>' + 
+                      '<button id="togglePause" type="button" name="togglePause"> Play </button>' +
+                      '<label for="togglePause" id="pauseIcon" class="fa fa-play"></label>' + 
+                      '<input id="strengthSlider" type="range" name="strengthSlider" min="0.00" max="1.00" value="0.85" step="0.05">' + 
+                      '<label for="strengthSlider"> Bundle strength </label>' + 
+                      '<select id="edgeColor" name="edgeColor">' + 
+                        '<option value="none"> None </option>' + 
+                        '<option value="gradient"> From-to </option>' + 
+                        '<option value="sentiment"> Sentiment </option>' +
+                      '</select>' 
+                      );
+    }
+
     else if(selectValue == "MSV"){
         console.log(fieldName)
         makeMSV(localStorage.getItem('CurDataSet'), fieldName);

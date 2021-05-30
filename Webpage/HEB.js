@@ -3,6 +3,7 @@ Thomas Broers (1538705)
 Bas van Hoeflaken (1556282)
 */
 
+//Global arrays
 var usableData = [];
 var userIndex = [];
 var allEdges = [];
@@ -10,36 +11,16 @@ var drawnEdges = [];
 var wrong_Jobtitles = [];
 var jobGroupIndex = [];
 
-wrong_Jobtitles[0] = [];
-wrong_Jobtitles[1] = [];
-wrong_Jobtitles[2] = [];
-wrong_Jobtitles[3] = [];
-wrong_Jobtitles[4] = [];
-wrong_Jobtitles[5] = [];
-var colorswitch = true;
-
+//Set default stroke color
+var colorSelected = "black";
 
 //Datapath is the location of the user's dataset. 
-//fieldName is the name (id) of the visualisationBox the dataset is currently in.
-function restartHEB(dataPath, fieldName) {
-    //Delete previous object
-    d3.select("#" + fieldName).selectAll("#HEBdiagram").remove();
-
-}
-
+//FieldName is the name (id) of the visualisationBox the dataset is currently in.
 function makeHEB(dataPath, fieldName) {
-    //Make id
-    /*
-    hebId = Math.floor(Math.random() * 100000);
-    console.log(hebId);
-    */
-    usableData = [];
-    d3.select("#" + fieldName).selectAll("#HEBdiagram").remove();
 
+    d3.select("#" + fieldName).select("#HEBFigure").select("#HEBdiagram").remove();
 
-    //VARIABLES AND SUCH
-    //VARIABLES AND SUCH
-    //VARIABLES AND SUCH
+    //Variables
 
     //Link elements in dbl_vis.php to variables
     var startYear = d3.select("#" + fieldName).select("#startYear");
@@ -50,6 +31,7 @@ function makeHEB(dataPath, fieldName) {
     var pauseIcon = d3.select("#" + fieldName).select("#pauseIcon");
     var togglePause = d3.select("#" + fieldName).select("#togglePause");
     var strengthSlider = d3.select("#" + fieldName).select("#strengthSlider");
+    var edgeColor = d3.select("#" + fieldName).select("#edgeColor");
 
     //Date variables
     var endYearAdjust = false;
@@ -59,33 +41,38 @@ function makeHEB(dataPath, fieldName) {
     //The number of the HEB
     var HEB_nr = fieldName.match(/(\d+)/)[0];
 
+    //Check if a wrong jobtitles array exists, if not make an empty one
+    if (wrong_Jobtitles.length < (parseInt(HEB_nr) + 1)) {
+        wrong_Jobtitles[HEB_nr] = [];
+    }
+
     //Animation variables
     var doAnimate = animToggle.property("checked");
     var isPaused = true;
     var frameTime = 1000;
 
+    //Set selected stroke color
+    colorSelected = edgeColor.property("value");
 
     //Set dimensions
     let margin = { top: 15, right: 10, bottom: 15, left: 10 };
-    let figureSize = 900; //changed this because it was too big for the current fieldsize, but ultimately this should not be hardcoded -Daan
+    let figureHeight = 690; //changed this because it was too big for the current fieldsize, but ultimately this should not be hardcoded -Daan
+    let figureWidth = 800; //changed this because it was too big for the current fieldsize, but ultimately this should not be hardcoded -Daan
     let diameter = 600;
     let radius = diameter / 2;
     let innerRadius = radius / 10;
 
+    //Reset the job group index
     jobGroupIndex = [];
 
     //Creating color array
     const color_arr = ["green", "blue", "chartreuse", "cyan", "darkmagenta", "deeppink", "gold", "lightseagreen", "mediumpurple", "olive", "orchid", "seagreen", "grey", "blue", "green", "blue", "green", "blue",];
 
-
-    //INPUT DATA PROCESSING
-    //INPUT DATA PROCESSING
-    //INPUT DATA PROCESSING
-
-
     //Variables for lines
     var bundleStrength = strengthSlider.property("value");
-    var lineOpacity = 0.6;
+    var lineOpacity = 1;
+
+    //Input data processing
 
     //Check if startYear is outside of allowed values
     if (startYear.property("value") < 1998) {
@@ -136,15 +123,12 @@ function makeHEB(dataPath, fieldName) {
     var curYear = parseInt(startYear.property("value"));
     var curDate = startDate;
 
-    //PROCESSING DATASET
-    //PROCESSING DATASET
-    //PROCESSING DATASET
+    //Processing data
 
     d3.csv(dataPath).then(function (data) {
         //Since d3.csv is asynchronous (it is not loaded immediatly, but it is a request to the webserver) we need all our code from the data in here. 
 
         //Construct array with data in a usable order 
-
         data.forEach(function (d) {
             //Check wheter the toId is already an object, if not create object with first found fromId
             if (!usableData.some(code => code.id == d.toId)) {
@@ -158,17 +142,11 @@ function makeHEB(dataPath, fieldName) {
             }
         });
 
-
         //Sort array by jobtitle
         usableData.sort((a, b) => d3.ascending(a.jobtitle, b.jobtitle) || d3.ascending(a.toId, b.toId));
-        var angleStep = Math.PI * 2 / usableData.length;
 
         //Get unique jobtitles
         let Jobtitles_list = [...new Set(usableData.map(ids => ids.jobtitle))];
-
-
-
-
 
         //Deleting all incoming mails from jobtitles that arent included.
         for (k = 0; k < usableData.length; k++) {
@@ -176,124 +154,49 @@ function makeHEB(dataPath, fieldName) {
                 var job_offf = findJobtitle(usableData[k].mails[j].from);
                 if (wrong_Jobtitles[HEB_nr].includes(job_offf)) {
                     (usableData[k].mails).splice(j, 1);
-                    // console.log(wrong_Jobtitles[HEB_nr].includes(job_offf));
                     j--;
                 }
             }
         }
-        //Deleting all rows for which the recipients jobtitle is not included.
+
+        //Deleting all users with jobtitles that arent included.
         for (k = 0; k < usableData.length; k++) {
             if (wrong_Jobtitles[HEB_nr].includes(usableData[k].jobtitle)) {
                 usableData.splice(k, 1);
                 k--;
             }
-
-
         }
 
-        //Make an array with its "index" in the middle of all circles so the paths can group in the center
-        Jobtitles_list.forEach(function (d) {
-            startIndex = findIndex(usableData, d, "front");
-            endIndex = findIndex(usableData, d, "back");
-            jobGroupIndex.push([d, startIndex + ((endIndex - startIndex) / 2)]);
-        })
+        //Set angle step
+        var angleStep = Math.PI * 2 / usableData.length;
 
-        console.log(usableData);  //TESTING PURPOSES
         //Get unique ids
         let unique_ids = [...new Set(usableData.map(ids => ids.id))];
 
-
-
-        //CREATION OF HEB
-        //CREATION OF HEB
-        //CREATION OF HEB
-
-
+        //Creation HEB
 
         //Make svg object
         let div = d3.select("#" + fieldName).select("#HEBFigure")
             .append("div")
             .attr("id", "HEBdiagram")
-            .attr("width", figureSize)
-            .attr("height", figureSize);
+            .attr("width", figureWidth)
+            .attr("height", figureHeight);
         let svg = div.append("svg")
-            .attr("width", figureSize)
-            .attr("height", figureSize)
+            .attr("width", figureWidth)
+            .attr("height", figureHeight)
             .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
 
         //Create tooltip
         var tooltip = div.append("div")
             .attr("class", "tooltip");
 
-        //Creates switch for coloring edges 1
-        svg.append('rect')
-            .attr('x', 720)
-            .attr('y', 420)
-            .attr("rx", 10)
-            .attr("ry", 10)
-            .attr('width', 60)
-            .attr('height', 40)
-            .attr('stroke', '#1aff1a')
-            .attr('fill', 'blue')
-            .style("opacity", 1)
-            .attr("id", "switch1")
-            .on("click", function () {
-                if (colorswitch == false) {
-                    d3.select(this)
-                        .attr('stroke', '#1aff1a')
-                        .style("opacity", 1)
-                    d3.selectAll("#switch2")
-                        .attr('stroke', 'black')
-                        .style("opacity", 0.5)
-                    colorswitch = true;
-                    change_edgeColor();
-                }
-            });
-        //Creates switch for coloring edges 1
-        svg.append('rect')
-            .attr('x', 720)
-            .attr('y', 465)
-            .attr("rx", 10)
-            .attr("ry", 10)
-            .attr('width', 60)
-            .attr('height', 40)
-            .attr('stroke', 'black')
-            .attr('fill', 'blue')
-            .style("opacity", 0.5)
-            .attr("id", "switch2")
-            .on("click", function () {
-                if (colorswitch) {
-                    d3.select(this)
-                        .attr('stroke', '#1aff1a')
-                        .style("opacity", 1)
-                    d3.selectAll("#switch1")
-                        .attr('stroke', 'black')
-                        .style("opacity", 0.5)
-                    colorswitch = false;
-                    change_edgeColor();
-
-                }
-
-            });
-            console.log("TETSTATSTST")
-        
-        //Checks if the color switch was still turned on
-        if (colorswitch == false) {
-            d3.select("#switch2")
-            .attr('stroke', '#1aff1a')
-            .style("opacity", 1)
-        d3.selectAll("#switch1")
-            .attr('stroke', 'black')
-            .style("opacity", 0.5)
-        }
         //Creates the group object for all rows in the usableData set
-        var g = svg.selectAll("#group1")
+        var g = svg.selectAll("g")
             .data(usableData)
             .enter()
-            .append("g")
-            .attr("id", "group1")
+            .append("g");
 
-        d3.selectAll("#group1").on("mouseover", function () {
+        g.on("mouseover", function () {
             d3.select(this)
                 //Create tooltip
                 .attr("", function (d) {
@@ -306,7 +209,6 @@ function makeHEB(dataPath, fieldName) {
                 .style("left", (event.x + 5) + "px")
                 .style("top", (event.y) + "px");
 
-
             d3.select(this).attr("", function (d) {
 
                 tooltip.style("opacity", 1);
@@ -318,29 +220,22 @@ function makeHEB(dataPath, fieldName) {
                 //Change width color and opacity for outgoing selected mails
                 d3.selectAll(outgoing)
                     .style("opacity", 1)
-                    .attr("stroke", "#4254f5")
-                    .attr("stroke-width", 2);
+                    .attr("stroke", "#40c7d6")
+                    .attr("stroke-width", 2)
                 d3.selectAll(".twoWay")
                     .style("opacity", 1)
                     .attr("stroke", "#eb9834")
                     .attr("stroke-width", 2);
                 //Place selected paths on top of others
-                if (d3.selectAll(incoming))
-                    d3.select(this).raise();
+                d3.select(this).raise().attr("stroke", "#5c5c5c");
                 d3.select(tooltip).raise();
-
-                d3.select(this).raise().attr("stroke", "#5c5c5c")
-
-
             })
-
 
         })
             .on("mouseleave", function (d) {
                 //Remove tooltip
                 tooltip.style("opacity", 0);
                 d3.select(this).attr("stroke", null)
-
                     //Return selected lines to normal
                     .attr("", function (d) {
                         incoming = ".to" + d.id;
@@ -349,13 +244,14 @@ function makeHEB(dataPath, fieldName) {
                 //Reset previously selected paths to normal
                 d3.selectAll(incoming)
                     .style("opacity", lineOpacity)
-                    .attr("stroke", "black")
+                    .attr("stroke", function (d) { return getStroke(d); })
                     .attr("stroke-width", 1);
                 d3.selectAll(outgoing)
                     .style("opacity", lineOpacity)
-                    .attr("stroke", "black")
+                    .attr("stroke", function (d) { return getStroke(d); })
                     .attr("stroke-width", 1);
-            });
+            }
+        );
 
         //creates circles for all working persons
         var circle = g.append("circle")
@@ -394,29 +290,24 @@ function makeHEB(dataPath, fieldName) {
             })
             .attr("font-size", "8pt")
             .attr("dominant-baseline", "central")
-            .text(function (d, i) { return d.id; });
+            .text(function(d, i) { return d.id; });
 
+        //Make an array with its "index" in the middle of all circles so the paths can group in the center
+        Jobtitles_list.forEach(function(d) {
+            startIndex = findIndex(usableData, d, "front");
+            endIndex = findIndex(usableData, d, "back");
+            jobGroupIndex.push([d, startIndex + ((endIndex - startIndex) / 2)]);
+        })
 
-
-
-        //Set color scale for gradient
+        //Set colors for gradient
         var colors = ["#4334eb", "#eb9834"];
         var colorPicker = d3.scaleLinear().range(colors).domain([1, 2]);
 
-        //Make gradient (Not functional yet)
-        var linearGradient = svg.append("defs")
-            .append("linearGradient")
-            .attr("id", "linear_gradient");
-
-        //Set first color of gradient
-        linearGradient.append("stop")
-            .attr("offset", "0%")
-            .attr("stop-color", colorPicker(1));
-
-        //Set last color of gradient
-        linearGradient.append("stop")
-            .attr("offset", "100%")
-            .attr("stop-color", colorPicker(2));
+        //Make array of options for colors for paths
+        var colorOptions = [];
+        unique_ids.forEach(function(d) {
+            colorOptions.push({"none": "black", "gradient": [], "sentiment": []})
+        })
 
         //Edges need to be generated on first pass but need to be able to be redrawn later for animation
         generateEdges();
@@ -444,6 +335,7 @@ function makeHEB(dataPath, fieldName) {
                         if ((!doAnimate && (d.mails[k]["date"] >= startDate && d.mails[k]["date"] <= endDate)) ||
                             (doAnimate && d.mails[k]["date"] == curDate)) {
                             var fromId = d.mails[k]["from"];
+                            var toId = d["id"];
                             var senti = d.mails[k]["sent"];
 
                             //Check if the same edges (but in a different month) has already been drawn
@@ -508,6 +400,28 @@ function makeHEB(dataPath, fieldName) {
                                 } else {
                                     mail_lines.push({ "from": fromId, "to": d["id"], "path": line(coords), "sent": senti });
                                 }
+
+                                var angle = Math.atan2(y_target - y_source, x_target - x_source) * 180 / Math.PI;
+                                
+                                //Make gradient (Not functional yet)
+                                var linearGradient = d3.select(this).append("defs")
+                                .append("linearGradient")
+                                .attr("id", function(d) {
+                                    return "gradient_" + fromId + "_" + toId;
+                                })
+                                .attr("gradientTransform", function(d) {
+                                    return "rotate("+ angle + ")";
+                                });
+
+                                //Set first color of gradient
+                                linearGradient.append("stop")
+                                .attr("offset", "0%")
+                                .attr("stop-color", colorPicker(1));
+
+                                //Set last color of gradient
+                                linearGradient.append("stop")
+                                    .attr("offset", "100%")
+                                    .attr("stop-color", colorPicker(2));
                             }
                         }
                     }
@@ -519,7 +433,12 @@ function makeHEB(dataPath, fieldName) {
                 .enter()
                 .append("path")
                 .attr("d", function (d) { return d.path; })
-                .attr("stroke", "black")
+                .attr("id", function (d) {
+                    return "from_" + d.from + "to_" + d.to + ")";
+                })
+                .attr("stroke", function (d) {
+                    return getStroke(d);
+                })
                 .attr("fill", "none")
                 .attr("stroke-width", 1)
                 .style("opacity", lineOpacity)
@@ -528,21 +447,17 @@ function makeHEB(dataPath, fieldName) {
                 });
         }
 
-        //EVENT HANDLERS
-        //EVENT HANDLERS
-        //EVENT HANDLERS
-
         //Make array for legend content
-        let legendContent = [{ "item": "incoming", "color": "#eb4034" }, { "item": "outgoing (w.i.p.)", "color": "#4254f5" }, { "item": "two-way (w.i.p.)", "color": "#4b00bf" }];
+        let edgeLegendContent = [{ "item": "incoming", "color": "#eb4034" }, { "item": "outgoing (w.i.p.)", "color": "#40c7d6" }, { "item": "two-way (w.i.p.)", "color": "#4b00bf" }];
 
-        //Create legend
-        var legend = svg.selectAll("entries")
-            .data(legendContent)
+        //Create edge legend
+        var edgeLegend = svg.selectAll("entries")
+            .data(edgeLegendContent)
             .enter()
             .append("g");
 
         //Example line for item
-        legend.append("line")
+        edgeLegend.append("line")
             .attr("x1", 10)
             .attr("x2", 35)
             .attr("y1", function (d, i) {
@@ -557,7 +472,7 @@ function makeHEB(dataPath, fieldName) {
             .attr("stroke-width", 2);
 
         //Text for item
-        legend.append("text")
+        edgeLegend.append("text")
             .attr("font-size", "11pt")
             .attr("x", 40)
             .attr("y", function (d, i) {
@@ -567,15 +482,12 @@ function makeHEB(dataPath, fieldName) {
                 return d.item;
             });
 
-
-
-
-        //Creates second grouping element, used for the legend.
-        var g2 = svg.selectAll("#group2")
+        //Create jobs legend
+        var jobLegend = svg.selectAll("entries")
             .data(Jobtitles_list)
             .enter()
             .append("g")
-            .attr("id", "group2")
+            .attr("style", "cursor: pointer;")
             .on("click", function (d) {
                 //When clicking on the legend circles the jobtitle is removed or added back again.
                 d3.select(this).attr("", function (d) {
@@ -587,7 +499,6 @@ function makeHEB(dataPath, fieldName) {
                         //If it was removed, it will be added back
                         wrong_Jobtitles[HEB_nr].splice(wrong_Jobtitles[HEB_nr].indexOf(d), 1);
                     }
-                    console.log(wrong_Jobtitles[HEB_nr]);
                 })
                 d3.select(this).select("text").attr("text-decoration", function (d) {
                     //Puts a line through when jobtitle is removed.
@@ -595,28 +506,34 @@ function makeHEB(dataPath, fieldName) {
                         return "line-through";
                     }
                     else { return ""; }
-
                 })
-
             })
+            .on("mouseover", function (d) {
+                d3.select(this).raise().attr("stroke", "#5c5c5c");
+            })
+            .on("mouseleave", function (d) {
+                d3.select(this).attr("stroke", null);
+            });
 
-        //Creates the circles for the legend
-        var job_circle = g2.append("circle")
-            .attr("cx", 720)
+        //Example line for item
+        jobLegend.append("circle")
+            .attr("cx", figureWidth - 150)
             .attr("cy", function (d, i) {
-                return 150 + 25 * i;
+                return 12 + 18 * i;
             })
-            .attr("r", 10)
+            .attr("r", 5)
             //Fills the circles according to jobtitle
             .attr("fill", function (d, i) {
                 return color_arr[i];
             });
-        //Creates the text for the jobtitles for the legend.
-        var job_text = g2.append('text').attr("font-size", "12pt")
-            .attr("dominant-baseline", "central")
-            .attr("x", 740)
+
+
+        //Text for item
+        jobLegend.append("text")
+            .attr("font-size", "11pt")
+            .attr("x", figureWidth - 140)
             .attr("y", function (d, i) {
-                return 150 + 25 * i;
+                return 15 + 18 * i;
             })
             .text(function (d, i) { return d; })
             .attr("text-decoration", function (d) {
@@ -625,14 +542,7 @@ function makeHEB(dataPath, fieldName) {
                     return "line-through";
                 }
                 else { return ""; }
-
             });
-
-        d3.selectAll("#group2").on("mouseover", function (d, i) {
-            d3.select(this).raise().attr("stroke", "#5c5c5c");
-        }).on("mouseleave", function (d, i) {
-            d3.select(this).raise().attr("stroke", null);
-        });
 
         //Check if pausebutton has been clicked 
         togglePause.on("click", function () {
@@ -648,21 +558,27 @@ function makeHEB(dataPath, fieldName) {
                 //Draw next frame when unpaused
                 nextFrame();
             }
-        })
+        });
 
         //Event handler that changes the bundlestrength when changed at slider
-        strengthSlider.on("input", function () {
+        strengthSlider.on("input", function() {
             bundleStrength = strengthSlider.property("value");
             d3.select("#" + fieldName).selectAll("path").remove();
-            console.log("sliderTEST")
             generateEdges();
-        })
+        });
+
+        edgeColor.on("change", function() {
+            colorSelected = edgeColor.property("value");
+            d3.select("#" + fieldName)
+              .selectAll("path")
+              .attr("stroke", function (d) { return getStroke(d); });
+        });
 
         var animTimer;
 
         //If animation is selected and not paused on first pass, draw next frame
         if (doAnimate && !isPaused) {
-            animTimer = setTimeout(function () { nextFrame() }, frameTime);
+            animTimer = setTimeout(function() { nextFrame() }, frameTime);
             animTimer;
         }
 
@@ -688,9 +604,7 @@ function makeHEB(dataPath, fieldName) {
                 }
             }
         }
-
     });
-
 }
 
 //Function for checking if a mail from the same person in the same month is already in the mails array of the reciever
@@ -777,17 +691,18 @@ function isTwoWay(from, to) {
     return true;
 }
 
-function change_edgeColor() {
-    if (colorswitch) { }
-    else {
-        d3.selectAll('path')
-            .attr("stroke", function (d, i) {
-                if (d.sent < 0) {
-                    return "rgb("+(122.5-d.sent*255)+", "+ (122.5+(d.sent*255)) +", 0)";
-                }
-                else { return"rgb("+(122.5-(d.sent*255))+", "+ (122.5+d.sent*255) +", 0)"; }
-            })
+function getStroke(d) {
+    if (colorSelected == "gradient") {
+        return "url(#gradient_" + d.from + "_" + d.to + ")";
+    } else if (colorSelected == "sentiment"){
+        if (d.sent < 0) {
+            return "rgb(" + (122.5 - Math.sqrt(-d.sent) * 255) + ", " + (122.5 + (Math.sqrt(-d.sent) * 255)) + ", 0)";
+        }
+        else { 
+            return "rgb(" + (122.5 - (Math.sqrt(d.sent) * 255)) + ", " + (122.5 + Math.sqrt(-d.sent) * 255) + ", 0)"; 
+        }
+    } else {
+        return "black"
     }
-
 }
 

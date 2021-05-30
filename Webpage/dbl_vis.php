@@ -20,6 +20,7 @@
   		<script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
 
 		<!-- Import custom scripts -->
+
 		<script src="Webpagecode.js"></script>
 		<script src="D3Functions.js"></script>
 		<script src= "generalUIVis.js"></script>
@@ -93,7 +94,7 @@
 		<div class="fa fa-angle-down" id="tooltoggle" onclick="toggleToolbar()"> <span class="tooltext"> Toolbar </span> </div>	
 
 		<!--pagecontent-->
-		<div id="pageContent" class="pageContent">
+		<div id="visContent" class="visContent">
 
 			<!--temp text-->
 		<div id = "upload">
@@ -104,7 +105,7 @@
 			<form action="upload.php" method="POST" enctype="multipart/form-data" >
 				<input id="oldDataSetsInput" type="text" name="testName" value = "temp" hidden>
 				<input id="file_input" type="file" name="dataset" accept=".csv" onchange="changeFile()">
-				<label id="upload_button" for="file_input">
+				<label id="largeButton" for="file_input">
 					<i class="fa fa-upload" id="upload_icon" style="font-size: 20px;"></i>
 					Upload dataset
 				</label>
