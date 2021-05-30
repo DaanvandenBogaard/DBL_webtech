@@ -152,7 +152,7 @@ function OnChangeSelect(fieldName){
                       '<div>' +
                         '<input id="animateToggle" type="checkbox">' +
                         '<label for="animateToggle"> animation </label>' +
-                        '<button id="startHEB" type="button" name="HEB" onclick="makeHEB(localStorage.getItem(' + "'DataSet'" + ') ,' + "'" + fieldName + "'"   + ' )"> Start </button>' + 
+                        '<button id="startHEB" type="button" name="HEB" onclick="makeHEB(localStorage.getItem(' + "'CurDataSet'" + ') ,' + "'" + fieldName + "'"   + ' )"> Start </button>' + 
                       '</div>' + 
                       '<button id="togglePause" type="button" name="togglePause"> Play </button>' +
                       '<label for="togglePause" id="pauseIcon" class="fa fa-play"></label>' + 
