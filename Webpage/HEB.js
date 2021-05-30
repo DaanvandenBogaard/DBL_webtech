@@ -278,18 +278,15 @@ function makeHEB(dataPath, fieldName) {
                 //Change width color and opacity for outgoing selected mails
                 d3.selectAll(outgoing)
                     .style("opacity", 1)
-                    .attr("stroke", "#4254f5")
-                    .attr("stroke-width", 2);
+                    .attr("stroke", "#53d94a")
+                    .attr("stroke-width", 2)
                 d3.selectAll(".twoWay")
                     .style("opacity", 1)
                     .attr("stroke", "#eb9834")
                     .attr("stroke-width", 2);
                 //Place selected paths on top of others
-                d3.select(this).raise();
+                d3.select(this).raise().attr("stroke", "#5c5c5c");
                 d3.select(tooltip).raise();
-
-                d3.select(this).raise().attr("stroke", "#5c5c5c")
-
             })
 
         })
@@ -322,7 +319,6 @@ function makeHEB(dataPath, fieldName) {
             .attr("cy", function (d, i) {
                 return circ_y(300, i);
             })
-            .attr("id", "HEBdiagram")
             .attr("r", 5)
             //Fills the circles according to jobtitle
             .attr("fill", function (d) {
@@ -456,21 +452,23 @@ function makeHEB(dataPath, fieldName) {
                                 } else {
                                     mail_lines.push({ "from": fromId, "to": d["id"], "path": line(coords), "sent": senti });
                                 }
+
+                                var angle = Math.atan2(y_target - y_source, x_target - x_source) * 180 / Math.PI;
                                 
                                 //Make gradient (Not functional yet)
-                                var linearGradient = svg.append("defs")
+                                var linearGradient = d3.select(this).append("defs")
                                 .append("linearGradient")
                                 .attr("id", function(d) {
                                     return "gradient_" + fromId + "_" + toId;
                                 })
                                 .attr("gradientTransform", function(d) {
-                                    return "rotate("+ Math.atan2(y_target - y_source, x_target - x_source) * 180 / Math.PI + ")";
-                                })
+                                    return "rotate("+ angle + ")";
+                                });
 
                                 //Set first color of gradient
                                 linearGradient.append("stop")
                                 .attr("offset", "0%")
-                                .attr("stop-color", colorPicker(1))
+                                .attr("stop-color", colorPicker(1));
 
                                 //Set last color of gradient
                                 linearGradient.append("stop")
@@ -502,7 +500,7 @@ function makeHEB(dataPath, fieldName) {
         }
 
         //Make array for legend content
-        let edgeLegendContent = [{ "item": "incoming", "color": "#eb4034" }, { "item": "outgoing (w.i.p.)", "color": "#4254f5" }, { "item": "two-way (w.i.p.)", "color": "#4b00bf" }];
+        let edgeLegendContent = [{ "item": "incoming", "color": "#eb4034" }, { "item": "outgoing (w.i.p.)", "color": "#53d94a" }, { "item": "two-way (w.i.p.)", "color": "#4b00bf" }];
 
         //Create edge legend
         var edgeLegend = svg.selectAll("entries")
