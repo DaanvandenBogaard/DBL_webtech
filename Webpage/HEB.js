@@ -40,6 +40,7 @@ function makeHEB(dataPath, fieldName) {
     //The number of the HEB
     var HEB_nr = fieldName.match(/(\d+)/)[0];
 
+
     if (wrong_Jobtitles.length < (parseInt(HEB_nr) + 1)) {
         wrong_Jobtitles[HEB_nr] = [];
     }
@@ -183,7 +184,8 @@ function makeHEB(dataPath, fieldName) {
         //Create tooltip
         var tooltip = div.append("div")
             .attr("class", "tooltip");
-        
+
+
         /*
         //Creates switch for coloring edges 1
         svg.append('rect')
@@ -270,25 +272,46 @@ function makeHEB(dataPath, fieldName) {
             d3.select(this).attr("", function (d) {
 
                 tooltip.style("opacity", 1);
-                //Change width color and opacity for incoming selected mails
-                d3.selectAll(incoming)
-                    .style("opacity", 1)
-                    .attr("stroke", "#eb4034")
-                    .attr("stroke-width", 2);
-                //Change width color and opacity for outgoing selected mails
-                d3.selectAll(outgoing)
-                    .style("opacity", 1)
-                    .attr("stroke", "#4254f5")
-                    .attr("stroke-width", 2);
-                d3.selectAll(".twoWay")
-                    .style("opacity", 1)
-                    .attr("stroke", "#eb9834")
-                    .attr("stroke-width", 2);
-                //Place selected paths on top of others
-                d3.select(this).raise();
-                d3.select(tooltip).raise();
+                if (edgeColor.value == "from-to") {
+                    //Change width color and opacity for incoming selected mails
+                    d3.selectAll(incoming)
+                        .style("opacity", 1)
+                        .attr("stroke", "#eb4034")
+                        .attr("stroke-width", 2);
+                    //Change width color and opacity for outgoing selected mails
+                    d3.selectAll(outgoing)
+                        .style("opacity", 1)
+                        .attr("stroke", "#4254f5")
+                        .attr("stroke-width", 2);
+                    d3.selectAll(".twoWay")
+                        .style("opacity", 1)
+                        .attr("stroke", "#eb9834")
+                        .attr("stroke-width", 2);
+                    //Place selected paths on top of others
+                    d3.select(this).raise();
+                    d3.select(tooltip).raise();
 
-                d3.select(this).raise().attr("stroke", "#5c5c5c")
+                    d3.select(this).raise().attr("stroke", "#5c5c5c")
+                }
+                else{
+                    //Change width color and opacity for incoming selected mails
+                    d3.selectAll(incoming)
+                        .style("opacity", 1)
+                        .attr("stroke-width", 2);
+                    //Change width color and opacity for outgoing selected mails
+                    d3.selectAll(outgoing)
+                        .style("opacity", 1)
+                        .attr("stroke-width", 2);
+                    d3.selectAll(".twoWay")
+                        .style("opacity", 1)
+                        .attr("stroke-width", 2);
+                    //Place selected paths on top of others
+                    d3.select(this).raise();
+                    d3.select(tooltip).raise();
+
+                    d3.select(this).raise().attr("stroke", "#5c5c5c")
+
+                }
 
             })
 
@@ -303,16 +326,28 @@ function makeHEB(dataPath, fieldName) {
                         incoming = ".to" + d.id;
                         outgoing = ".from" + d.id;
                     });
+                    if(edgeColor.value == "from-to"){
                 //Reset previously selected paths to normal
                 d3.selectAll(incoming)
                     .style("opacity", lineOpacity)
-                    .attr("stroke", function(d) { return d3.select(this).attr("id"); })
+                    .attr("stroke", function (d) { return d3.select(this).attr("id"); })
                     .attr("stroke-width", 1);
                 d3.selectAll(outgoing)
                     .style("opacity", lineOpacity)
-                    .attr("stroke", function(d) { return d3.select(this).attr("id"); })
+                    .attr("stroke", function (d) { return d3.select(this).attr("id"); })
                     .attr("stroke-width", 1);
-            });
+            }
+            else{
+                 //Reset previously selected paths to normal
+                 d3.selectAll(incoming)
+                 .style("opacity", lineOpacity)
+                 .attr("stroke-width", 1);
+             d3.selectAll(outgoing)
+                 .style("opacity", lineOpacity)
+                 .attr("stroke-width", 1);
+            }
+        
+        });
 
         //creates circles for all working persons
         var circle = g.append("circle")
@@ -456,26 +491,26 @@ function makeHEB(dataPath, fieldName) {
                                 } else {
                                     mail_lines.push({ "from": fromId, "to": d["id"], "path": line(coords), "sent": senti });
                                 }
-                                
+
                                 //Make gradient (Not functional yet)
                                 var linearGradient = svg.append("defs")
-                                .append("linearGradient")
-                                .attr("id", function(d) {
-                                    return "gradient_" + fromId + "_" + toId;
-                                })
-                                .attr("gradientTransform", function(d) {
-                                    return "rotate("+ Math.atan2(y_target - y_source, x_target - x_source) * 180 / Math.PI + ")";
-                                })
+                                    .append("linearGradient")
+                                    .attr("id", function (d) {
+                                        return "gradient_" + fromId + "_" + toId;
+                                    })
+                                    .attr("gradientTransform", function (d) {
+                                        return "rotate(" + Math.atan2(y_target - y_source, x_target - x_source) * 180 / Math.PI + ")";
+                                    })
 
                                 //Set first color of gradient
                                 linearGradient.append("stop")
-                                .attr("offset", "0%")
-                                .attr("stop-color", colorPicker(1))
+                                    .attr("offset", "0%")
+                                    .attr("stop-color", colorPicker(1))
 
                                 //Set last color of gradient
                                 linearGradient.append("stop")
-                                .attr("offset", "100%")
-                                .attr("stop-color", colorPicker(2));
+                                    .attr("offset", "100%")
+                                    .attr("stop-color", colorPicker(2));
                             }
                         }
                     }
@@ -487,10 +522,10 @@ function makeHEB(dataPath, fieldName) {
                 .enter()
                 .append("path")
                 .attr("d", function (d) { return d.path; })
-                .attr("stroke", function(d) {
+                .attr("stroke", function (d) {
                     return "url(#gradient_" + d.from + "_" + d.to + ")";
                 })
-                .attr("id", function(d) {
+                .attr("id", function (d) {
                     return "url(#gradient_" + d.from + "_" + d.to + ")";
                 })
                 .attr("fill", "none")
@@ -499,6 +534,7 @@ function makeHEB(dataPath, fieldName) {
                 .attr("class", function (d) {
                     return "from" + d.from + " to" + d.to;
                 });
+                change_edgeColor();
         }
 
         //Make array for legend content
@@ -542,7 +578,7 @@ function makeHEB(dataPath, fieldName) {
             .enter()
             .append("g")
             .attr("style", "cursor: pointer;")
-            .on("click", function(d) {
+            .on("click", function (d) {
                 //When clicking on the legend circles the jobtitle is removed or added back again.
                 d3.select(this).attr("", function (d) {
                     if (!wrong_Jobtitles[HEB_nr].includes(d)) {
@@ -562,10 +598,10 @@ function makeHEB(dataPath, fieldName) {
                     else { return ""; }
                 })
             })
-            .on("mouseover", function(d) {
+            .on("mouseover", function (d) {
                 d3.select(this).raise().attr("stroke", "#5c5c5c");
             })
-            .on("mouseleave", function(d) {
+            .on("mouseleave", function (d) {
                 d3.select(this).attr("stroke", null);
             });
 
@@ -652,7 +688,7 @@ function makeHEB(dataPath, fieldName) {
             }
         }
 
-        console.log(wrong_Jobtitles);
+
     });
 }
 
@@ -741,14 +777,14 @@ function isTwoWay(from, to) {
 }
 
 function change_edgeColor() {
-    if (colorswitch) { }
+    if (edgeColor.value != "sentiment") { }
     else {
         d3.selectAll('path')
             .attr("stroke", function (d, i) {
                 if (d.sent < 0) {
-                    return "rgb("+(122.5-d.sent*255)+", "+ (122.5+(d.sent*255)) +", 0)";
+                    return "rgb(" + (122.5 - Math.sqrt(-d.sent) * 255) + ", " + (122.5 + (Math.sqrt(-d.sent) * 255)) + ", 0)";
                 }
-                else { return"rgb("+(122.5-(d.sent*255))+", "+ (122.5+d.sent*255) +", 0)"; }
+                else { return "rgb(" + (122.5 - (Math.sqrt(d.sent) * 255)) + ", " + (122.5 + Math.sqrt(-d.sent) * 255) + ", 0)"; }
             })
     }
 
