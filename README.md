@@ -31,6 +31,19 @@ Contact:
 * StudentID: 1534173 
 * Email: d.c.l.v.d.bogaard@student.tue.nl
 
+# Uploading datasets
+When you first log into the site, you will be asked to upload a dataset. 
+We do not have a feature to upload a new dataset (yet).
+
+Should you want to upload another dataset, we have the following procedure:
+* First go back to the home-page.
+* Now, go back to the visualisation-page through the menu.
+* Hit "F12" and go to "Console"
+* Type "localStorage.setItem('DataSet', null);". This will remove any reference to the old dataset.
+* Refresh the webpage.
+
+This should make it so that the upload button appears once again!
+
 # General use
 On loading the website, users will find themself on our home-page. 
 To navigate to any other webpage, please use the buttons on the left side of the page. 
@@ -68,7 +81,20 @@ Dragging: All sankey nodes (the coloured blocks) are fully draggable. You can re
 Colouring: The nodes all have a colour assigned to them by a specific colour hash. The nodes will always have the same colour, even when you look at them in the context of other nodes. 
 
 # HEB (Hierarchical Edge Bundling)
+When hierarchical is selected the user is presented with the option to select the 
+time frame in which the user would like to view the data. When the animation option is selected
+the diagram will go month by month through the selected time period. 
 
+When the start button is pressed the diagram will appear below. Note, the start button can currently
+only be pressed once. The animation is paused by default so the user needs to press 
+play to start the animation.
+
+After generation the user kan adjust the bundle strength with the slider above. If the animation
+was selected it can be paused with the pause button.
+
+When looking at the diagram the user can hover over the user nodes to view their jobtitle and 
+the number of people that sent and recieved mails to/from this employee. Note, the outgoin edges
+are not yet highlighted on top and the two-way highlight is not yet functional
 
 # MSV (Massive Sequence View) 
 You can select the MSV as one of the possible visualizations,

@@ -2,21 +2,79 @@
 var visualisations = ["Sankey" , "HEB" , "MSV" , "Gestalt"];
 var index = 0;
 
-function AddVisualisationBlock(){
+//A function to handle the choosing of uploaded datasets:
+//Input: JSON string of the datasets
+//Output: A button appended to the toolbar.
+function MakeDataSetSelector(dataSets) {
+    //Retrieve info on user datasets:
+    dataSets = JSON.parse(dataSets);
+    
+    //First, we check whether there is a curdataset, if not, we select one:
+    if (RetrieveLocalStorage("CurDataSet") == "null") {
+        ChangeLocalStorage("CurDataSet", dataSets[0]);
+    }
+
+    let select = d3.select("#toolbar")
+                   .append("select")
+                   .attr("id" , "DataSetSelector")
+                   .attr("onchange" , "OnChangeDataSetSelector()");
+                   
+    //Append options:
+    var selector = document.getElementById("DataSetSelector");
+    let newOption = document.createElement("option");
+    newOption.text = RetrieveLocalStorage("CurDataSet");
+    selector.add(newOption);
+    dataSets.forEach(function(d){ 
+        if(d != RetrieveLocalStorage("CurDataSet")){
+            let newOption = document.createElement("option");
+            newOption.text = d;
+            selector.add(newOption);
+        }
+    }); 
+}
+
+//ActionListener for DataSetSelector:
+function OnChangeDataSetSelector() {
+    //Call function in main file to change this value as we are not allowed to edit this form this file!
+    DataSetSwitch(document.getElementById("DataSetSelector").value);
+}
+
+//Changelisterner of close buttons:
+function changeListenerFunction(name){
+    d3.select("#" + name).remove();
+}
+
+function AddVisualisationBlock() {
     //Check if dataset is loaded (only works because this file is directely loaded into dbl_vis.php!!!)
     if (localStorage.getItem('DataSet') == 'null') {
         console.log("Please load a dataset first!");
         return
     }
 
+
     console.log("add new block! name = vis" + index);
     let mainBlock = d3.select("#visContent");
+
     let newVisBlock = mainBlock.append("div")
                                .attr("id" , "vis" + index)
                                .attr("class" , "visField")
+                               
                                .style("height" , "800px");
+    newVisBlock.style("position","absolute").attr("x", 0).attr("y",0);
     CreateVisField("vis" + index); 
-           
+      
+    //Use JQuery to have the blocks be draggable:
+    console.log("added UI JQuery!");
+    
+    $( function() {
+        $( "#vis" + index ).draggable({snap: true , stack: ".visField"});
+      } ); 
+
+    //Add the resizeable effect:
+    $( function() {
+        $( "#vis" + index ).resizable();
+      } );
+
     index += 1;                
 }
 
@@ -28,9 +86,16 @@ function CreateVisField(fieldName){
 	var vis = d3.select("#" + fieldName);
 							
 	var upperbar = vis.append("div")
-						   .attr("class" , "upperVisBox")
-						   .attr("float" , "left")
-						   .attr("id" , "upperbar");
+					  .attr("class" , "upperVisBox")
+					  .attr("float" , "left")
+					  .attr("id" , "upperbar");
+
+    //Add close button to upperbar:
+    var closeButton = upperbar.append("button")
+                              .style("width" , "50px")
+                              .style("height" , "50px")
+                              .attr("onclick" , "changeListenerFunction('"+fieldName +"')"
+                              );
 
 	//define ('hardcode') the possible visualisations:	
     let select = upperbar.append("select")
@@ -67,7 +132,7 @@ function OnChangeSelect(fieldName){
     //Now add new visualisation:	
     selectValue = d3.select("#" + fieldName).select('select').property('value');
     if (selectValue == "Sankey") {
-        makeSankey(localStorage.getItem('DataSet') , fieldName);
+        makeSankey(localStorage.getItem('CurDataSet') , fieldName);
     } 
     else if (selectValue == "HEB") {
         /*TO THOMAS&BAS: hier zetten wij jullie UI weg, wil je deze later weghalen uit het bestand, aanpassen, of iets aan toevoegen? Doe dat hier!
@@ -77,6 +142,7 @@ function OnChangeSelect(fieldName){
         console.log("test");
         d3.select("#" + fieldName).append('div').attr("id", "HEBFigure");
         let hebUIBox = d3.select('#' + fieldName).select("#upperbar").append('div').attr("id" , "hebUIBox");
+
         hebUIBox.html('<span> From (year-month) </span>' +
                       '<input id="startYear" class="yearInput" type="number" name="startYear" placeholder=1998>' + 
                       '<input id="startMonth" class="monthInput"  type="number" name="startMonth" placeholder=01>' +
@@ -102,9 +168,10 @@ function OnChangeSelect(fieldName){
                       '</select>' 
                       );
     }
+
     else if(selectValue == "MSV"){
         console.log(fieldName)
-        makeMSV(localStorage.getItem('DataSet'), fieldName);
+        makeMSV(localStorage.getItem('CurDataSet'), fieldName);
     }
     else {
         console.log('Sorry! We were unable to load the correct visualisation. Please submit this bug.');

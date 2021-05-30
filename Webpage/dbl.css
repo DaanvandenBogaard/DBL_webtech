@@ -25,7 +25,7 @@ body {
 	left: 0;
 	overflow-x: hidden;
 	position: fixed; 
-	z-index: 1;
+	z-index: 101;
 } 
 
 .sidebar.expanded {
@@ -108,7 +108,7 @@ a:hover {
 	background-color: var(--grey);
 	width: 100%;
 	position: fixed;
-	z-index: 1;
+	z-index: 100;
 	overflow: hidden;
 }
 
@@ -130,7 +130,7 @@ a:hover {
 	color: var(--white);
 	background-color: var(--grey);
 	transition: var(--transition);
-	z-index: 10;
+	z-index: 110;
 	border-radius: 0 0 5px 5px;
 	cursor: pointer;
 }
@@ -184,6 +184,8 @@ a:hover {
 	margin-top: 30px;
 	transition: var(--transition);
 	text-align: center;
+	display: inline-block;
+	position: absolute;
 }
 
 .visContent.expanded {
@@ -389,15 +391,17 @@ button#togglePause {
 	cursor: pointer;
 }
 
-.visField {
+div[class^='visField'], div[class*=' visField'] {
 	border-style: solid;
 	border-width: 2px;
 	border-radius: 7px;
 	border-color: var(--accent);
 	width: 90%;
 	height: 100%;
+
 	margin: 10px;
-	display: inline-block;
+	background: #ddd;
+	position: absolute;
 }
 
 /* HEB */
