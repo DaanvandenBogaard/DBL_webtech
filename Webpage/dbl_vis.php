@@ -90,6 +90,14 @@
 		<div id="toolbar" class="toolbar">
 			<!--Function definition in generalUIVis.js: -->
 			<button onclick="AddVisualisationBlock()"> Add visualisation block </button>
+			<!-- General time selector: -->
+			<span style="display:inline;">>
+				<label style="display:inline;" for="from">From</label>
+				<input style="display:inline;" type="text" id="from" name="from">
+				<label style="display:inline;" for="to">to</label>
+				<input style="display:inline;" type="text" id="to" name="to">
+			</span>
+			<!-- End of general time selector -->
 		</div>
 		<div class="fa fa-angle-down" id="tooltoggle" onclick="toggleToolbar()"> <span class="tooltext"> Toolbar </span> </div>	
 
@@ -149,6 +157,9 @@
 				//uploadHTML.style("display" , "none");	
 				MakeDataSetSelector(localStorage.getItem('DataSet'));
 			}
+
+			//Call global time manager:
+			MakeGeneralTimeManager();
 		</script>
 	</body>
 </html>

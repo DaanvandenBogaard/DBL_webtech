@@ -110,6 +110,7 @@ a:hover {
 	position: fixed;
 	z-index: 100;
 	overflow: hidden;
+	display: hidden;
 }
 
 .toolbar.expanded {
