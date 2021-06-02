@@ -23,8 +23,8 @@ function makeSankey(dataPath , fieldName) {
   var upperBoxHeight = parseFloat(div.select("#upperbar").style("height"))
 
   //retrieve width and height:
-  var height = parseFloat( div.style("height"))- upperBoxHeight;
-  var width = parseFloat( div.style("width") );
+  var height = parseFloat( div.style("height"))- upperBoxHeight -20;
+  var width = parseFloat( div.style("width") ) -20;
 
   sankeyDiv.style("height" , height-125)
            .style("width" , width-125);

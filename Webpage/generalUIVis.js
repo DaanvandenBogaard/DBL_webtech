@@ -268,7 +268,7 @@ function MakeGeneralTimeManager(dataset){
       } );
       //Set standard values:  
       //$( "#toTime" ).datepicker( "setDate", $.datepicker.formatDate('d M y', new Date(maxYear, maxMonth, maxDay)));
-      //$( "#fromTime" ).datepicker( "setDate", "1");
+      //$( "#fromTime" ).datepicker( "setDate", "00/00/00");
     }) 
 }
 
