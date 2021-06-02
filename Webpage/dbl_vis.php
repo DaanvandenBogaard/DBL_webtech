@@ -7,7 +7,7 @@
 		<meta name="viewpoint" content="width=device-width, initial-scale=1.0" />
 		<link rel="stylesheet" type="text/css" href="dbl.css" />
 		<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
-
+		<link rel="stylesheet" href="//code.jquery.com/ui/1.12.1/themes/smoothness/jquery-ui.css">
 		<link rel="stylesheet" type="text/css" 
 		href="http://ajax.googleapis.com/ajax/libs/jqueryui/1.7.1/themes/base/jquery-ui.css"/>
 
@@ -91,20 +91,20 @@
 			<!--Function definition in generalUIVis.js: -->
 			<button onclick="AddVisualisationBlock()"> Add visualisation block </button>
 			<!-- General time selector: -->
-			<span style="display:inline;">>
-				<label style="display:inline;" for="from">From</label>
-				<input style="display:inline;" type="text" id="from" name="from">
-				<label style="display:inline;" for="to">to</label>
-				<input style="display:inline;" type="text" id="to" name="to">
-			</span>
+			<!-- <input type="text" id="from" name="from"> -->
+			<!-- <input type="text" id="to" name="to"> -->
 			<!-- End of general time selector -->
 		</div>
 		<div class="fa fa-angle-down" id="tooltoggle" onclick="toggleToolbar()"> <span class="tooltext"> Toolbar </span> </div>	
 
 		<!--pagecontent-->
 		<div id="visContent" class="visContent">
-
-			<!--temp text-->
+			<label for="from">From</label>
+			<input type="text" id="fromTime" name="from">
+			<label for="to">to</label>
+			<input type="text" id="toTime" name="to">
+	
+		<!--temp text-->
 		<div id = "upload">
 			<p class="title">Visualisation</p>
 			<p>Upload a dataset to start the visualisation</p>
@@ -159,7 +159,8 @@
 			}
 
 			//Call global time manager:
-			MakeGeneralTimeManager();
+			MakeGeneralTimeManager(localStorage.getItem("CurDataSet"));
+			
 		</script>
 	</body>
 </html>

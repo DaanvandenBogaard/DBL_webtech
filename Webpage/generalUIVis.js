@@ -176,44 +176,162 @@ function OnChangeSelect(fieldName){
 }
 
 //Function handling the functional aspects of the general time manager.
-function MakeGeneralTimeManager(){
-    $( function() {
-      var dateFormat = "mm/dd/yy",
-        from = $( "#from" )
-          .datepicker({
-            defaultDate: "+1w",
+function MakeGeneralTimeManager(dataset){
+    //Retrieve date range from curent dataset:
+    d3.csv(dataset).then(function(data) {
+      //convert to numbers:
+      data.forEach(function(d) {
+        d.fromId = +d.fromId; 
+        d.sentiment = +d.sentiment;
+        d.toId = +d.toId; 
+  
+        //Add the d.time to get a representative variable for slicing:
+        let timeData = d.date.split("-");
+        d.year = +timeData[0];
+        d.month = +timeData[1];
+        d.day = +timeData[2];
+      });
+  
+      //now, find min and max dates:
+      //We take the maximum (safe) integers in order to make sure our comparisons will pass all tests.
+      let minDay = Number.MAX_SAFE_INTEGER;
+      let minMonth = Number.MAX_SAFE_INTEGER;
+      let minYear = Number.MAX_SAFE_INTEGER;
+      //Similairly, we take the minimum (safe) integers for the max:
+      let maxDay = Number.MIN_SAFE_INTEGER;
+      let maxMonth = Number.MIN_SAFE_INTEGER;
+      let maxYear = Number.MIN_SAFE_INTEGER; 
+  
+      data.forEach(function(d) {
+        //Check for minimum
+        //Check years:
+        if (d.year < minYear) {
+          minYear = d.year;
+          //Check months:
+          if (d.month < minMonth) {
+            minMonth = d.month;
+            //Check days:
+            if (d.day < minDay) {
+              minDay = d.day;
+            }
+          }
+        }
+  
+        //Check for maximum
+        //Check years:
+        if (d.year > maxYear) {
+          maxYear = d.year;
+          //Check months:
+          if (d.month > maxMonth) {
+            maxMonth = d.month;
+            //Check days:
+            if (d.day > maxDay) {
+              maxDay = d.day;
+            }
+          }
+        }
+      });
+      
+      //Load the HTML elements:
+      let fromField = document.getElementById("fromTime");
+      let toField = document.getElementById("toTime");
+
+      $( function() {
+        var dateFormat = "dd/mm/yy",
+          from = $( "#fromTime" )
+            .datepicker({
+              dateFormat : "d M, y" ,
+              defaultDate: new Date(minYear, minMonth, minDay),
+              changeMonth: true,
+              numberOfMonths: 1,
+              minDate: new Date(minYear, minMonth, minDay), 
+              maxDate: new Date(maxYear, maxMonth, maxDay),
+              showAnim: "fadeIn",
+              setDate: $.datepicker.formatDate('d M y', new Date(minYear, minMonth, minDay))
+            })
+            .on( "change", function() {
+              to.datepicker( "option", "minDate", fromField.value );
+            }),
+          to = $( "#toTime" ).datepicker({
+            dateFormat : "d M, y" ,
+            defaultDate: new Date(maxYear, maxMonth, maxDay),
             changeMonth: true,
-            numberOfMonths: 3
+            numberOfMonths: 1,
+            minDate: new Date(minYear, minMonth, minDay), 
+            maxDate: new Date(maxYear, maxMonth, maxDay),
+            showAnim: "fadeIn",
+            setDate: $.datepicker.formatDate('d M y', new Date(maxYear, maxMonth, maxDay))
           })
           .on( "change", function() {
-            to.datepicker( "option", "minDate", getDate( this ) );
-          }),
-        to = $( "#to" ).datepicker({
-          defaultDate: "+1w",
-          changeMonth: true,
-          numberOfMonths: 3
-        })
-        .on( "change", function() {
-          from.datepicker( "option", "maxDate", getDate( this ) );
-        });
-   
-      function getDate( element ) {
-        var date;
-        try {
-          date = $.datepicker.parseDate( dateFormat, element.value );
-        } catch( error ) {
-          date = null;
-        }
-   
-        return date;
-      }
-    } );
+            from.datepicker( "option", "maxDate", toField.value );
+          });
+      } );
+      //Set standard values:  
+      //$( "#toTime" ).datepicker( "setDate", $.datepicker.formatDate('d M y', new Date(maxYear, maxMonth, maxDay)));
+      //$( "#fromTime" ).datepicker( "setDate", "1");
+    }) 
 }
 
+//ASYNCHRONOUS!!!
 //Function handling the retrieval of minimal and maximum date.
 //Input: Location of the dataset to read. 
 //Output: An array in the form  [min,max], where each date is a tuple: '{day,month,year}'
 function GetMinMaxDate(dataset){
+  d3.csv(dataset).then(function(data) {
+    //convert to numbers:
+    data.forEach(function(d) {
+      d.fromId = +d.fromId; 
+      d.sentiment = +d.sentiment;
+      d.toId = +d.toId; 
 
+      //Add the d.time to get a representative variable for slicing:
+      let timeData = d.date.split("-");
+      d.year = +timeData[0];
+      d.month = +timeData[1];
+      d.day = +timeData[2];
+    });
+
+    //now, find min and max dates:
+    //We take the maximum (safe) integers in order to make sure our comparisons will pass all tests.
+    let minDay = Number.MAX_SAFE_INTEGER;
+    let minMonth = Number.MAX_SAFE_INTEGER;
+    let minYear = Number.MAX_SAFE_INTEGER;
+    //Similairly, we take the minimum (safe) integers for the max:
+    let maxDay = Number.MIN_SAFE_INTEGER;
+    let maxMonth = Number.MIN_SAFE_INTEGER;
+    let maxYear = Number.MIN_SAFE_INTEGER; 
+
+    data.forEach(function(d) {
+      //Check for minimum
+      //Check years:
+      if (d.year < minYear) {
+        minYear = d.year;
+        //Check months:
+        if (d.month < minMonth) {
+          minMonth = d.month;
+          //Check days:
+          if (d.day < minDay) {
+            minDay = d.day;
+          }
+        }
+      }
+
+      //Check for maximum
+      //Check years:
+      if (d.year > maxYear) {
+        maxYear = d.year;
+        //Check months:
+        if (d.month > maxMonth) {
+          maxMonth = d.month;
+          //Check days:
+          if (d.day > maxDay) {
+            maxDay = d.day;
+          }
+        }
+      }
+    });
+    console.log({minDay , minMonth , minYear , maxDay , maxMonth , maxYear});
+    return {minDay , minMonth , minYear , maxDay , maxMonth , maxYear};
+  })
 }
 

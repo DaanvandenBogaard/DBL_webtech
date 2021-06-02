@@ -406,3 +406,7 @@ div[class^='visField'], div[class*=' visField'] {
 	text-align: left;
 	white-space: pre-wrap;
 }
+
+#ui-datepicker-div {
+	display: none;
+}
