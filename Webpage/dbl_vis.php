@@ -152,15 +152,14 @@
 			HiddenInputDocuments.value = localStorage.getItem('DataSet');
 
 			//Handle upload button: 
-			if (localStorage.getItem('DataSet') != 'null') {
+			if (localStorage.getItem('CurDataSet') != 'null') {
 				var uploadHTML = d3.select("#upload");
 				//uploadHTML.style("display" , "none");	
 				MakeDataSetSelector(localStorage.getItem('DataSet'));
-			}
 
-			//Call global time manager:
-			MakeGeneralTimeManager(localStorage.getItem("CurDataSet"));
-			
+				//Call global time manager:
+				MakeGeneralTimeManager(localStorage.getItem("CurDataSet"));
+			}
 		</script>
 	</body>
 </html>

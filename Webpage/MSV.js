@@ -73,9 +73,10 @@ function makeMSV(dataPath, fieldName) {
         selectType(data, IDS, colouring, currentIDS, currentColouring, fieldName);
         selectColor(data, colouring, IDS, currentIDS, currentColouring, fieldName);
 
-        //Draw edges
+        //Draw edges and create buttons etc
         drawEdges(data, IDS,  colouring, fieldName);
-        addLegend(currentColouring, fieldName);
+        applyEdgeSampling(data, currentIDS, currentColouring, fieldName);
+        addLegend(currentColouring, fieldName, false);
     }); 
 }
 
@@ -90,40 +91,20 @@ Returns:
 */
 function drawEdges(data, IDS, colouring, fieldName){
     const max = d3.max(data, function(d) { return +d.value; });
+    let selectedColouring = d3.select(fieldName).select("#MSVID").select(".selectColor").property("value");
     let lines = d3.select(fieldName).select("#MSVID")
                   .select("svg")
                   .append("g");
 
-    //go to function for drawing gradient
-    if(colouring[0] === "fromTo"){
-        colourLines(data, IDS, fieldName);
-    } else {
-
-        //draw edges and add nice animation if data set is small enough, else draw it without the animation
-        if(data.length < 3500){              
-            for(let i = 0; i < data.length; i++) {
-            lines.append('line')
-                .style("stroke",  colouring[i])
-                .style("stroke-width", 1)
-                .attr("x1", data[i].time )
-                .attr("y1", IDS[data[i].fromId] )
-                .attr("x2", data[i].time )
-            //    .transition()
-             //   .duration(2000)
-                .attr("y2", IDS[data[i].toId])
-            }
-        }
-        else{
-            for(let i = 0; i < data.length; i++) {
-                lines.append('line')
-                .style("stroke",  colouring[i])
-                .style("stroke-width", 1)
-                .attr("x1", data[i].time )
-                .attr("y1", IDS[data[i].fromId] )
-                .attr("x2", data[i].time )
-                .attr("y2", IDS[data[i].toId])
-            }
-        }
+    //go to function for drawing gradient if the type is fromTo
+    if(selectedColouring === "From-To"){
+        gradientEdges(data, IDS, fieldName);
+    }
+    else if(selectedColouring === "Blocks"){
+        blockEdges(data, IDS, colouring, lines);
+    }
+    else {
+        normalEdges(data, IDS, colouring, lines);
     }
 }
 
@@ -139,7 +120,7 @@ Returns:
     None
 */
 function selectType(data, IDS, colouring, currentIDS, currentColouring, fieldName){
-    var types = ["Standard", "Degree", "In-degree", "Out-degree", "Activity"]
+    var types = ["Standard", "Degree", "In-degree", "Out-degree", "Activity", "Edge Length", "Standard Deviation"]
 
     let select = d3.select(fieldName).select("#MSVID").select("#upperVisBox")
             .append("select")
@@ -180,9 +161,9 @@ function selectColor(data, colouring, IDS, currentIDS, currentColouring, fieldNa
             .attr('class', 'selectColor')
             .attr('float', 'left')
             .on("change", function(d){
-                let selectedColouring = d3.select(this).property("value")
-                let selected = d3.select(fieldName).select("#MSVID").select(".select").property("value")
-                updateType(selected, selectedColouring, data, IDS, colouring, currentIDS, currentColouring, fieldName)
+                let selectedColouring = d3.select(this).property("value");
+                let selected = d3.select(fieldName).select("#MSVID").select(".select").property("value");
+                updateType(selected, selectedColouring, data, IDS, colouring, currentIDS, currentColouring, fieldName);
             })
 
     let optionsColor = selectColor
@@ -213,7 +194,7 @@ function updateType(selected, selectedColouring, data, IDS, colouring, currentID
     let val =  Math.min(5, IDS.length / 2);
     if(document.querySelectorAll(fieldName + ' #MSVID .blockInput').length == 1){
         val = d3.select(fieldName).select("#MSVID").select(".blockInput").property("value");
-        d3.select(fieldName).select("#MSVID").select("input").remove();
+        d3.select(fieldName).select("#MSVID").select(".blockInput").remove();
     }
 
     //select the right type of MSV
@@ -229,6 +210,12 @@ function updateType(selected, selectedColouring, data, IDS, colouring, currentID
     else if(selected === "Activity"){
         currentIDS = activitySort(data, IDS);
     } 
+    else if(selected === "Edge Length"){
+        currentIDS = optimizeLayout(data, IDS, selected);
+    }
+    else if(selected === "Standard Deviation"){
+        currentIDS = optimizeLayout(data, IDS, selected)
+    }
     else {
         currentIDS = IDS;
     }
@@ -257,14 +244,16 @@ function updateType(selected, selectedColouring, data, IDS, colouring, currentID
     d3.select(fieldName).select("#MSVID").select("svg").selectAll("defs").remove();
     d3.select(fieldName).select("#MSVID").select("svg").selectAll("svg").remove();
     d3.select(fieldName).select("#MSVID").select("#legendBox").remove();
+    d3.select(fieldName).select("#MSVID").select("#edgeSampleBox").remove();
 
     //draw new MSV
     drawEdges(data, currentIDS, currentColouring, fieldName);
+    applyEdgeSampling(data, currentIDS, currentColouring, fieldName);
     addLegend(currentColouring, fieldName);
 }
 
 
-/*colourLines: Updates the type of colouring after selecting an option on the selector
+/*gradientEdges: Draws and colours the edges corresponding to the FromTo selector
 Parameters:
     data: The dataset
     IDS: The standard sequential list of node appearance
@@ -272,7 +261,7 @@ Parameters:
 Returns:
     None
 */
-function colourLines(data, IDS, fieldName) {
+function gradientEdges(data, IDS, fieldName) {
     let svg = d3.select(fieldName).select("#MSVID").select("svg");
     let svgHeight = parseInt(d3.select(fieldName).select("#MSVID").select("svg").style("height"));
     //draw the edges with gradient, add animation if datasetis small enough        
@@ -384,6 +373,132 @@ function blockEdges(data, IDS, colouring, lines){
     }
 }
 
+/*normalEdges: Draws and colours the edges corresponding to the indicated colouring, works for any other colouring than fromTo and Block
+Parameters:
+   data: data object of the edges
+   IDS: sequential list of node appearance
+   colouring: Array containing the colour of the edge corresponding to the index of the data
+   lines: element in which the lines should be drawn
+Returns:
+    None
+*/
+function normalEdges(data, IDS, colouring, lines){
+//draw edges and add nice animation if data set is small enough, else draw it without the animation
+console.log(data)
+    if(data.length < 3500){              
+        for(let i = 0; i < data.length; i++) {
+            lines.append('line')
+                .style("stroke",  colouring[i])
+                .style("stroke-width", 1)
+                .attr("x1", data[i].time )
+                .attr("y1", IDS[data[i].fromId])
+                .attr("x2", data[i].time )
+                .transition()
+                .duration(2000)
+                .attr("y2", IDS[data[i].toId] )
+
+/*            lines.append("text")
+                .attr("y", IDS[data[i].fromId] * 30 + 10)
+                .attr("x", data[i].time )
+                .attr("font-size", 12)
+                .text("From: " + IDS[data[i].fromId] )
+
+            lines.append("text")
+                .attr("y", IDS[data[i].toId] * 30 + 10)
+                .attr("x", data[i].time )
+                .attr("font-size", 12)
+                .text("To: " + IDS[data[i].toId]) */
+        }
+    }
+    else{
+        for(let i = 0; i < data.length; i++) {
+            lines.append('line')
+                .style("stroke",  colouring[i] )
+                .style("stroke-width", 1)
+                .attr("x1", data[i].time )
+                .attr("y1", IDS[data[i].fromId] )
+                .attr("x2", data[i].time )
+                .attr("y2", IDS[data[i].toId] )
+        }
+    }
+}
+
+/*normalEdges: Draws and colours the edges corresponding to the blockcolouring and makes sure the coloured edges get drawn on top
+Parameters:
+   data: data object of the edges
+   IDS: sequential list of node appearance
+   colouring: Array containing the colour of the edge corresponding to the index of the data
+   lines: element in which the lines should be drawn
+Returns:
+    None
+*/
+function blockEdges(data, IDS, colouring, lines){
+    let blockColours = new Array();
+
+    //draw edges, with animation if dataset < 3500, otherwise without
+    if(data.length < 3500){              
+        for(let i = 0; i < data.length; i++) {
+
+            //make an array of all indices that have a non #D4D4D4 colouring
+            if(colouring[i] != "#D4D4D4"){
+                blockColours[blockColours.length] = i;
+            }
+            
+            //draw unimportant edges
+            lines.append('line')
+                .style("stroke",  "#D4D4D4")
+                .style("stroke-width", 1)
+                .attr("id", "line" + i)
+                .attr("x1", data[i].time )
+                .attr("y1", IDS[data[i].fromId] )
+                .attr("x2", data[i].time )
+                .transition()
+                .duration(2000)
+                .attr("y2", IDS[data[i].toId])
+        }
+        //draw important edges so they will be on top
+        for(let i = 0; i < blockColours.length; i++){
+            //remove the edges so they wont be drawn twice
+            lines.select("#line" + blockColours[i]).remove();
+            //draw the coloured edges 
+            lines.append('line')
+                .style("stroke",  colouring[blockColours[i]])
+                .style("stroke-width", 1)
+                .attr("x1", data[blockColours[i]].time)
+                .attr("y1", IDS[data[blockColours[i]].fromId])
+                .attr("x2", data[blockColours[i]].time)
+                .transition()
+                .duration(2000)
+                .attr("y2", IDS[data[blockColours[i]].toId])
+        }
+    }
+    else{
+        for(let i = 0; i < data.length; i++) {
+            if(colouring[i] != "#D4D4D4"){
+                blockColours[blockColours.length] = i;
+            }
+
+            lines.append('line')
+                .style("stroke",  "#D4D4D4")
+                .style("stroke-width", 1)
+                .attr("x1", data[i].time )
+                .attr("y1", IDS[data[i].fromId] )
+                .attr("x2", data[i].time )
+                .attr("y2", IDS[data[i].toId])
+        }
+
+        for(let i = 0; i < blockColours.length; i++){
+            lines.append('line')
+                .style("stroke",  colouring[blockColours[i]])
+                .style("stroke-width", 1)
+                .attr("x1", data[blockColours[i]].time)
+                .attr("y1", IDS[data[blockColours[i]].fromId])
+                .attr("x2", data[blockColours[i]].time)
+                .attr("y2", IDS[data[blockColours[i]].toId])
+        }
+    }
+}
+
 /*createBlockBox: Creates input box for block colouring
 Parameters:
     data: The dataset
@@ -417,13 +532,14 @@ function createBlockBox( data, currentIDS, currentColouring, val, fieldName){
             }
             //update colouring
             currentColouring = blockColouring(data, currentIDS, newVal);
+
             //remove old edges
             d3.select(fieldName).select("#MSVID").select("svg").selectAll("g").remove();
             d3.select(fieldName).select("#MSVID").select("#legendBox").remove();
+            
             //draw new edges 
             drawEdges(data, currentIDS, currentColouring, fieldName);
             addLegend(currentColouring, fieldName);
-            //draw new legend if needed
         })
         .on("keyup", function(d){
             //Handle min max on display
@@ -431,7 +547,8 @@ function createBlockBox( data, currentIDS, currentColouring, val, fieldName){
             if(parseInt(this.value) < 1){ this.value =1;}
         });
 }
-/*addLegend: Draws and colours the edges corresponding to the indicated colouring, works for any other colouring than fromTo and Block
+
+/*normalEdges: Draws and colours the edges corresponding to the indicated colouring, works for any other colouring than fromTo and Block
 Parameters:
     currentColouring: Current rray containing the colour of the edge corresponding to the index of the data
     fieldName: class tag of the field the current visualization is in
@@ -569,9 +686,11 @@ function blockLegend(currentColouring, fieldName){
                 .attr("height", 10)
                 .attr("width", width)
                 .attr("fill", rects[i][0])
+
             cIndex++;
         } 
     }
+
     //draw the noise in the legend
     legendSVG.append("rect")
             .attr('x', 0.4 * parseInt(legendSVG.style("width")) + (rects.length - 1) * width)
@@ -591,9 +710,11 @@ function blockLegend(currentColouring, fieldName){
         .attr("font-size", 12)  
         .text("Noise")
 }
-/*sortRects: Sorts the colours of the to be drawn rects based on frequency
+
+/*blockLegend: Sorts the colours of the to be drawn rects based on frequency
 Parameters:
     currentColouring: Current rray containing the colour of the edge corresponding to the index of the data
+    fieldName: class tag of the field the current visualization is in
 Returns:
     An array with all distinct colours and their freuncy sorted decreasingly
 */
@@ -605,13 +726,36 @@ function sortRects(currentColouring){
     for(let i = 0; i < colours.length; i++){
         colourAmounts[i] = [colours[i], 0];
     }
+
     for(let i = 0; i < currentColouring.length; i++){
         colourAmounts[colours.indexOf(currentColouring[i])][1] += 1;
     }
+
     //sort decreasingly
     colourAmounts.sort(function(a, b){return b[1] - a[1]});
+
     return colourAmounts;
 }
+
+function applyEdgeSampling(data, currentIDS, currentColouring, fieldName){
+    d3.select(fieldName).select("#MSVID").select("#upperVisBox")
+            .append("input")
+            .attr("id", "edgeSampleBox")
+            .attr('type', 'button')
+            .attr("value", "Apply edge sampling")
+            .on("click", function(d){ 
+                //Handle toggle
+                if(d3.select(this).property("value") == "Apply edge sampling"){
+				//	let sampledData = edgeSampling();
+                    d3.select(this).attr("value", "Remove edge sampling");
+                //    drawEdges(sampledData, currentIDS, currentColouring, fieldName);
+				} else {
+                    d3.select(this).attr("value", "Apply edge sampling");
+                    drawEdges(data, currentIDS, currentColouring, fieldName);
+				}	
+            })
+}
+
 /*findMinMax: Find maximum and minimum
 Note: stores min max in the values minDate and maxDate to allow one function for both.
 Parameters:
