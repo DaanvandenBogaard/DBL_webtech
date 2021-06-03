@@ -20,25 +20,25 @@ Returns:
 */
 function optimizeLayout(data, IDS, costFunction) {
     //Initialize the annealing parameters
-    let t = 100                      //Starting temperature variable
-    let tMin = 0.00001;              //Ending temperature 
+    let t = 100;                      //Starting temperature variable
+    let tMin = 0.000001;              //Ending temperature 
    //let tMin = 99.0;
     let decrease = 0.999;             //variable temperature is multiplied by for decreasing
     let amountIterations = 1;     //Amount of iterations per temperature
 
     //Calculates cost of the original input before annealing.
-    let currentIDS = Array.from(IDS);
+    let currentIDS = IDS.slice();
     let currentEdges = getEdges(data, currentIDS);
     let currentCost = calculateCost(currentEdges, costFunction);
 
     console.log(meanEdgeLength(currentEdges));
-     currentEdges = getEdges(data, currentIDS);
-     console.log(meanEdgeLength(currentEdges));
+
     let smallestCost = currentCost;
-    let smallestSol = Array.from(currentIDS);
+    let smallestSol = currentIDS.slice();
     let smallestEdges = currentEdges;
     console.log(currentIDS)
-
+    let one = 0;
+    let two = 0;
     while (t > tMin) {
         for (let i = 0; i < amountIterations; i++) {
             //Calulates a new solution, edges and its cost
@@ -47,62 +47,41 @@ function optimizeLayout(data, IDS, costFunction) {
             let newCost = calculateCost(newEdges, costFunction);         
 
             //If it is a more optimal solution then it is automatically accepted otherwise it only sometimes accepts it
-            if (currentCost > newCost && currentCost != newCost) {
-                
-                currentIDS = newIDS;
+            if (currentCost > newCost) {
+                one++;
+                currentIDS = newIDS.slice();
                 currentCost = calculateCost(newEdges, costFunction);
-                currentEdges = newEdges;
-                console.log(currentIDS == newIDS)
+                currentEdges = newEdges.slice();
+              //  console.log(currentIDS == newIDS)
                 //We store the absolute smallest in case the SA process doesnt get to the global minimum, we take the smallest local minimum
                 if(newCost < smallestCost){
-                    smallestCost = calculateCost(newEdges, costFunction);   
+                    smallestCost = newCost;   
                     smallestSol = newIDS.slice();
                     smallestEdges = newEdges;
-
-
-                        console.log(smallestSol)
-                        console.log(newIDS)
-                        console.log(newEdges) 
-                        console.log(newCost)
-                        edgeUwU = getEdges(data, smallestSol);
-                        console.log(edgeUwU);
                     
                 }
-             //   
             }
             else {
                 let ap = Math.pow(Math.E, (currentCost - newCost)/t); //calculates e^(delta/t) for the probability 
-
+                two++;
                 //chance of accepting the new solution
                 if(ap > Math.random()){
-                    currentIDS = newIDS;
+                    currentIDS = newIDS.slice();
                     currentCost = calculateCost(newEdges, costFunction);
-                    currentEdges =  newEdges;
+                    currentEdges =  newEdges.slice();
                 }
             }
         }
         //Decreases temperature
         t *= decrease;
-     //   console.log("Currentcost: " + currentCost);
     }
-    console.log(currentIDS == smallestSol)
-    console.log(meanEdgeLength(smallestEdges));
-    console.log(smallestEdges );
-    console.log(smallestSol[data[0].fromId] + " " + data[0].fromId)
-
-    console.log(smallestSol)
-
-    currentEdges = getEdges(data, smallestSol);
-    console.log(meanEdgeLength(currentEdges) == meanEdgeLength(smallestEdges));
-
-    let returnArray = new Array(smallestSol);
-    for (let i = 0; i < smallestSol.length; i++) {
-        returnArray[i] = smallestSol.indexOf(i);
-    }    
+    console.log(one + " " + two)
+    console.log(smallestCost)
+  
     return smallestSol;
 }
 
-/*newSolution: generates a permutation of the array given, where the amount of difference is dictated by t and perMul
+/*newSolution: generates a permutation of the array given
 Parameters:
     array: array to permute
     t: an integer that dictates the amount of permuting
@@ -111,16 +90,26 @@ Returns:
     array: the permuted array
 */
 function newSolution(array,  t, edges) {
-  //let iterations = Math.ceil(t * 5); //The 5 is based on t not the number of nodes, might need to be changed depending on t
-    let j =  Math.floor((array.length - 1 )*Math.random());
-    let k = Math.floor((array.length - 1 )*Math.random()) ; //choose random element
-   // console.log(array + " j:" +j + " k: " + k)
-    //do the switcheroo
-    let x = array[k];
-    array[k] = array[j];               
-    array[j] = x;
-   // console.log(array)
+    let j = Math.floor(Math.random() * 2); //Pick either 0 or 1
+    let k = Math.floor((array.length - 1 )*Math.random())  + 1; // Pick random position
 
+    //Switch node with one of it's neighbours (and check extreme cases)
+    if(j == 0){                             
+        if(k == array.length - 1){
+            k -= 1;
+        }
+        let x = array[k];
+        array[k] = array[k + 1];
+        array[k + 1] = x;
+    } else {
+        if(k == 0){
+            k += 1;
+        }
+        let x = array[k];
+        array[k] = array[k - 1];
+        array[k - 1] = x;
+    } 
+        
     return array; 
 }
 

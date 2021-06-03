@@ -68,13 +68,14 @@ function makeMSV(dataPath, fieldName) {
         let colouring = new Array(data.length).fill("#0000FF");
         let currentIDS = IDS;
         let currentColouring = colouring;
-        //IDS = optimizeLayout(data, IDS);
+
         //select the type of MSV and colouring 
         selectType(data, IDS, colouring, currentIDS, currentColouring, fieldName);
         selectColor(data, colouring, IDS, currentIDS, currentColouring, fieldName);
 
-        //Draw edges
+        //Draw edges and create buttons etc
         drawEdges(data, IDS,  colouring, fieldName);
+        applyEdgeSampling(data, currentIDS, currentColouring, fieldName);
         addLegend(currentColouring, fieldName, false);
     }); 
 }
@@ -210,14 +211,7 @@ function updateType(selected, selectedColouring, data, IDS, colouring, currentID
         currentIDS = activitySort(data, IDS);
     } 
     else if(selected === "Edge Length"){
-        currentEdges = getEdges(data, IDS);
-        console.log(meanEdgeLength(currentEdges));
-        console.log(IDS)
-        currentIDS = optimizeLayout(data, IDS, selected)
-        currentEdges = getEdges(data, currentIDS);
-        console.log(currentIDS)
-        console.log(meanEdgeLength(currentEdges));
-        console.log(currentEdges)
+        currentIDS = optimizeLayout(data, IDS, selected);
     }
     else if(selected === "Standard Deviation"){
         currentIDS = optimizeLayout(data, IDS, selected)
@@ -250,10 +244,12 @@ function updateType(selected, selectedColouring, data, IDS, colouring, currentID
     d3.select(fieldName).select("#MSVID").select("svg").selectAll("defs").remove();
     d3.select(fieldName).select("#MSVID").select("svg").selectAll("svg").remove();
     d3.select(fieldName).select("#MSVID").select("#legendBox").remove();
+    d3.select(fieldName).select("#MSVID").select("#edgeSampleBox").remove();
 
     //draw new MSV
     drawEdges(data, currentIDS, currentColouring, fieldName);
-    addLegend(currentColouring, fieldName)
+    applyEdgeSampling(data, currentIDS, currentColouring, fieldName);
+    addLegend(currentColouring, fieldName);
 }
 
 
@@ -567,15 +563,11 @@ function createBlockBox( data, currentIDS, currentColouring, val, fieldName){
 
             //remove old edges
             d3.select(fieldName).select("#MSVID").select("svg").selectAll("g").remove();
-
+            d3.select(fieldName).select("#MSVID").select("#legendBox").remove();
+            
             //draw new edges 
             drawEdges(data, currentIDS, currentColouring, fieldName);
-
-            //draw new legend if needed
-            if(document.querySelectorAll(fieldName + ' #MSVID #legend').length == 1){
-                d3.select(fieldName).select("#MSVID").select("#legend").remove();
-                createLegend(currentColouring, fieldName);
-            }
+            addLegend(currentColouring, fieldName);
         })
         .on("keyup", function(d){
             //Handle min max on display
@@ -779,6 +771,25 @@ function sortRects(currentColouring){
     colourAmounts.sort(function(a, b){return b[1] - a[1]});
 
     return colourAmounts;
+}
+
+function applyEdgeSampling(data, currentIDS, currentColouring, fieldName){
+    d3.select(fieldName).select("#MSVID").select("#upperVisBox")
+            .append("input")
+            .attr("id", "edgeSampleBox")
+            .attr('type', 'button')
+            .attr("value", "Apply edge sampling")
+            .on("click", function(d){ 
+                //Handle toggle
+                if(d3.select(this).property("value") == "Apply edge sampling"){
+				//	let sampledData = edgeSampling();
+                    d3.select(this).attr("value", "Remove edge sampling");
+                //    drawEdges(sampledData, currentIDS, currentColouring, fieldName);
+				} else {
+                    d3.select(this).attr("value", "Apply edge sampling");
+                    drawEdges(data, currentIDS, currentColouring, fieldName);
+				}	
+            })
 }
 
 /*findMinMax: Find maximum and minimum

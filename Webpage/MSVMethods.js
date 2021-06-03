@@ -231,7 +231,6 @@ function blockColouring(data, IDS, blockNumber){
             colouring[index] = color;
         }
     }
-    console.log(colouring)
     return colouring;
 }
 
