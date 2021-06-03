@@ -251,6 +251,7 @@ function MakeGeneralTimeManager(dataset){
             })
             .on( "change", function() {
               to.datepicker( "option", "minDate", fromField.value );
+              AlertVisualisationsDate();
             }),
           to = $( "#toTime" ).datepicker({
             dateFormat : "d M, y" ,
@@ -264,12 +265,20 @@ function MakeGeneralTimeManager(dataset){
           })
           .on( "change", function() {
             from.datepicker( "option", "maxDate", toField.value );
+            AlertVisualisationsDate();
           });
       } );
       //Set standard values:  
       //$( "#toTime" ).datepicker( "setDate", $.datepicker.formatDate('d M y', new Date(maxYear, maxMonth, maxDay)));
       //$( "#fromTime" ).datepicker( "setDate", "00/00/00");
     }) 
+}
+
+//A function which will alert all visualisations on a change of date.
+function AlertVisualisationsDate() {
+  //First, gather a list of all visualisations.
+  var visblocks = d3.selectAll("visField");
+  console.log(visblocks);
 }
 
 //ASYNCHRONOUS!!!
