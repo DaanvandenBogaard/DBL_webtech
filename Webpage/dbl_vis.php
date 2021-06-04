@@ -100,9 +100,9 @@
 		<!--pagecontent-->
 		<div id="visContent" class="visContent">
 			<label for="from">From</label>
-			<input type="text" id="fromTime" name="from">
+			<input type="text" id="fromTime" name="from" readonly>
 			<label for="to">to</label>
-			<input type="text" id="toTime" name="to">
+			<input type="text" id="toTime" name="to" readonly>
 	
 		<!--temp text-->
 		<div id = "upload">

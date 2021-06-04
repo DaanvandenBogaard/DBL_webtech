@@ -7,6 +7,8 @@ var dataSet;
 var tooltip;
 var outOfBounds = false;
 
+var dateRange = 2001;
+
 function makeSankey(dataPath , fieldName) {
   //Ask the user for the desired ID numbers:
   var idInput = window.prompt("Enter ID-numbers (seperated by commas):")
@@ -31,16 +33,6 @@ function makeSankey(dataPath , fieldName) {
 
   tooltip = div.append("div")
                .attr("class" , "tooltip");
-
-  let sliderHTML = div.select("#upperbar")
-                      .append('svg')
-                      .attr('width', 350)
-                      .attr('height', 100)
-                      .attr("display" , "inline")
-                      .attr("class" , "test")
-                      .attr("vertical-align" , "middle")
-                      .append('g')
-                      .attr('transform', 'translate(30,30)');
                            
   let svg = sankeyDiv.append("svg")
                      .attr("id" , "visualisation")
@@ -81,41 +73,38 @@ function makeSankey(dataPath , fieldName) {
       d.day = +timeData[2];
     });
 
-    let minMaxDates = findMinMax(data, "year");
-
-    //Slider:
-    let sliderVal = minMaxDates[0];
-    var slider = d3
-    .sliderHorizontal()
-    .min(minMaxDates[0])
-    .max(minMaxDates[1])
-    .step(1)
-    .tickValues([1998,1999,2000,2001,2002]) //TODO, define dynamically
-    .ticks(minMaxDates[1] - minMaxDates[0] + 1)
-    .width(300)
-    .tickFormat(x => x) 
-    .displayValue(false)
-    .on('onchange', (val) => {
-      sliderVal = val;
-      UpdateD3(data , sankey ,sliderVal ,idNums , fieldName);
+    let upperBar = div.select("#upperbar")
+    var trigger = upperBar.append('input')
+                      .attr("type", "text")
+                      .attr("id", "sankeyTrigger")
+                      .attr('width', 350)
+                      .attr('height', 100)
+                      .style("display" , "none")
+                      .attr("class" , "sankeyTrigger")
+                      .attr("value" , "test")
+                      .attr("vertical-align" , "middle");
+    
+    trigger.on("input", function() {
+      //Find new date range:
+      console.log("TRIGGERED!");
+      //Execute update:
+      UpdateD3(data , sankey ,dateRange ,idNums , fieldName);
     });
-
-    sliderHTML.call(slider); 
-
+      
     //Define sankey data by sankey.js
-    dataSet = constrDataSet(data , idNums , sliderVal);
+    dataSet = constrDataSet(data , idNums , dateRange);
     MakeD3(dataSet , sankey , d3.select("#" + fieldName).select("#sankeyID").select('#visualisation') , fieldName);
   }); 
 }
 
-function constrDataSet(data, idNums , sliderVal){
+function constrDataSet(data, idNums , dateRange){
   let linksDataDupRaw = data.filter(function(d){
     return idNums.includes(d.fromId);
   });
   
   //Get proper slice:
   linksDataDupRaw = linksDataDupRaw.filter(function(d){
-    return d.year == sliderVal
+    return d.year == dateRange
   });
 
   let linksDataDup = linksDataDupRaw.map(function(d){
@@ -188,11 +177,11 @@ function findMinMax(data, attribute) {
   return [min, max]
 }
 
-function UpdateD3(data , sankey ,sliderVal ,idNums  ,fieldName){
+function UpdateD3(data , sankey ,dateRange ,idNums  ,fieldName){
   //Delete old chart:
   d3.select("#" + fieldName).select("#sankeyID").select("#visualisation").selectAll("g").remove();
   //Construct new chart:
-  dataSet = constrDataSet(data, idNums , sliderVal);
+  dataSet = constrDataSet(data, idNums , dateRange);
   MakeD3(dataSet, sankey, d3.select("#" + fieldName).select("#sankeyID").select("#visualisation") , fieldName);
 }
 

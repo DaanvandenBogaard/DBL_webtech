@@ -51,8 +51,6 @@ function AddVisualisationBlock() {
         return
     }
 
-
-    console.log("add new block! name = vis" + index);
     let mainBlock = d3.select("#visContent");
 
     let newVisBlock = mainBlock.append("div")
@@ -63,9 +61,7 @@ function AddVisualisationBlock() {
     newVisBlock.style("position","absolute").attr("x", 0).attr("y",0);
     CreateVisField("vis" + index); 
       
-    //Use JQuery to have the blocks be draggable:
-    console.log("added UI JQuery!");
-    
+    //Use JQuery to have the blocks be draggable:    
     $( function() {
         $( "#vis" + index ).draggable({snap: true , stack: ".visField"});
       } ); 
@@ -277,8 +273,14 @@ function MakeGeneralTimeManager(dataset){
 //A function which will alert all visualisations on a change of date.
 function AlertVisualisationsDate() {
   //First, gather a list of all visualisations.
-  var visblocks = d3.selectAll("visField");
-  console.log(visblocks);
+  var visblocks = d3.selectAll(".visField"); //D3 equivalent of document.getElementsByClassName("visField");
+  //Now, per visualisation, integrate the correct call:
+  //Sankey:
+    //The sankey has a hidden input box with an onchange event listener.
+    index += 1;
+    d3.selectAll("#sankeyTrigger").dispatch("input");
+    console.log("Tried changing input field variable.");
+
 }
 
 //ASYNCHRONOUS!!!
