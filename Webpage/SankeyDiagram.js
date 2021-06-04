@@ -6,10 +6,11 @@ Myrte van Ginkel (1566237)
 var dataSet;
 var tooltip;
 var outOfBounds = false;
-
-var dateRange = 2001;
+var dateRange;
 
 function makeSankey(dataPath , fieldName) {
+  //Initialise dateRange
+  dateRange = findDateRange();
   //Ask the user for the desired ID numbers:
   var idInput = window.prompt("Enter ID-numbers (seperated by commas):")
   let idNums = JSON.parse("[" + idInput + "]");
@@ -85,8 +86,9 @@ function makeSankey(dataPath , fieldName) {
                       .attr("vertical-align" , "middle");
     
     trigger.on("input", function() {
-      //Find new date range:
       console.log("TRIGGERED!");
+      //Find new date range (update range):
+      dateRange = findDateRange();
       //Execute update:
       UpdateD3(data , sankey ,dateRange ,idNums , fieldName);
     });
@@ -101,10 +103,30 @@ function constrDataSet(data, idNums , dateRange){
   let linksDataDupRaw = data.filter(function(d){
     return idNums.includes(d.fromId);
   });
-  
+
   //Get proper slice:
   linksDataDupRaw = linksDataDupRaw.filter(function(d){
-    return d.year == dateRange
+    //Check wether or not the data tuple is in our dateRange. 
+    let isInRange = false;
+    //Check whether it is on the correct year:
+    if (dateRange['fromYear'] < d.year && d.year < dateRange["toYear"]) {
+      isInRange = true;
+    }
+    //If it's on the edge we must check months (and possibly days):
+    else if (d.year == dateRange["fromYear"] || d.year == dateRange["toYear"]) {
+      if (dateRange["fromMonth"] < d.month && d.month < dateRange['toMonth']) {
+        isInRange = true;
+      }
+      //if it's on the edge we must check days
+      else if (d.month == dateRange["fromMonth"] || d.month == dateRange["toMonth"]) {
+        if (dateRange["fromDay"] <= d.day && d.day <= dateRange["toDay"]) {
+          isInRange = true;
+        }
+      }
+    }
+
+
+    return isInRange;
   });
 
   let linksDataDup = linksDataDupRaw.map(function(d){
@@ -116,7 +138,7 @@ function constrDataSet(data, idNums , dateRange){
   });  
 
   let linksDataNestedFormat = d3.nest()
-                                .key(function(d) { return d. source; })
+                                .key(function(d) { return d.source; })
                                 .key(function(d) { return d.target; })
                                 .rollup(function(leaves) { return d3.sum(leaves, function(d) {return parseFloat(d.value)})})
                                 .entries(linksDataDup);
@@ -373,3 +395,48 @@ function dragended(event, d) {
   outOfBounds = false;
 }
 
+//A function to retrieve the date selected by the general date selector:
+//Return: A dictonairy containing the correct dates of the date range.
+//The return has the following form:
+/*
+{
+"fromDay"  : fromTime[0],
+"fromMonth" : fromTime[1],
+"fromYear" : fromTime[2],
+"toDay"    : toTime[0]  ,
+"toMonth"   : toTime[1]  ,
+"toYear"   : toTime[2]
+}
+
+Note that null values will be seen as infinity (or minus infinity).
+*/
+function findDateRange(){
+  //Find new date range:
+  let fromTimeString = document.getElementById("fromTime").value;
+  let toTimeString = document.getElementById("toTime").value;
+  let fromTime = fromTimeString.split("/");
+  let toTime = toTimeString.split("/");
+
+  //check for null:
+  if (fromTimeString == null || fromTimeString == "") {
+    fromTime[0] = Number.MIN_VALUE;
+    fromTime[1] = Number.MIN_VALUE;
+    fromTime[2] = Number.MIN_VALUE;
+  }
+  if (toTimeString == null || toTimeString == "") {
+    toTime[0] = Number.MAX_VALUE;
+    toTime[1] = Number.MAX_VALUE;
+    toTime[2] = Number.MAX_VALUE;
+  }
+
+  dateRange = {
+               "fromDay"  : fromTime[0],
+               "fromMonth" : fromTime[1],
+               "fromYear" : fromTime[2],
+               "toDay"    : toTime[0]  ,
+               "toMonth"   : toTime[1]  ,
+               "toYear"   : toTime[2]
+              };
+  console.log(dateRange);
+  return dateRange
+}

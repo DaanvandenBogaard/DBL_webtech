@@ -236,28 +236,28 @@ function MakeGeneralTimeManager(dataset){
         var dateFormat = "dd/mm/yy",
           from = $( "#fromTime" )
             .datepicker({
-              dateFormat : "d M, y" ,
+              dateFormat : "dd/mm/yy" ,
               defaultDate: new Date(minYear, minMonth, minDay),
               changeMonth: true,
               numberOfMonths: 1,
               minDate: new Date(minYear, minMonth, minDay), 
               maxDate: new Date(maxYear, maxMonth, maxDay),
               showAnim: "fadeIn",
-              setDate: $.datepicker.formatDate('d M y', new Date(minYear, minMonth, minDay))
+              setDate: $.datepicker.formatDate('dd/mm/yy', new Date(minYear, minMonth, minDay))
             })
             .on( "change", function() {
               to.datepicker( "option", "minDate", fromField.value );
               AlertVisualisationsDate();
             }),
           to = $( "#toTime" ).datepicker({
-            dateFormat : "d M, y" ,
+            dateFormat : 'dd/mm/yy' ,
             defaultDate: new Date(maxYear, maxMonth, maxDay),
             changeMonth: true,
             numberOfMonths: 1,
             minDate: new Date(minYear, minMonth, minDay), 
             maxDate: new Date(maxYear, maxMonth, maxDay),
             showAnim: "fadeIn",
-            setDate: $.datepicker.formatDate('d M y', new Date(maxYear, maxMonth, maxDay))
+            setDate: $.datepicker.formatDate('dd/mm/yy', new Date(maxYear, maxMonth, maxDay))
           })
           .on( "change", function() {
             from.datepicker( "option", "maxDate", toField.value );
@@ -277,9 +277,7 @@ function AlertVisualisationsDate() {
   //Now, per visualisation, integrate the correct call:
   //Sankey:
     //The sankey has a hidden input box with an onchange event listener.
-    index += 1;
     d3.selectAll("#sankeyTrigger").dispatch("input");
-    console.log("Tried changing input field variable.");
 
 }
 
