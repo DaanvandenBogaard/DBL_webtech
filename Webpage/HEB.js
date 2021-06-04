@@ -129,6 +129,8 @@ function makeHEB(dataPath, fieldName) {
     d3.csv(dataPath).then(function (data) {
         //Since d3.csv is asynchronous (it is not loaded immediatly, but it is a request to the webserver) we need all our code from the data in here. 
 
+        usableData = [];
+
         //Construct array with data in a usable order 
         data.forEach(function (d) {
             //Check wheter the toId is already an object, if not create object with first found fromId
@@ -596,61 +598,81 @@ function makeHEB(dataPath, fieldName) {
         .attr("offset", "100%")
         .attr("stop-color", sentPicker(2));
 
+        //Draw legend for selected coloring method
+        var colorLegend = svg.append("g")   
+        .attr("id", "colorLegend")
+        .attr("font-size", "11pt")
+        .attr("opacity", function() {
+            if (colorSelected == "none") {
+                return 0;
+            } else {
+                return 1;
+            } 
+        });                          
+        
+        var colorLegendTextF = colorLegend.append("text")
+        .attr("y", figureHeight - 4)
+        .attr("x", function() {
+            if (colorSelected == "gradient") {
+                return 163;
+            } else if (colorSelected == "sentiment") {
+                return 182;
+            }
+        })
+        .text(function() {
+            if (colorSelected == "gradient") {
+                return "From";
+            } else if (colorSelected == "sentiment") {
+                return "-1";
+            }
+        });
+
+        var colorLegendRect = colorLegend.append("rect")
+        .attr("y", figureHeight - 15)
+        .attr("x", 200)
+        .attr("width", 300)
+        .attr("height", 15)
+        .attr("fill", function() {
+            if (colorSelected == "gradient") {
+                return "url(#linearGradient)";
+            } else if (colorSelected == "sentiment") {
+                return "url(#sentGradient)";
+            }
+        });
+
+        var colorLegendTextB = colorLegend.append("text")
+        .attr("y", figureHeight - 4)
+        .attr("x", 505)
+        .text(function() {
+            if (colorSelected == "gradient") {
+                return "To";
+            } else if (colorSelected == "sentiment") {
+                return "1";
+            }
+        });
+
         //Event handler for the selected edge color
         edgeColor.on("change", function() {
             colorSelected = edgeColor.property("value");
             d3.select("#" + fieldName)
               .selectAll("path")
               .attr("stroke", function (d) { return getStroke(d); });
-
-            //Remove previous legend
-            d3.select("#" + fieldName).selectAll("#colorLegend").remove();
-
-            //Draw legend for selected coloring method
-            var colorLegend = svg.append("g")   
-            .attr("id", "colorLegend")
-            .attr("font-size", "11pt");                          
             
-            colorLegend.append("text")
-            .attr("y", figureHeight - 4)
-            .attr("x", function() {
-                if (colorSelected == "gradient") {
-                    return 163;
-                } else if (colorSelected == "sentiment") {
-                    return 182;
-                }
-            })
-            .text(function() {
-                if (colorSelected == "gradient") {
-                    return "From";
-                } else if (colorSelected == "sentiment") {
-                    return "-1";
-                }
-            });
-
-            colorLegend.append("rect")
-            .attr("y", figureHeight - 15)
-            .attr("x", 200)
-            .attr("width", 300)
-            .attr("height", 15)
-            .attr("fill", function() {
-                if (colorSelected == "gradient") {
-                    return "url(#linearGradient)";
-                } else if (colorSelected == "sentiment") {
-                    return "url(#sentGradient)";
-                }
-            });
-
-            colorLegend.append("text")
-            .attr("y", figureHeight - 4)
-            .attr("x", 505)
-            .text(function() {
-                if (colorSelected == "gradient") {
-                    return "To";
-                } else if (colorSelected == "sentiment") {
-                    return "1";
-                }
-            });
+            if (colorSelected == "none") {
+                colorLegend.attr("opacity", 0);
+            } else if (colorSelected == "gradient") {
+                colorLegend.attr("opacity", 1);
+                colorLegendTextF.attr("x", 163)
+                                .text("From");
+                colorLegendRect.attr("fill", "url(#linearGradient)");
+                colorLegendTextB.text("To");
+            } else if (colorSelected == "sentiment") {
+                colorLegend.attr("opacity", 1);
+                colorLegendTextF.attr("x", 182)
+                                .text("-1");
+                colorLegendRect.attr("fill", "url(#sentGradient)");
+                colorLegendTextB.text("1");
+            }
         });
 
         var animTimer;

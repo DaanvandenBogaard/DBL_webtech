@@ -92,10 +92,14 @@ function CreateVisField(fieldName){
 
     //Add close button to upperbar:
     var closeButton = upperbar.append("button")
-                              .style("width" , "50px")
-                              .style("height" , "50px")
+                              .attr("id", "closeButton")
                               .attr("onclick" , "changeListenerFunction('"+fieldName +"')"
                               );
+
+    var closeLabel = upperbar.append("label")
+                             .attr("for", "closeButton")
+                             .attr("class", "fa fa-times closeLabel")
+                             .attr("style", "font-size: 20px;");
 
 	//define ('hardcode') the possible visualisations:	
     let select = upperbar.append("select")
@@ -139,7 +143,6 @@ function OnChangeSelect(fieldName){
         
         Deze UI elementen worden in de "upperbar" gezet. Dit is een flex element wat bovenin de visualisation box zit.
         (zie documentation over de general UI handling voor meer info) */
-        console.log("test");
         d3.select("#" + fieldName).append('div').attr("id", "HEBFigure");
         let hebUIBox = d3.select('#' + fieldName).select("#upperbar").append('div').attr("id" , "hebUIBox");
 
@@ -152,7 +155,7 @@ function OnChangeSelect(fieldName){
                       '<div>' +
                         '<input id="animateToggle" class="animToggle" type="checkbox">' +
                         '<label for="animateToggle"> animation </label>' +
-                        '<button id="startHEB" type="button" name="HEB" onclick="makeHEB(localStorage.getItem(' + "'DataSet'" + ') ,' + "'" + fieldName + "'"   + ' )"> Start </button>' +
+                        '<button id="startHEB" type="button" name="HEB" onclick="makeHEB(localStorage.getItem(' + "'CurDataSet'" + ') ,' + "'" + fieldName + "'"   + ' )"> Start </button>' +
                         '<label for="startHEB" class="startButton HEBButtons"> Start </label>' + 
                       '</div>' + 
                       '<button id="togglePause" type="button" name="togglePause"> Play </button>' +
