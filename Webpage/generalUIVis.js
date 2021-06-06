@@ -55,8 +55,7 @@ function AddVisualisationBlock() {
 
     let newVisBlock = mainBlock.append("div")
                                .attr("id" , "vis" + index)
-                               .attr("class" , "visField")
-                               
+                               .attr("class" , "visField")                              
                                .style("height" , "800px");
     newVisBlock.style("position","absolute").attr("x", 0).attr("y",0);
     CreateVisField("vis" + index); 
@@ -173,8 +172,16 @@ function OnChangeSelect(fieldName){
 
 //Function handling the functional aspects of the general time manager.
 function MakeGeneralTimeManager(dataset){
-    //Retrieve date range from curent dataset:
-    d3.csv(dataset).then(function(data) {
+  //Append the HTML:
+  console.log('test');
+  let TimeManager = d3.select("#visContent").append('div');
+  TimeManager.html("<label for='from'>From</label>"
+                  +"<input type='text' id='fromTime' name='from' readonly>"
+                  +"<label for='to'>to</label>"
+                  +"<input type='text' id='toTime' name='to' readonly>");
+
+  //Retrieve date range from curent dataset:
+  d3.csv(dataset).then(function(data) {
       //convert to numbers:
       data.forEach(function(d) {
         d.fromId = +d.fromId; 

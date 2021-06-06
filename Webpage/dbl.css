@@ -410,3 +410,6 @@ div[class^='visField'], div[class*=' visField'] {
 #ui-datepicker-div {
 	display: none;
 }
+
+/* Important css rule which will make sure the date picker will go on top of any other visualisation blocks. */
+.ui-datepicker{z-index: 9999 !important};

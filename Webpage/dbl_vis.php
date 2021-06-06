@@ -74,6 +74,15 @@
 		echo "<script type='text/javascript'>  
 		localStorage.setItem('DataSet', '".$newArray."'); 
 		</script>";	
+
+		#if this is the first uploaded dataset, then $curDataSets will be null
+		#Set the new dataset as the curdataset!:
+
+		if ($curDataSets == "null") {
+			echo "<script type='text/javascript'>  
+			localStorage.setItem('CurDataSet', '".$filename."'); 
+			</script>";
+		}
     } 
     ?>
 
@@ -99,10 +108,7 @@
 
 		<!--pagecontent-->
 		<div id="visContent" class="visContent">
-			<label for="from">From</label>
-			<input type="text" id="fromTime" name="from" readonly>
-			<label for="to">to</label>
-			<input type="text" id="toTime" name="to" readonly>
+			
 	
 		<!--temp text-->
 		<div id = "upload">
