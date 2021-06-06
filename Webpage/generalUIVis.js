@@ -250,6 +250,9 @@ function MakeGeneralTimeManager(dataset){
               minDate: new Date(minYear, minMonth, minDay), 
               maxDate: new Date(maxYear, maxMonth, maxDay),
               showAnim: "fadeIn",
+              showWeek: true,
+              firstDay: 1,
+              changeYear: true,
               setDate: $.datepicker.formatDate('dd/mm/yy', new Date(minYear, minMonth, minDay))
             })
             .on( "change", function() {
@@ -264,6 +267,9 @@ function MakeGeneralTimeManager(dataset){
             minDate: new Date(minYear, minMonth, minDay), 
             maxDate: new Date(maxYear, maxMonth, maxDay),
             showAnim: "fadeIn",
+            showWeek: true,
+            firstDay: 1,
+            changeYear: true,
             setDate: $.datepicker.formatDate('dd/mm/yy', new Date(maxYear, maxMonth, maxDay))
           })
           .on( "change", function() {
