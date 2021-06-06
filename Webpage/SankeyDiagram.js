@@ -21,24 +21,24 @@ function makeSankey(dataPath , fieldName) {
 
   var nodeWidthSankey = 80;
   let div = d3.select("#" + fieldName);
-  let sankeyDiv = div.append("div").attr("id" , "sankeyID");
+  let sankeyDiv = div.append("div").attr("id" , "sankeyID")
+                                   .attr("height" , "90%");
   //Retrieve height upperbox:
   var upperBoxHeight = parseFloat(div.select("#upperbar").style("height"))
 
   //retrieve width and height:
-  var height = parseFloat( div.style("height"))- upperBoxHeight -20;
-  var width = parseFloat( div.style("width") ) -20;
-
-  sankeyDiv.style("height" , height-125)
-           .style("width" , width-125);
+  var height = parseFloat( div.style("height") ) - upperBoxHeight - 20;
+  var width = parseFloat( div.style("width") ) - 20;
 
   tooltip = div.append("div")
                .attr("class" , "tooltip");
                            
   let svg = sankeyDiv.append("svg")
                      .attr("id" , "visualisation")
-                     .attr("width" , width /*+ 50*/)
-                     .attr("height", height /*+ 50*/);
+                     //.attr("width" , width /*+ 50*/)
+                     //.attr("height", height /*+ 50*/);
+                     .attr("preserveAspectRatio", "none")
+                     .attr("viewBox", "0 0 " + width +" "+height)
   let g =   svg.append("g")
                //.attr("width" , width)
                //.attr("height", height)
@@ -46,14 +46,14 @@ function makeSankey(dataPath , fieldName) {
 
   //Import sankey package as variable:
   sankey = d3.sankey()
-               .nodeWidth(nodeWidthSankey)
-               .nodePadding(25)
-               .nodeAlign(d3.sankeyCenter)
-               .nodeSort(null)
-               .nodeId(d => d.name)
-               .size([width,height])
-               .extent([[1, 5], [width - 1, height - 5]])
-               .iterations(125);
+             .nodeWidth(nodeWidthSankey)
+             .nodePadding(25)
+             .nodeAlign(d3.sankeyCenter)
+             .nodeSort(null)
+             .nodeId(d => d.name)
+             .size([width,height])
+             .extent([[1, 5], [width - 1, height - 5]])
+             .iterations(125);
 
   //From now on, we load the data:
   d3.csv(dataPath).then(function(data) {
@@ -76,14 +76,14 @@ function makeSankey(dataPath , fieldName) {
 
     let upperBar = div.select("#upperbar")
     var trigger = upperBar.append('input')
-                      .attr("type", "text")
-                      .attr("id", "sankeyTrigger")
-                      .attr('width', 350)
-                      .attr('height', 100)
-                      .style("display" , "none")
-                      .attr("class" , "sankeyTrigger")
-                      .attr("value" , "test")
-                      .attr("vertical-align" , "middle");
+                          .attr("type", "text")
+                          .attr("id", "sankeyTrigger")
+                          .attr('width', 350)
+                          .attr('height', 100)
+                          .style("display" , "none")
+                          .attr("class" , "sankeyTrigger")
+                          .attr("value" , "test")
+                          .attr("vertical-align" , "middle");
     
     trigger.on("input", function() {
       console.log("TRIGGERED!");
@@ -319,42 +319,42 @@ function MakeD3(dataSet , sankey , svg , fieldName){
 
 //Append a new group for the nodes and set it's attributes:
   let node = d3.select("#" + fieldName).select("#sankeyID").select('#visualisation').append("g")
-                .attr("stoke" , "#000")
-                .selectAll("rect")
-                .data(nodes) 
-                .join("rect")
-                .attr("x" , d => d.x0)
-                .attr("y" , d => d.y0)
-                .attr("fill" , d => getColor(d.name))
-                .attr("width", d => d.x1 - d.x0 - 2)
-                .attr("height", d => d.y1 - d.y0)
-                .call(drag)
-                .on("mouseover", function(d) {
+               .attr("stoke" , "#000")
+               .selectAll("rect")
+               .data(nodes) 
+               .join("rect")
+               .attr("x" , d => d.x0)
+               .attr("y" , d => d.y0)
+               .attr("fill" , d => getColor(d.name))
+               .attr("width", d => d.x1 - d.x0 - 2)
+               .attr("height", d => d.y1 - d.y0)
+               .call(drag)
+               .on("mouseover", function(d) {
                   tooltip.style("opacity", 1);
                   d3.select(this).raise().attr("stroke", "black");
-                })
-                .on("mousemove", mousemoveNode)
-                .on("mouseleave", function(d) {
+               })
+               .on("mousemove", mousemoveNode)
+               .on("mouseleave", function(d) {
                   tooltip.style("opacity", 0);
                   d3.select(this).attr("stroke", null);
-                })
-                .append("title")
-                .text(d => d.name);
+               })
+               .append("title")
+               .text(d => d.name);
 
     //Set text:
     //MAY CAUSE ISSUES WHEN USING NUMBERS ON THE RIGHT SIDE AND/OR TEXT ON THE LEFT SIDE!
     d3.select("#" + fieldName).select("#sankeyID").select('#visualisation').append("g")
-     .attr("id" , "text")
-     .style("font", "35px sans-serif") //TODO ask Thomas for right font style
-     .attr("pointer-events", "none")
-     .selectAll("text")
-     .data(nodes)
-     .join("text")
-     .attr("id" , d => ("ID" + d.name).replace(/ /g,'') )
-     .attr("y", d => ((d.y1 + d.y0) / 2) + 10) //set y coordinate
-     .attr("x", d => d.x0 < width / 2 ? d.x1 + textpadding : d.x0 - textpadding) //set x coordinate based on the location of the node.
-     .attr("text-anchor", d => d.x0 < width / 2 ? "start" : "end")
-     .text(d => d.name.toString()); //set the text value
+      .attr("id" , "text")
+      .style("font", "35px sans-serif") //TODO ask Thomas for right font style
+      .attr("pointer-events", "none")
+      .selectAll("text")
+      .data(nodes)
+      .join("text")
+      .attr("id" , d => ("ID" + d.name).replace(/ /g,'') )
+      .attr("y", d => ((d.y1 + d.y0) / 2) + 10) //set y coordinate
+      .attr("x", d => d.x0 < width / 2 ? d.x1 + textpadding : d.x0 - textpadding) //set x coordinate based on the location of the node.
+      .attr("text-anchor", d => d.x0 < width / 2 ? "start" : "end")
+      .text(d => d.name.toString()); //set the text value
 }
 
 //Functions handling color retrival and hashing names to colours. 

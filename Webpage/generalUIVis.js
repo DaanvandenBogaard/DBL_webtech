@@ -55,8 +55,7 @@ function AddVisualisationBlock() {
 
     let newVisBlock = mainBlock.append("div")
                                .attr("id" , "vis" + index)
-                               .attr("class" , "visField")                              
-                               .style("height" , "800px");
+                               .attr("class" , "visField");                              
     newVisBlock.style("position","absolute").attr("x", 0).attr("y",0);
     CreateVisField("vis" + index); 
       
@@ -67,7 +66,7 @@ function AddVisualisationBlock() {
 
     //Add the resizeable effect:
     $( function() {
-        $( "#vis" + index ).resizable();
+        $( "#vis" + index ).resizable({aspectRatio: 16 / 9});
       } );
 
     index += 1;                
@@ -81,9 +80,9 @@ function CreateVisField(fieldName){
 	var vis = d3.select("#" + fieldName);
 							
 	var upperbar = vis.append("div")
-					  .attr("class" , "upperVisBox")
-					  .attr("float" , "left")
-					  .attr("id" , "upperbar");
+					          .attr("class" , "upperVisBox")
+					          .attr("float" , "left")
+					          .attr("id" , "upperbar");
 
     //Add close button to upperbar:
     var closeButton = upperbar.append("button")
@@ -94,9 +93,9 @@ function CreateVisField(fieldName){
 
 	//define ('hardcode') the possible visualisations:	
     let select = upperbar.append("select")
-						 .attr("id" , "selector" + fieldName)				 
-						 .attr("class" , "selectorUI")
-						 .attr("onchange" , "OnChangeSelect("+ "'"  + fieldName + "'" +")");
+						             .attr("id" , "selector" + fieldName)				 
+						             .attr("class" , "selectorUI")
+						             .attr("onchange" , "OnChangeSelect("+ "'"  + fieldName + "'" +")");
 	
     //Must be defined again as we define it here as a DOM element!
     var selector = document.getElementById("selector" + fieldName);
@@ -108,9 +107,9 @@ function CreateVisField(fieldName){
 
     //set invisible option:					
     select.append("option")
-	      .attr("selected" , "true")
-	      .attr("hidden" , "true")
-	      .text("Choose a visualisation");		
+	        .attr("selected" , "true")
+	        .attr("hidden" , "true")
+	        .text("Choose a visualisation");		
 			
 }
 
@@ -173,7 +172,6 @@ function OnChangeSelect(fieldName){
 //Function handling the functional aspects of the general time manager.
 function MakeGeneralTimeManager(dataset){
   //Append the HTML:
-  console.log('test');
   let TimeManager = d3.select("#visContent").append('div');
   TimeManager.html("<label for='from'>From</label>"
                   +"<input type='text' id='fromTime' name='from' readonly>"

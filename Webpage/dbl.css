@@ -373,9 +373,8 @@ div[class^='visField'], div[class*=' visField'] {
 	border-width: 2px;
 	border-radius: 7px;
 	border-color: var(--accent);
-	width: 90%;
-	height: 100%;
-
+	width: 1000px;
+	height: 563px;
 	margin: 10px;
 	background: #ddd;
 	position: absolute;
@@ -412,4 +411,4 @@ div[class^='visField'], div[class*=' visField'] {
 }
 
 /* Important css rule which will make sure the date picker will go on top of any other visualisation blocks. */
-.ui-datepicker{z-index: 9999 !important};
+.ui-datepicker{z-index: 99 !important};
