@@ -119,7 +119,7 @@
 			<form action="upload.php" method="POST" enctype="multipart/form-data" >
 				<input id="oldDataSetsInput" type="text" name="testName" value = "temp" hidden>
 				<input id="file_input" type="file" name="dataset" accept=".csv" onchange="changeFile()">
-				<label id="largeButton" for="file_input">
+				<label id="uploadButton" for="file_input">
 					<i class="fa fa-upload" id="upload_icon" style="font-size: 20px;"></i>
 					Upload dataset
 				</label>

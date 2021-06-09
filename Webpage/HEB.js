@@ -29,6 +29,7 @@ function makeHEB(dataPath, fieldName) {
     var endMonth = d3.select("#" + fieldName).select("#endMonth");
     var animToggle = d3.select("#" + fieldName).select("#animateToggle");
     var pauseIcon = d3.select("#" + fieldName).select("#pauseIcon");
+    var pauseText = d3.select("#" + fieldName).select(".pauseButton");
     var togglePause = d3.select("#" + fieldName).select("#togglePause");
     var strengthSlider = d3.select("#" + fieldName).select("#strengthSlider");
     var edgeColor = d3.select("#" + fieldName).select("#edgeColor");
@@ -128,6 +129,8 @@ function makeHEB(dataPath, fieldName) {
     d3.csv(dataPath).then(function (data) {
         //Since d3.csv is asynchronous (it is not loaded immediatly, but it is a request to the webserver) we need all our code from the data in here. 
 
+        usableData = [];
+
         //Construct array with data in a usable order 
         data.forEach(function (d) {
             //Check wheter the toId is already an object, if not create object with first found fromId
@@ -209,25 +212,49 @@ function makeHEB(dataPath, fieldName) {
                 .style("left", (event.x + 5) + "px")
                 .style("top", (event.y) + "px");
 
-            d3.select(this).attr("", function (d) {
+            d3.select(this).attr("", function () {
 
                 tooltip.style("opacity", 1);
                 //Change width color and opacity for incoming selected mails
                 d3.selectAll(incoming)
                     .style("opacity", 1)
                     .attr("stroke", "#eb4034")
-                    .attr("stroke-width", 2);
-                //Change width color and opacity for outgoing selected mails
-                d3.selectAll(outgoing)
-                    .style("opacity", 1)
-                    .attr("stroke", "#40c7d6")
                     .attr("stroke-width", 2)
-                d3.selectAll(".twoWay")
-                    .style("opacity", 1)
-                    .attr("stroke", "#eb9834")
-                    .attr("stroke-width", 2);
-                //Place selected paths on top of others
+                    //Find two way edges for all incoming edges
+                    .each(function() {
+                        //get  from and to for current path
+                        var classes = String(d3.select(this).attr("class"));
+                        var from = parseInt(classes.substr(0, classes.indexOf(" ")).replace("from", ""));
+                        var to = parseInt(classes.substr(classes.indexOf(" ") + 1, classes.length -1).replace("to", ""));
+                        isTwoWay(from, to);
+                    });
+                //Make a copy of all outgoing edges
+                d3.selectAll(outgoing)
+                    .each(function() {
+                        var path = d3.select(this).attr("d");
+                        svg.append("path")
+                           .attr("id", "outgoing")
+                           .attr("d", function() { return path })
+                           .attr("fill", "none")
+                           .attr("stroke", "#40c7d6")
+                           .attr("stroke-width", 2);
+                    })
+
+                //Raise incoming edges above non selected edges
                 d3.select(this).raise().attr("stroke", "#5c5c5c");
+
+                d3.selectAll(".two-way")
+                .each(function() {
+                    var path = d3.select(this).attr("d");
+                    svg.append("path")
+                       .attr("id", "two-way")
+                       .attr("d", function() { return path })
+                       .attr("fill", "none")
+                       .attr("stroke", "#8be667")
+                       .attr("stroke-width", 2);
+                })
+                
+                //Place tooltip above other elements
                 d3.select(tooltip).raise();
             })
 
@@ -246,10 +273,12 @@ function makeHEB(dataPath, fieldName) {
                     .style("opacity", lineOpacity)
                     .attr("stroke", function (d) { return getStroke(d); })
                     .attr("stroke-width", 1);
-                d3.selectAll(outgoing)
-                    .style("opacity", lineOpacity)
-                    .attr("stroke", function (d) { return getStroke(d); })
-                    .attr("stroke-width", 1);
+                //Delete the copies of outgoing and two-way edges
+                d3.selectAll("#outgoing").remove();
+                d3.selectAll("#two-way").remove();
+
+                //Remove the two-way class from all paths
+                d3.selectAll("path").classed("two-way", false);
             }
         );
 
@@ -300,20 +329,30 @@ function makeHEB(dataPath, fieldName) {
         })
 
         //Set colors for gradient
-        var colors = ["#4334eb", "#eb9834"];
-        var colorPicker = d3.scaleLinear().range(colors).domain([1, 2]);
+        var gradientColors = ["#4334eb", "#eb9834"];
+        var gradientPicker = d3.scaleLinear().range(gradientColors).domain([1, 2]);
 
-        //Make array of options for colors for paths
-        var colorOptions = [];
-        unique_ids.forEach(function(d) {
-            colorOptions.push({"none": "black", "gradient": [], "sentiment": []})
-        })
+        //Set colors for sentiment legend
+        var sentColors = ["red", "blue"];
+        var sentPicker = d3.scaleLinear().range(sentColors).domain([1, 2]);
 
         //Edges need to be generated on first pass but need to be able to be redrawn later for animation
         generateEdges();
 
         //Function that can generate the edges based on mail traffic
         function generateEdges() {
+            if(curMonthDisplay != null) {
+            curMonthDisplay.attr("opacity", function() {
+                if (doAnimate) {
+                    return 1;
+                } else {
+                    return 0;
+                }
+            });
+            console.log("yes");
+            curMonthText.text("Current month: " + String(curDate).substr(0, 4) + "-" + String(curDate).substr(4, 6));
+            }
+
             svg.selectAll("g")
                 .data(usableData)
             allEdges = [];
@@ -342,7 +381,7 @@ function makeHEB(dataPath, fieldName) {
                             if (notDrawn(d["id"], fromId)) {
                                 //Add adresses to drawnEdges so the same path does not get drawn twice
                                 drawnEdges.push([d["id"], fromId]);
-                                allEdges.push([d["id"], fromId]);
+                                allEdges.push([parseInt(d["id"]), parseInt(fromId)]);
 
                                 //Find the job for sender
                                 targetJob = findJobtitle(fromId);
@@ -416,12 +455,12 @@ function makeHEB(dataPath, fieldName) {
                                 //Set first color of gradient
                                 linearGradient.append("stop")
                                 .attr("offset", "0%")
-                                .attr("stop-color", colorPicker(1));
+                                .attr("stop-color", gradientPicker(1));
 
                                 //Set last color of gradient
                                 linearGradient.append("stop")
-                                    .attr("offset", "100%")
-                                    .attr("stop-color", colorPicker(2));
+                                .attr("offset", "100%")
+                                .attr("stop-color", gradientPicker(2));
                             }
                         }
                     }
@@ -447,14 +486,33 @@ function makeHEB(dataPath, fieldName) {
                 });
         }
 
+        //Element that displays the current month for the animation
+        var curMonthDisplay = svg.append("g")
+            .attr("id", "curMonthDisplay")
+            .attr("opacity", function() {
+                if (doAnimate) {
+                    return 1;
+                } else {
+                    return 0;
+                }
+            });
+        
+        //Text for current month display
+        var curMonthText = curMonthDisplay.append("text")
+            .attr("font-size", "11pt")
+            .attr("x", 280)
+            .attr("y", 12)
+            .text("Current month: " + String(curDate).substr(0, 4) + "-" + String(curDate).substr(4, 6));
+
         //Make array for legend content
-        let edgeLegendContent = [{ "item": "incoming", "color": "#eb4034" }, { "item": "outgoing (w.i.p.)", "color": "#40c7d6" }, { "item": "two-way (w.i.p.)", "color": "#4b00bf" }];
+        let edgeLegendContent = [{ "item": "incoming", "color": "#eb4034" }, { "item": "outgoing", "color": "#40c7d6" }, { "item": "two-way", "color": "#8be667" }];
 
         //Create edge legend
         var edgeLegend = svg.selectAll("entries")
             .data(edgeLegendContent)
             .enter()
-            .append("g");
+            .append("g")
+            .attr("id", "edgeLegend");
 
         //Example line for item
         edgeLegend.append("line")
@@ -487,6 +545,7 @@ function makeHEB(dataPath, fieldName) {
             .data(Jobtitles_list)
             .enter()
             .append("g")
+            .attr("id", "jobLegend")
             .attr("style", "cursor: pointer;")
             .on("click", function (d) {
                 //When clicking on the legend circles the jobtitle is removed or added back again.
@@ -550,11 +609,13 @@ function makeHEB(dataPath, fieldName) {
                 isPaused = true;
                 pauseIcon.attr("class", "fa fa-play");
                 togglePause.text("Play");
+                pauseText.text("Play");
                 clearTimeout(animTimer);
             } else if (isPaused && doAnimate) {
                 isPaused = false;
                 pauseIcon.attr("class", "fa fa-pause");
                 togglePause.text("Pause");
+                pauseText.text("Pause");
                 //Draw next frame when unpaused
                 nextFrame();
             }
@@ -567,11 +628,107 @@ function makeHEB(dataPath, fieldName) {
             generateEdges();
         });
 
+        //Make gradient legend gradient
+        var linearGradient = svg.append("defs")
+        .append("linearGradient")
+        .attr("id", "linearGradient");
+        //Set first color of gradient
+        linearGradient.append("stop")
+        .attr("offset", "0%")
+        .attr("stop-color", gradientPicker(1));
+        //Set last color of gradient
+        linearGradient.append("stop")
+        .attr("offset", "100%")
+        .attr("stop-color", gradientPicker(2));
+
+        //Make sentiment legend gradient
+        var sentGradient = svg.append("defs")
+        .append("linearGradient")
+        .attr("id", "sentGradient");
+        //Set first color of gradient
+        sentGradient.append("stop")
+        .attr("offset", "0%")
+        .attr("stop-color", sentPicker(1));
+        //Set last color of gradient
+        sentGradient.append("stop")
+        .attr("offset", "100%")
+        .attr("stop-color", sentPicker(2));
+
+        //Draw legend for selected coloring method
+        var colorLegend = svg.append("g")   
+        .attr("id", "colorLegend")
+        .attr("font-size", "11pt")
+        .attr("opacity", function() {
+            if (colorSelected == "none") {
+                return 0;
+            } else {
+                return 1;
+            } 
+        });                          
+        
+        var colorLegendTextF = colorLegend.append("text")
+        .attr("y", figureHeight - 4)
+        .attr("x", function() {
+            if (colorSelected == "gradient") {
+                return 163;
+            } else if (colorSelected == "sentiment") {
+                return 182;
+            }
+        })
+        .text(function() {
+            if (colorSelected == "gradient") {
+                return "From";
+            } else if (colorSelected == "sentiment") {
+                return "-1";
+            }
+        });
+
+        var colorLegendRect = colorLegend.append("rect")
+        .attr("y", figureHeight - 15)
+        .attr("x", 200)
+        .attr("width", 300)
+        .attr("height", 15)
+        .attr("fill", function() {
+            if (colorSelected == "gradient") {
+                return "url(#linearGradient)";
+            } else if (colorSelected == "sentiment") {
+                return "url(#sentGradient)";
+            }
+        });
+
+        var colorLegendTextB = colorLegend.append("text")
+        .attr("y", figureHeight - 4)
+        .attr("x", 505)
+        .text(function() {
+            if (colorSelected == "gradient") {
+                return "To";
+            } else if (colorSelected == "sentiment") {
+                return "1";
+            }
+        });
+
+        //Event handler for the selected edge color
         edgeColor.on("change", function() {
             colorSelected = edgeColor.property("value");
             d3.select("#" + fieldName)
               .selectAll("path")
               .attr("stroke", function (d) { return getStroke(d); });
+            
+            if (colorSelected == "none") {
+                colorLegend.attr("opacity", 0);
+            } else if (colorSelected == "gradient") {
+                colorLegend.attr("opacity", 1);
+                colorLegendTextF.attr("x", 163)
+                                .text("From");
+                colorLegendRect.attr("fill", "url(#linearGradient)");
+                colorLegendTextB.text("To");
+            } else if (colorSelected == "sentiment") {
+                colorLegend.attr("opacity", 1);
+                colorLegendTextF.attr("x", 182)
+                                .text("-1");
+                colorLegendRect.attr("fill", "url(#sentGradient)");
+                colorLegendTextB.text("1");
+            }
         });
 
         var animTimer;
@@ -681,27 +838,38 @@ function notDrawn(from, to) {
     return true;
 }
 
+//Function to check if two nodes have two-way mail traffic (non functional yet)
 function isTwoWay(from, to) {
-    for (i = 0; i < allEdges.length; i++) {
-        if (allEdges[i][0] == to &&
-            allEdges[i][1] == from) {
-            return false;
+    //From and to selected from incoming so reverse for outgoing
+    var outgoing = ".to" + from;
+    var fromOut = "";
+    var toOut = "";
+    d3.selectAll(outgoing)
+      .each(function() {
+        var classes = String(d3.select(this).attr("class"));
+        fromOut = parseInt(classes.substr(0, classes.indexOf(" ")).replace("from", ""));
+        toOut = parseInt(classes.substr(classes.indexOf(" ") + 1, classes.length -1).replace("to", ""));
+        if (from == toOut && to == fromOut) {
+            d3.select(this).classed("two-way", true);
         }
-    }
-    return true;
+      })
 }
 
+//Function to determine what stroke to use based on the edgeColor selecter
 function getStroke(d) {
     if (colorSelected == "gradient") {
+        //Set stroke to link to fitting gradient
         return "url(#gradient_" + d.from + "_" + d.to + ")";
     } else if (colorSelected == "sentiment"){
+        //Calculate what color to give stroke based on sentiment
         if (d.sent < 0) {
-            return "rgb(" + (122.5 - Math.sqrt(-d.sent) * 255) + ", " + (122.5 + (Math.sqrt(-d.sent) * 255)) + ", 0)";
+            return "rgb(" + (122.5 - Math.sqrt(-d.sent) * 122.5) + ", 0, " + (122.5 + (Math.sqrt(-d.sent) * 122.5)) + ")";
         }
         else { 
-            return "rgb(" + (122.5 - (Math.sqrt(d.sent) * 255)) + ", " + (122.5 + Math.sqrt(-d.sent) * 255) + ", 0)"; 
+            return "rgb(" + (122.5 - (Math.sqrt(d.sent) * 122.5)) + ", 0," + (122.5 + Math.sqrt(-d.sent) * 122.5) + ")"; 
         }
     } else {
+        //If none match set stroke to black
         return "black"
     }
 }

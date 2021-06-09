@@ -86,10 +86,14 @@ function CreateVisField(fieldName){
 
     //Add close button to upperbar:
     var closeButton = upperbar.append("button")
-                              .style("width" , "50px")
-                              .style("height" , "50px")
+                              .attr("id", "closeButton")
                               .attr("onclick" , "changeListenerFunction('"+fieldName +"')"
                               );
+
+    var closeLabel = upperbar.append("label")
+                             .attr("for", "closeButton")
+                             .attr("class", "fa fa-times closeLabel")
+                             .attr("style", "font-size: 20px;");
 
 	//define ('hardcode') the possible visualisations:	
     let select = upperbar.append("select")
@@ -133,26 +137,28 @@ function OnChangeSelect(fieldName){
         
         Deze UI elementen worden in de "upperbar" gezet. Dit is een flex element wat bovenin de visualisation box zit.
         (zie documentation over de general UI handling voor meer info) */
-        console.log("test");
         d3.select("#" + fieldName).append('div').attr("id", "HEBFigure");
         let hebUIBox = d3.select('#' + fieldName).select("#upperbar").append('div').attr("id" , "hebUIBox");
 
         hebUIBox.html('<span> From (year-month) </span>' +
-                      '<input id="startYear" type="number" name="startYear" default=1998>' + 
-                      '<input id="startMonth" type="number" name="startMonth" default=01>' +
+                      '<input id="startYear" class="yearInput" type="number" name="startYear" placeholder=1998>' + 
+                      '<input id="startMonth" class="monthInput"  type="number" name="startMonth" placeholder=01>' +
                       '<span> to (year-month) </span>' + 
-                      '<input id="endYear" type="number" name="endYear" default=2002>' + 
-                      '<input id="endMonth" type="number" name="endMonth" default=12>' + 
+                      '<input id="endYear" class="yearInput" type="number" name="endYear" placeholder=2002>' + 
+                      '<input id="endMonth" class="monthInput type="number" name="endMonth" placeholder=12>' + 
                       '<div>' +
-                        '<input id="animateToggle" type="checkbox">' +
+                        '<input id="animateToggle" class="animToggle" type="checkbox">' +
                         '<label for="animateToggle"> animation </label>' +
-                        '<button id="startHEB" type="button" name="HEB" onclick="makeHEB(localStorage.getItem(' + "'CurDataSet'" + ') ,' + "'" + fieldName + "'"   + ' )"> Start </button>' + 
+                        '<button id="startHEB" type="button" name="HEB" onclick="makeHEB(localStorage.getItem(' + "'CurDataSet'" + ') ,' + "'" + fieldName + "'"   + ' )"> Start </button>' +
+                        '<label for="startHEB" class="startButton HEBButtons"> Start </label>' + 
                       '</div>' + 
                       '<button id="togglePause" type="button" name="togglePause"> Play </button>' +
+                      '<label for="togglePause" class="pauseButton HEBButtons"> Play </label>' + 
                       '<label for="togglePause" id="pauseIcon" class="fa fa-play"></label>' + 
-                      '<input id="strengthSlider" type="range" name="strengthSlider" min="0.00" max="1.00" value="0.85" step="0.05">' + 
-                      '<label for="strengthSlider"> Bundle strength </label>' + 
-                      '<select id="edgeColor" name="edgeColor">' + 
+                      '<label for="strengthSlider" class="inputLabel"> Bundle strength </label>' + 
+                      '<input id="strengthSlider" class="strengthSlider" type="range" name="strengthSlider" min="0.00" max="1.00" value="0.85" step="0.05">' + 
+                      '<label for="edgeColor" class="inputLabel"> Edge color </label>' +
+                      '<select id="edgeColor" class="edgeColor" name="edgeColor">' + 
                         '<option value="none"> None </option>' + 
                         '<option value="gradient"> From-to </option>' + 
                         '<option value="sentiment"> Sentiment </option>' +
