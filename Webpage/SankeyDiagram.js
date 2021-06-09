@@ -110,8 +110,8 @@ function makeSankey(dataPath , fieldName) {
       //Retrieve value from input field:
       let val = d3.select("#" + fieldName).select("#brushLinkTrigger").attr("value");
       console.log("Brushing and linking triggered: " + val +  "!");
-      //Highlighed selected elements:
-
+      //Highlighed selected element:
+      d3.select("#id" + val).raise().attr("stroke", "black");
     })
       
     //Define sankey data by sankey.js
@@ -126,6 +126,10 @@ function makeSankey(dataPath , fieldName) {
 function triggerBrushLinking(selected){
 d3.selectAll("#brushLinkTrigger").attr("value" , selected);
 d3.selectAll("#brushLinkTrigger").dispatch("input");
+}
+
+function stopBrushLinking(selected){
+  d3.selectAll("#id" + selected).attr("stroke" , null);
 }
 
 function constrDataSet(data, idNums , dateRange){
@@ -355,6 +359,7 @@ function MakeD3(dataSet , sankey , svg , fieldName){
                .attr("x" , d => d.x0)
                .attr("y" , d => d.y0)
                .attr("fill" , d => getColor(d.name))
+               .attr("id" , d => "id" + d.name)
                .attr("width", d => d.x1 - d.x0 - 2)
                .attr("height", d => d.y1 - d.y0)
                .call(drag)
@@ -364,7 +369,8 @@ function MakeD3(dataSet , sankey , svg , fieldName){
                   d3.select(this).raise().attr("stroke", "black");
                })
                .on("mousemove", mousemoveNode)
-               .on("mouseleave", function(d) {
+               .on("mouseleave", function(event , d) {
+                  stopBrushLinking(d.name);
                   tooltip.style("opacity", 0);
                   d3.select(this).attr("stroke", null);
                })
