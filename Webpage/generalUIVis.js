@@ -66,7 +66,13 @@ function AddVisualisationBlock() {
 
     //Add the resizeable effect:
     $( function() {
-        $( "#vis" + index ).resizable({aspectRatio: 16 / 9});
+        $( "#vis" + index ).resizable(
+          {
+            aspectRatio: 16 / 9//,
+           // minHeight: 563,
+            //minWidth: 1000
+          }
+          );
       } );
 
     index += 1;                
@@ -281,9 +287,6 @@ function MakeGeneralTimeManager(dataset){
             AlertVisualisationsDate();
           });
       } );
-      //Set standard values:  
-      //$( "#toTime" ).datepicker( "setDate", $.datepicker.formatDate('d M y', new Date(maxYear, maxMonth, maxDay)));
-      //$( "#fromTime" ).datepicker( "setDate", "00/00/00");
     }) 
 }
 
@@ -295,7 +298,6 @@ function AlertVisualisationsDate() {
   //Sankey:
     //The sankey has a hidden input box with an onchange event listener.
     d3.selectAll("#sankeyTrigger").dispatch("input");
-
 }
 
 //ASYNCHRONOUS!!!

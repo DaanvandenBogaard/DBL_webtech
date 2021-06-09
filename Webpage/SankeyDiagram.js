@@ -35,9 +35,7 @@ function makeSankey(dataPath , fieldName) {
                            
   let svg = sankeyDiv.append("svg")
                      .attr("id" , "visualisation")
-                     //.attr("width" , width /*+ 50*/)
-                     //.attr("height", height /*+ 50*/);
-                     .attr("preserveAspectRatio", "none")
+                     .attr("preserveAspectRatio", "xMinYMid meet")
                      .attr("viewBox", "0 0 " + width +" "+height)
                      .attr("actWidth" , width)
                      .attr("actHeight" , height);
@@ -77,6 +75,8 @@ function makeSankey(dataPath , fieldName) {
       d.day = +timeData[2];
     });
 
+
+
     let upperBar = div.select("#upperbar")
     var trigger = upperBar.append('input')
                           .attr("type", "text")
@@ -95,11 +95,37 @@ function makeSankey(dataPath , fieldName) {
       //Execute update:
       UpdateD3(data , sankey ,dateRange ,idNums , fieldName);
     });
+
+    let brushLinkTrigger = upperBar.append('input')
+                                   .attr("type", "text")
+                                   .attr("id", "brushLinkTrigger")
+                                   .attr('width', 350)
+                                   .attr('height', 100)
+                                   //.style("display" , "none")
+                                   .attr("class" , "brushLinkTrigger")
+                                   .attr("value" , "none")
+                                   .attr("vertical-align" , "middle"); 
+    
+    brushLinkTrigger.on("input", function() {
+      //Retrieve value from input field:
+      let val = d3.select("#" + fieldName).select("#brushLinkTrigger").attr("value");
+      console.log("Brushing and linking triggered: " + val +  "!");
+      //Highlighed selected elements:
+
+    })
       
     //Define sankey data by sankey.js
     dataSet = constrDataSet(data , idNums , dateRange);
     MakeD3(dataSet , sankey , d3.select("#" + fieldName).select("#sankeyID").select('#visualisation') , fieldName);
   }); 
+}
+
+//Input: selection of elements
+//Output: updates all elements at every visblock and triggers 
+//The function handling the brushing and linking selection.
+function triggerBrushLinking(selected){
+d3.selectAll("#brushLinkTrigger").attr("value" , selected);
+d3.selectAll("#brushLinkTrigger").dispatch("input");
 }
 
 function constrDataSet(data, idNums , dateRange){
@@ -223,7 +249,7 @@ function MakeD3(dataSet , sankey , svg , fieldName){
   var textpadding = 10;
   
   //Set functions for hover over tooltip:
-  var mouseover = function(d) {
+  var mouseover = function(event , d) {
     tooltip = d3.select("#" + fieldName).select(".tooltip");
     tooltip.style("opacity", 1);
     d3.select(this).attr("stroke", d => d3.color(d.color) || "#BBBBBB");
@@ -332,7 +358,8 @@ function MakeD3(dataSet , sankey , svg , fieldName){
                .attr("width", d => d.x1 - d.x0 - 2)
                .attr("height", d => d.y1 - d.y0)
                .call(drag)
-               .on("mouseover", function(d) {
+               .on("mouseover", function(event , d) {
+                  triggerBrushLinking(d.name)
                   tooltip.style("opacity", 1);
                   d3.select(this).raise().attr("stroke", "black");
                })

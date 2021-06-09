@@ -381,7 +381,7 @@ button#closeButton{
 
 /* Visualisation UI */
 .upperVisBox {
-	display: flex;
+	display: inline-block;
 	align-items: center;
 	justify-content: center; 
 }
@@ -394,6 +394,7 @@ button#closeButton{
 	padding: 15px;
 	font-size: 25px;
 	cursor: pointer;
+	display: flex;
 }
 
 div[class^='visField'], div[class*=' visField'] {
@@ -538,3 +539,4 @@ input::-webkit-inner-spin-button {
 input[type=number] {
 	-moz-appearance: textfield;
   }
+
