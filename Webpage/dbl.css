@@ -478,14 +478,12 @@ div[class^='visField'], div[class*=' visField'] {
 	cursor: pointer;
 }
 
-<<<<<<< HEAD
 #ui-datepicker-div {
 	display: none;
 }
 
 /* Important css rule which will make sure the date picker will go on top of any other visualisation blocks. */
-.ui-datepicker{z-index: 99 !important};
-=======
+.ui-datepicker{z-index: 99999999999999 !important};
 .HEBButtons:active {
 	background-color: var(--active);
 }
@@ -540,4 +538,3 @@ input::-webkit-inner-spin-button {
 input[type=number] {
 	-moz-appearance: textfield;
   }
->>>>>>> HEB

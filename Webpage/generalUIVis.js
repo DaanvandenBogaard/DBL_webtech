@@ -178,7 +178,7 @@ function OnChangeSelect(fieldName){
 //Function handling the functional aspects of the general time manager.
 function MakeGeneralTimeManager(dataset){
   //Append the HTML:
-  let TimeManager = d3.select("#visContent").append('div');
+  let TimeManager = d3.select("#toolbar").append('div').style("display", "inline-block");
   TimeManager.html("<label for='from'>From</label>"
                   +"<input type='text' id='fromTime' name='from' readonly>"
                   +"<label for='to'>to</label>"
@@ -361,3 +361,47 @@ function GetMinMaxDate(dataset){
   })
 }
 
+//A function to retrieve the date selected by the general date selector:
+//Return: A dictonairy containing the correct dates of the date range.
+//The return has the following form:
+/*
+{
+"fromDay"  : fromTime[0],
+"fromMonth" : fromTime[1],
+"fromYear" : fromTime[2],
+"toDay"    : toTime[0]  ,
+"toMonth"   : toTime[1]  ,
+"toYear"   : toTime[2]
+}
+
+Note that null values will be seen as infinity (or minus infinity).
+*/
+function findDateRange(){
+  //Find new date range:
+  let fromTimeString = document.getElementById("fromTime").value;
+  let toTimeString = document.getElementById("toTime").value;
+  let fromTime = fromTimeString.split("/");
+  let toTime = toTimeString.split("/");
+
+  //check for null:
+  if (fromTimeString == null || fromTimeString == "") {
+    fromTime[0] = Number.MIN_VALUE;
+    fromTime[1] = Number.MIN_VALUE;
+    fromTime[2] = Number.MIN_VALUE;
+  }
+  if (toTimeString == null || toTimeString == "") {
+    toTime[0] = Number.MAX_VALUE;
+    toTime[1] = Number.MAX_VALUE;
+    toTime[2] = Number.MAX_VALUE;
+  }
+
+  dateRange = {
+               "fromDay"  : fromTime[0],
+               "fromMonth" : fromTime[1],
+               "fromYear" : fromTime[2],
+               "toDay"    : toTime[0]  ,
+               "toMonth"   : toTime[1]  ,
+               "toYear"   : toTime[2]
+              };
+  return dateRange
+}
