@@ -39,6 +39,9 @@ function makeSankey(dataPath , fieldName) {
                      //.attr("height", height /*+ 50*/);
                      .attr("preserveAspectRatio", "none")
                      .attr("viewBox", "0 0 " + width +" "+height)
+                     .attr("actWidth" , width)
+                     .attr("actHeight" , height);
+
   let g =   svg.append("g")
                //.attr("width" , width)
                //.attr("height", height)
@@ -283,10 +286,10 @@ function MakeD3(dataSet , sankey , svg , fieldName){
            .on("drag", function dragged(event, d) {
             //Check if the mouse is still in frame:
               //retrieve height and width:
-              let width = d3.select("#" + fieldName).select("#sankeyID").select("#visualisation").attr("width");
-              let height = d3.select("#" + fieldName).select("#sankeyID").select("#visualisation").attr("height");
-              let padding = 10;
-            if (event.x < padding || event.x > width - padding || event.y < padding || event.y > height -padding || outOfBounds) {
+              let width = d3.select("#" + fieldName).select("#sankeyID").select("#visualisation").attr("actWidth").split("px")[0];
+              let height = d3.select("#" + fieldName).select("#sankeyID").select("#visualisation").attr("actHeight").split("px")[0];
+              let padding = 20;
+            if (event.x < padding || event.x > width - padding || event.y < padding || event.y > height - padding || outOfBounds) {
               outOfBounds = true;
               return;
             }
