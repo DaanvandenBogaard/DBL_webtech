@@ -36,7 +36,7 @@ function makeSankey(dataPath , fieldName) {
   let svg = sankeyDiv.append("svg")
                      .attr("id" , "visualisation")
                      .attr("preserveAspectRatio", "xMinYMid meet")
-                     .attr("viewBox", "0 0 " + width +" "+height)
+                     .attr("viewBox", "-5 0 " + width +" "+height)
                      .attr("actWidth" , width)
                      .attr("actHeight" , height);
 
@@ -75,8 +75,6 @@ function makeSankey(dataPath , fieldName) {
       d.day = +timeData[2];
     });
 
-
-
     let upperBar = div.select("#upperbar")
     var trigger = upperBar.append('input')
                           .attr("type", "text")
@@ -101,7 +99,7 @@ function makeSankey(dataPath , fieldName) {
                                    .attr("id", "brushLinkTrigger")
                                    .attr('width', 350)
                                    .attr('height', 100)
-                                   //.style("display" , "none")
+                                   .style("display" , "none")
                                    .attr("class" , "brushLinkTrigger")
                                    .attr("value" , "none")
                                    .attr("vertical-align" , "middle"); 
@@ -109,7 +107,6 @@ function makeSankey(dataPath , fieldName) {
     brushLinkTrigger.on("input", function() {
       //Retrieve value from input field:
       let val = d3.select("#" + fieldName).select("#brushLinkTrigger").attr("value");
-      console.log("Brushing and linking triggered: " + val +  "!");
       //Highlighed selected element:
       d3.select("#id" + val).raise().attr("stroke", "black");
     })
@@ -269,29 +266,22 @@ function MakeD3(dataSet , sankey , svg , fieldName){
   }
   var mousemoveNode = function(event , d) {
     //Calculate the total number of emails sent by the source (node).
+    let sum = 0;
+    links.forEach(function(entry){
+      if (entry.source['name'] === d.name) {
+        sum += entry.value;
+      }
+    });
+    
     //Determine type of variable:
-    if (typeof d.name === "number") {
-      let sum = 0;
-      links.forEach(function(entry){
-        if (entry.source['name'] === d.name) {
-          sum += entry.value;
-        }
-      });
-      tooltip.html(d.name + " has sent " + sum + " emails.")
-             .style("left", (event.x + 70) + "px")
-             .style("top", (event.y) + "px");
+    if (typeof d.name === "number") {  
+      tooltip.html(d.name + " has sent " + sum + " emails.")        
     } 
     else{
-      let sum = 0;
-      links.forEach(function(entry){
-        if (entry.target['name'] === d.name) {
-          sum += entry.value;
-        }
-      });
       tooltip.html(d.name + " has received " + sum + " emails.")
-             .style("left", (event.x + event.dx + 70) + "px")
-             .style("top", (event.y + event.dy ) + "px");
     }
+    tooltip.style("left", (event.x + 70) + "px")
+           .style("top", (event.y) + "px");
   }
 
   //Append the links:
@@ -314,6 +304,8 @@ function MakeD3(dataSet , sankey , svg , fieldName){
   drag = d3.drag()
            .on("start", dragstarted)
            .on("drag", function dragged(event, d) {
+            //Disable tooltip:
+            tooltip.style("opacity", 0);
             //Check if the mouse is still in frame:
               //retrieve height and width:
               let width = d3.select("#" + fieldName).select("#sankeyID").select("#visualisation").attr("actWidth").split("px")[0];

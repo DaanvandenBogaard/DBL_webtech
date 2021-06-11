@@ -381,6 +381,7 @@ button#closeButton{
 
 /* Visualisation UI */
 .upperVisBox {
+	height: 10%;
 	display: inline-block;
 	align-items: center;
 	justify-content: center; 

@@ -41,6 +41,8 @@ function OnChangeDataSetSelector() {
 
 //Changelisterner of close buttons:
 function changeListenerFunction(name){
+    console.log("tried to press delete");
+    console.log("#" + name);
     d3.select("#" + name).remove();
 }
 
@@ -68,9 +70,9 @@ function AddVisualisationBlock() {
     $( function() {
         $( "#vis" + index ).resizable(
           {
-            aspectRatio: 16 / 9//,
-           // minHeight: 563,
-            //minWidth: 1000
+            aspectRatio: 16 / 9,
+            minHeight: 563,
+            minWidth: 1000
           }
           );
       } );
@@ -93,8 +95,7 @@ function CreateVisField(fieldName){
     //Add close button to upperbar:
     var closeButton = upperbar.append("button")
                               .attr("id", "closeButton")
-                              .attr("onclick" , "changeListenerFunction('"+fieldName +"')"
-                              );
+                              .attr("onclick" , "changeListenerFunction("+ "'"+fieldName + "'"+ ")");
 
     var closeLabel = upperbar.append("label")
                              .attr("for", "closeButton")
