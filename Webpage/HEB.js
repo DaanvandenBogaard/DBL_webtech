@@ -21,12 +21,8 @@ function makeHEB(dataPath, fieldName) {
     d3.select("#" + fieldName).select("#HEBFigure").select("#HEBdiagram").remove();
 
     //Variables
-
+    var dateRange_HEB;
     //Link elements in dbl_vis.php to variables
-    var startYear = d3.select("#" + fieldName).select("#startYear");
-    var startMonth = d3.select("#" + fieldName).select("#startMonth");
-    var endYear = d3.select("#" + fieldName).select("#endYear");
-    var endMonth = d3.select("#" + fieldName).select("#endMonth");
     var animToggle = d3.select("#" + fieldName).select("#animateToggle");
     var pauseIcon = d3.select("#" + fieldName).select("#pauseIcon");
     var pauseText = d3.select("#" + fieldName).select(".pauseButton");
@@ -59,7 +55,7 @@ function makeHEB(dataPath, fieldName) {
     let margin = { top: 15, right: 10, bottom: 15, left: 10 };
     let figureHeight = 690; //changed this because it was too big for the current fieldsize, but ultimately this should not be hardcoded -Daan
     let figureWidth = 800; //changed this because it was too big for the current fieldsize, but ultimately this should not be hardcoded -Daan
-    let diameter = 600;
+    let diameter = 600  ;
     let radius = diameter / 2;
     let innerRadius = radius / 10;
 
@@ -73,56 +69,6 @@ function makeHEB(dataPath, fieldName) {
     var bundleStrength = strengthSlider.property("value");
     var lineOpacity = 1;
 
-    //Input data processing
-
-    //Check if startYear is outside of allowed values
-    if (startYear.property("value") < 1998) {
-        startYear.property("value", 1998);
-    } else if (startYear.property("value") > 2002) {
-        startYear.property("value", 2002);
-    }
-
-    //Check if startMonth is outside of allowed values
-    if (startMonth.property("value") < 1) {
-        startMonth.property("value", 1);
-    } else if (startMonth.property("value") > 12) {
-        startMonth.property("value", 12);
-    }
-
-    //If startMonth is 1-9 add 0 in front to match date format
-    if (startMonth.property("value").length == 1) {
-        startMonth.property("value", 0 + startMonth.property("value"));
-    }
-
-    //Check if endYear is outside of allowed values or below startYear
-    if (endYear.property("value") < 1998) {
-        endYear.property("value", 1998);
-    } else if (endYear.property("value") > 2002) {
-        endYear.property("value", 2002);
-    } else if (endYear.property("value") < startYear.property("value")) {
-        endYear.property("value", startYear.property("value"));
-        endYearAdjust = true;
-    }
-
-    //Check if endMonth is outside of allowed value or if endDate is before startDate
-    if (endMonth.property("value") < 1) {
-        endMonth.property("value", 1);
-    } else if (endMonth.property("value") > 12) {
-        endMonth.property("value", 12);
-    } else if ((endYearAdjust == true || startYear.property("value") == endYear.property("value")) && endMonth.property("value") < startMonth.property("value")) {
-        endMonth.property("value", startMonth.property("value"));
-    }
-
-    //If endMonth is 1-9 add 0 in front to match date format
-    if (endMonth.property("value").length == 1) {
-        endMonth.property("value", 0 + endMonth.property("value"));
-    }
-
-    //Set dates to right format and set curDate to startDate for start of animation
-    startDate = parseInt(startYear.property("value") + startMonth.property("value"));
-    endDate = parseInt(endYear.property("value") + endMonth.property("value"));
-    var curYear = parseInt(startYear.property("value"));
-    var curDate = startDate;
 
     //Processing data
 
@@ -131,6 +77,21 @@ function makeHEB(dataPath, fieldName) {
 
         usableData = [];
 
+        //Get the univwersal date range
+        dateRange_HEB = findDateRange();
+        var startYear = dateRange_HEB['fromYear'];
+        var startMonth = dateRange_HEB['fromMonth'];
+        var startDay = dateRange_HEB['fromDay'];
+        var endYear = dateRange_HEB['toYear'];
+        var endMonth = dateRange_HEB['toMonth'];
+        var endDay = dateRange_HEB['toDay'];
+
+        //Set dates to right format and set curDate to startDate for start of animation
+        startDate = parseInt(startYear + startMonth + startDay);
+        endDate = parseInt(endYear + endMonth + endDay);
+        var curYear = parseInt(startYear);
+        var curDate = startDate;
+        console.log(startDate);
         //Construct array with data in a usable order 
         data.forEach(function (d) {
             //Check wheter the toId is already an object, if not create object with first found fromId
@@ -184,10 +145,17 @@ function makeHEB(dataPath, fieldName) {
             .attr("id", "HEBdiagram")
             .attr("width", figureWidth)
             .attr("height", figureHeight);
+
+        //retrieve width and height:
+        var height_HEB = parseFloat(div.attr("height")) -20  ;
+        var width_HEB = parseFloat(div.attr("width")) - 20;
+
         let svg = div.append("svg")
-            .attr("width", figureWidth)
-            .attr("height", figureHeight)
-            .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+        .attr("preserveAspectRatio", "xMinYMid meet")
+        .attr("viewBox", "-5 0 " + width_HEB +" "+height_HEB)
+        .attr("actWidth" , width_HEB)
+        .attr("actHeight" , height_HEB)
+        .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
 
         //Create tooltip
         var tooltip = div.append("div")
@@ -221,39 +189,39 @@ function makeHEB(dataPath, fieldName) {
                     .attr("stroke", "#eb4034")
                     .attr("stroke-width", 2)
                     //Find two way edges for all incoming edges
-                    .each(function() {
+                    .each(function () {
                         //get  from and to for current path
                         var classes = String(d3.select(this).attr("class"));
                         var from = parseInt(classes.substr(0, classes.indexOf(" ")).replace("from", ""));
-                        var to = parseInt(classes.substr(classes.indexOf(" ") + 1, classes.length -1).replace("to", ""));
+                        var to = parseInt(classes.substr(classes.indexOf(" ") + 1, classes.length - 1).replace("to", ""));
                         isTwoWay(from, to);
                     });
                 //Make a copy of all outgoing edges
                 d3.selectAll(outgoing)
-                    .each(function() {
+                    .each(function () {
                         var path = d3.select(this).attr("d");
                         svg.append("path")
-                           .attr("id", "outgoing")
-                           .attr("d", function() { return path })
-                           .attr("fill", "none")
-                           .attr("stroke", "#40c7d6")
-                           .attr("stroke-width", 2);
+                            .attr("id", "outgoing")
+                            .attr("d", function () { return path })
+                            .attr("fill", "none")
+                            .attr("stroke", "#40c7d6")
+                            .attr("stroke-width", 2);
                     })
 
                 //Raise incoming edges above non selected edges
                 d3.select(this).raise().attr("stroke", "#5c5c5c");
 
                 d3.selectAll(".two-way")
-                .each(function() {
-                    var path = d3.select(this).attr("d");
-                    svg.append("path")
-                       .attr("id", "two-way")
-                       .attr("d", function() { return path })
-                       .attr("fill", "none")
-                       .attr("stroke", "#8be667")
-                       .attr("stroke-width", 2);
-                })
-                
+                    .each(function () {
+                        var path = d3.select(this).attr("d");
+                        svg.append("path")
+                            .attr("id", "two-way")
+                            .attr("d", function () { return path })
+                            .attr("fill", "none")
+                            .attr("stroke", "#8be667")
+                            .attr("stroke-width", 2);
+                    })
+
                 //Place tooltip above other elements
                 d3.select(tooltip).raise();
             })
@@ -280,15 +248,15 @@ function makeHEB(dataPath, fieldName) {
                 //Remove the two-way class from all paths
                 d3.selectAll("path").classed("two-way", false);
             }
-        );
+            );
 
         //creates circles for all working persons
         var circle = g.append("circle")
             .attr("cx", function (d, i) {
-                return circ_x(300, i);
+                return circ_x(radius, i);
             })
             .attr("cy", function (d, i) {
-                return circ_y(300, i);
+                return circ_y(radius, i);
             })
             .attr("r", 5)
             //Fills the circles according to jobtitle
@@ -319,10 +287,10 @@ function makeHEB(dataPath, fieldName) {
             })
             .attr("font-size", "8pt")
             .attr("dominant-baseline", "central")
-            .text(function(d, i) { return d.id; });
+            .text(function (d, i) { return d.id; });
 
         //Make an array with its "index" in the middle of all circles so the paths can group in the center
-        Jobtitles_list.forEach(function(d) {
+        Jobtitles_list.forEach(function (d) {
             startIndex = findIndex(usableData, d, "front");
             endIndex = findIndex(usableData, d, "back");
             jobGroupIndex.push([d, startIndex + ((endIndex - startIndex) / 2)]);
@@ -341,22 +309,22 @@ function makeHEB(dataPath, fieldName) {
 
         //Function that can generate the edges based on mail traffic
         function generateEdges() {
-            if(curMonthDisplay != null) {
-            curMonthDisplay.attr("opacity", function() {
-                if (doAnimate) {
-                    return 1;
-                } else {
-                    return 0;
-                }
-            });
-            console.log("yes");
-            curMonthText.text("Current month: " + String(curDate).substr(0, 4) + "-" + String(curDate).substr(4, 6));
+            if (curMonthDisplay != null) {
+                curMonthDisplay.attr("opacity", function () {
+                    if (doAnimate) {
+                        return 1;
+                    } else {
+                        return 0;
+                    }
+                });
+                console.log("yes");
+                curMonthText.text("Current month: " + String(curDate).substr(0, 4) + "-" + String(curDate).substr(4, 6));
             }
 
             svg.selectAll("g")
                 .data(usableData)
             allEdges = [];
-
+            console.log(usableData);
             //Make a path for each node
             var edges = g.selectAll("path")
                 .data(function (d, i) {
@@ -441,26 +409,26 @@ function makeHEB(dataPath, fieldName) {
                                 }
 
                                 var angle = Math.atan2(y_target - y_source, x_target - x_source) * 180 / Math.PI;
-                                
+
                                 //Make gradient (Not functional yet)
                                 var linearGradient = d3.select(this).append("defs")
-                                .append("linearGradient")
-                                .attr("id", function(d) {
-                                    return "gradient_" + fromId + "_" + toId;
-                                })
-                                .attr("gradientTransform", function(d) {
-                                    return "rotate("+ angle + ")";
-                                });
+                                    .append("linearGradient")
+                                    .attr("id", function (d) {
+                                        return "gradient_" + fromId + "_" + toId;
+                                    })
+                                    .attr("gradientTransform", function (d) {
+                                        return "rotate(" + angle + ")";
+                                    });
 
                                 //Set first color of gradient
                                 linearGradient.append("stop")
-                                .attr("offset", "0%")
-                                .attr("stop-color", gradientPicker(1));
+                                    .attr("offset", "0%")
+                                    .attr("stop-color", gradientPicker(1));
 
                                 //Set last color of gradient
                                 linearGradient.append("stop")
-                                .attr("offset", "100%")
-                                .attr("stop-color", gradientPicker(2));
+                                    .attr("offset", "100%")
+                                    .attr("stop-color", gradientPicker(2));
                             }
                         }
                     }
@@ -489,14 +457,14 @@ function makeHEB(dataPath, fieldName) {
         //Element that displays the current month for the animation
         var curMonthDisplay = svg.append("g")
             .attr("id", "curMonthDisplay")
-            .attr("opacity", function() {
+            .attr("opacity", function () {
                 if (doAnimate) {
                     return 1;
                 } else {
                     return 0;
                 }
             });
-        
+
         //Text for current month display
         var curMonthText = curMonthDisplay.append("text")
             .attr("font-size", "11pt")
@@ -576,7 +544,7 @@ function makeHEB(dataPath, fieldName) {
 
         //Example line for item
         jobLegend.append("circle")
-            .attr("cx", figureWidth - 150)
+            .attr("cx", width_HEB - 150)
             .attr("cy", function (d, i) {
                 return 12 + 18 * i;
             })
@@ -590,7 +558,7 @@ function makeHEB(dataPath, fieldName) {
         //Text for item
         jobLegend.append("text")
             .attr("font-size", "11pt")
-            .attr("x", figureWidth - 140)
+            .attr("x", width_HEB - 140)
             .attr("y", function (d, i) {
                 return 15 + 18 * i;
             })
@@ -622,7 +590,7 @@ function makeHEB(dataPath, fieldName) {
         });
 
         //Event handler that changes the bundlestrength when changed at slider
-        strengthSlider.on("input", function() {
+        strengthSlider.on("input", function () {
             bundleStrength = strengthSlider.property("value");
             d3.select("#" + fieldName).selectAll("path").remove();
             generateEdges();
@@ -630,102 +598,102 @@ function makeHEB(dataPath, fieldName) {
 
         //Make gradient legend gradient
         var linearGradient = svg.append("defs")
-        .append("linearGradient")
-        .attr("id", "linearGradient");
+            .append("linearGradient")
+            .attr("id", "linearGradient");
         //Set first color of gradient
         linearGradient.append("stop")
-        .attr("offset", "0%")
-        .attr("stop-color", gradientPicker(1));
+            .attr("offset", "0%")
+            .attr("stop-color", gradientPicker(1));
         //Set last color of gradient
         linearGradient.append("stop")
-        .attr("offset", "100%")
-        .attr("stop-color", gradientPicker(2));
+            .attr("offset", "100%")
+            .attr("stop-color", gradientPicker(2));
 
         //Make sentiment legend gradient
         var sentGradient = svg.append("defs")
-        .append("linearGradient")
-        .attr("id", "sentGradient");
+            .append("linearGradient")
+            .attr("id", "sentGradient");
         //Set first color of gradient
         sentGradient.append("stop")
-        .attr("offset", "0%")
-        .attr("stop-color", sentPicker(1));
+            .attr("offset", "0%")
+            .attr("stop-color", sentPicker(1));
         //Set last color of gradient
         sentGradient.append("stop")
-        .attr("offset", "100%")
-        .attr("stop-color", sentPicker(2));
+            .attr("offset", "100%")
+            .attr("stop-color", sentPicker(2));
 
         //Draw legend for selected coloring method
-        var colorLegend = svg.append("g")   
-        .attr("id", "colorLegend")
-        .attr("font-size", "11pt")
-        .attr("opacity", function() {
-            if (colorSelected == "none") {
-                return 0;
-            } else {
-                return 1;
-            } 
-        });                          
-        
+        var colorLegend = svg.append("g")
+            .attr("id", "colorLegend")
+            .attr("font-size", "11pt")
+            .attr("opacity", function () {
+                if (colorSelected == "none") {
+                    return 0;
+                } else {
+                    return 1;
+                }
+            });
+
         var colorLegendTextF = colorLegend.append("text")
-        .attr("y", figureHeight - 4)
-        .attr("x", function() {
-            if (colorSelected == "gradient") {
-                return 163;
-            } else if (colorSelected == "sentiment") {
-                return 182;
-            }
-        })
-        .text(function() {
-            if (colorSelected == "gradient") {
-                return "From";
-            } else if (colorSelected == "sentiment") {
-                return "-1";
-            }
-        });
+            .attr("y", height_HEB - 4)
+            .attr("x", function () {
+                if (colorSelected == "gradient") {
+                    return 163;
+                } else if (colorSelected == "sentiment") {
+                    return 182;
+                }
+            })
+            .text(function () {
+                if (colorSelected == "gradient") {
+                    return "From";
+                } else if (colorSelected == "sentiment") {
+                    return "-1";
+                }
+            });
 
         var colorLegendRect = colorLegend.append("rect")
-        .attr("y", figureHeight - 15)
-        .attr("x", 200)
-        .attr("width", 300)
-        .attr("height", 15)
-        .attr("fill", function() {
-            if (colorSelected == "gradient") {
-                return "url(#linearGradient)";
-            } else if (colorSelected == "sentiment") {
-                return "url(#sentGradient)";
-            }
-        });
+            .attr("y", height_HEB - 15)
+            .attr("x", 200)
+            .attr("width", 300)
+            .attr("height", 15)
+            .attr("fill", function () {
+                if (colorSelected == "gradient") {
+                    return "url(#linearGradient)";
+                } else if (colorSelected == "sentiment") {
+                    return "url(#sentGradient)";
+                }
+            });
 
         var colorLegendTextB = colorLegend.append("text")
-        .attr("y", figureHeight - 4)
-        .attr("x", 505)
-        .text(function() {
-            if (colorSelected == "gradient") {
-                return "To";
-            } else if (colorSelected == "sentiment") {
-                return "1";
-            }
-        });
+            .attr("y", height_HEB - 4)
+            .attr("x", 505)
+            .text(function () {
+                if (colorSelected == "gradient") {
+                    return "To";
+                } else if (colorSelected == "sentiment") {
+                    return "1";
+                }
+            });
 
         //Event handler for the selected edge color
-        edgeColor.on("change", function() {
+        edgeColor.on("change", function () {
             colorSelected = edgeColor.property("value");
             d3.select("#" + fieldName)
-              .selectAll("path")
-              .attr("stroke", function (d) { return getStroke(d); });
-            
+                .selectAll("path")
+                .attr("stroke", function (d) { return getStroke(d); });
+
             if (colorSelected == "none") {
                 colorLegend.attr("opacity", 0);
             } else if (colorSelected == "gradient") {
                 colorLegend.attr("opacity", 1);
                 colorLegendTextF.attr("x", 163)
-                                .text("From");
+                    .text("From");
                 colorLegendRect.attr("fill", "url(#linearGradient)");
                 colorLegendTextB.text("To");
             } else if (colorSelected == "sentiment") {
                 colorLegend.attr("opacity", 1);
                 colorLegendTextF.attr("x", 182)
-                                .text("-1");
+                    .text("-1");
                 colorLegendRect.attr("fill", "url(#sentGradient)");
                 colorLegendTextB.text("1");
             }
@@ -735,7 +703,7 @@ function makeHEB(dataPath, fieldName) {
 
         //If animation is selected and not paused on first pass, draw next frame
         if (doAnimate && !isPaused) {
-            animTimer = setTimeout(function() { nextFrame() }, frameTime);
+            animTimer = setTimeout(function () { nextFrame() }, frameTime);
             animTimer;
         }
 
@@ -777,9 +745,11 @@ function notInMails(curFromId, curToId, date) {
     return true;
 }
 
-//Function for getting the date in the right format (yyyymm)
+//Function for getting the date in the right format (yyyymmdd)
 function dateFormat(date) {
-    return yearMonth = parseInt(date.replace(/-/, "").slice(0, -3), 10);
+    u_date = date.split("-")
+
+    return yearMonth = parseInt(u_date[0] + u_date[1] + u_date[2]);
 }
 
 //Function for placement on HEB (X)
@@ -845,14 +815,14 @@ function isTwoWay(from, to) {
     var fromOut = "";
     var toOut = "";
     d3.selectAll(outgoing)
-      .each(function() {
-        var classes = String(d3.select(this).attr("class"));
-        fromOut = parseInt(classes.substr(0, classes.indexOf(" ")).replace("from", ""));
-        toOut = parseInt(classes.substr(classes.indexOf(" ") + 1, classes.length -1).replace("to", ""));
-        if (from == toOut && to == fromOut) {
-            d3.select(this).classed("two-way", true);
-        }
-      })
+        .each(function () {
+            var classes = String(d3.select(this).attr("class"));
+            fromOut = parseInt(classes.substr(0, classes.indexOf(" ")).replace("from", ""));
+            toOut = parseInt(classes.substr(classes.indexOf(" ") + 1, classes.length - 1).replace("to", ""));
+            if (from == toOut && to == fromOut) {
+                d3.select(this).classed("two-way", true);
+            }
+        })
 }
 
 //Function to determine what stroke to use based on the edgeColor selecter
@@ -860,13 +830,13 @@ function getStroke(d) {
     if (colorSelected == "gradient") {
         //Set stroke to link to fitting gradient
         return "url(#gradient_" + d.from + "_" + d.to + ")";
-    } else if (colorSelected == "sentiment"){
+    } else if (colorSelected == "sentiment") {
         //Calculate what color to give stroke based on sentiment
         if (d.sent < 0) {
             return "rgb(" + (122.5 - Math.sqrt(-d.sent) * 122.5) + ", 0, " + (122.5 + (Math.sqrt(-d.sent) * 122.5)) + ")";
         }
-        else { 
-            return "rgb(" + (122.5 - (Math.sqrt(d.sent) * 122.5)) + ", 0," + (122.5 + Math.sqrt(-d.sent) * 122.5) + ")"; 
+        else {
+            return "rgb(" + (122.5 - (Math.sqrt(d.sent) * 122.5)) + ", 0," + (122.5 + Math.sqrt(d.sent) * 122.5) + ")";
         }
     } else {
         //If none match set stroke to black

@@ -147,12 +147,7 @@ function OnChangeSelect(fieldName){
         d3.select("#" + fieldName).append('div').attr("id", "HEBFigure");
         let hebUIBox = d3.select('#' + fieldName).select("#upperbar").append('div').attr("id" , "hebUIBox");
 
-        hebUIBox.html('<span> From (year-month) </span>' +
-                      '<input id="startYear" class="yearInput" type="number" name="startYear" placeholder=1998>' + 
-                      '<input id="startMonth" class="monthInput"  type="number" name="startMonth" placeholder=01>' +
-                      '<span> to (year-month) </span>' + 
-                      '<input id="endYear" class="yearInput" type="number" name="endYear" placeholder=2002>' + 
-                      '<input id="endMonth" class="monthInput type="number" name="endMonth" placeholder=12>' + 
+        hebUIBox.html(
                       '<div>' +
                         '<input id="animateToggle" class="animToggle" type="checkbox">' +
                         '<label for="animateToggle"> animation </label>' +
