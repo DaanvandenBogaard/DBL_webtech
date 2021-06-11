@@ -106,9 +106,10 @@ function makeSankey(dataPath , fieldName) {
     
     brushLinkTrigger.on("input", function() {
       //Retrieve value from input field:
+      console.log("triggered brush link!" + fieldName);
       let val = d3.select("#" + fieldName).select("#brushLinkTrigger").attr("value");
       //Highlighed selected element:
-      d3.select("#id" + val).raise().attr("stroke", "black");
+      d3.selectAll("#id" + val).raise().attr("stroke", "black");
     })
       
     //Define sankey data by sankey.js
