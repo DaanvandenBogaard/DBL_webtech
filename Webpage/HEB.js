@@ -17,7 +17,7 @@ var colorSelected = "black";
 //Datapath is the location of the user's dataset. 
 //FieldName is the name (id) of the visualisationBox the dataset is currently in.
 function makeHEB(dataPath, fieldName) {
-
+    console.log(fieldName);
     d3.select("#" + fieldName).select("#HEBFigure").select("#HEBdiagram").remove();
 
     //Variables
