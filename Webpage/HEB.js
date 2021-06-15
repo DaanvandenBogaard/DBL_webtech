@@ -55,7 +55,7 @@ function makeHEB(dataPath, fieldName) {
     let margin = { top: 15, right: 10, bottom: 15, left: 10 };
     let figureHeight = 690; //changed this because it was too big for the current fieldsize, but ultimately this should not be hardcoded -Daan
     let figureWidth = 800; //changed this because it was too big for the current fieldsize, but ultimately this should not be hardcoded -Daan
-    let diameter = 600  ;
+    let diameter = 300  ;
     let radius = diameter / 2;
     let innerRadius = radius / 10;
 
@@ -258,7 +258,7 @@ function makeHEB(dataPath, fieldName) {
             .attr("cy", function (d, i) {
                 return circ_y(radius, i);
             })
-            .attr("r", 5)
+            .attr("r", 2.5)
             //Fills the circles according to jobtitle
             .attr("fill", function (d) {
                 var job_code = Jobtitles_list.indexOf(d.jobtitle);
@@ -275,7 +275,7 @@ function makeHEB(dataPath, fieldName) {
                     var angle = angleStep * i * 180 / Math.PI;
                 }
                 //Translate it on the circle with small increase in radius as to not overlap node circles, rotate in the same "transform"
-                return "translate(" + (350 + (radius + 6) * (Math.cos(((2 * Math.PI) / usableData.length) * i))) + ", " + (350 + (radius + 6) * (Math.sin(((2 * Math.PI) / usableData.length) * i))) + ") rotate(" + angle + ")"
+                return "translate(" + (350 + (radius + 6) * (Math.cos(((2 * Math.PI) / usableData.length) * i))) + ", " + (170 + (radius + 6) * (Math.sin(((2 * Math.PI) / usableData.length) * i))) + ") rotate(" + angle + ")"
             })
             .attr("text-anchor", function (d, i) {
                 //Check if achor needs to be left or right depending on if the text has been flipped
@@ -285,7 +285,7 @@ function makeHEB(dataPath, fieldName) {
                     return "start";
                 }
             })
-            .attr("font-size", "8pt")
+            .attr("font-size", "4pt")
             .attr("dominant-baseline", "central")
             .text(function (d, i) { return d.id; });
 
@@ -759,7 +759,7 @@ function circ_x(radius, index) {
 
 //Function for placement on HEB (Y)
 function circ_y(radius, index) {
-    return 350 + radius * (Math.sin(((2 * Math.PI) / usableData.length) * index));
+    return 170 + radius * (Math.sin(((2 * Math.PI) / usableData.length) * index));
 }
 
 //Function that finds the index of the first or last job that has the searched for jobtitle depending on the direction selected
