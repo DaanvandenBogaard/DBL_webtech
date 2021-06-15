@@ -382,7 +382,7 @@ button#closeButton{
 /* Visualisation UI */
 .upperVisBox {
 	height: 10%;
-	display: inline-block;
+	display: flex;
 	align-items: center;
 	justify-content: center; 
 }
@@ -424,10 +424,12 @@ div[class^='visField'], div[class*=' visField'] {
 #HEBFigure {
 	font-family: var(--font);
 	font-size: 10pt;
+	height: 90%;
 }
 
 #HEBdiagram {
 	margin-left: 100px;
+	height: 100%;
 }
 
 .yearInput {

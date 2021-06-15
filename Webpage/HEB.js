@@ -53,9 +53,9 @@ function makeHEB(dataPath, fieldName) {
 
     //Set dimensions
     let margin = { top: 15, right: 10, bottom: 15, left: 10 };
-    let figureHeight = 690; //changed this because it was too big for the current fieldsize, but ultimately this should not be hardcoded -Daan
+    let figureHeight = 450; //changed this because it was too big for the current fieldsize, but ultimately this should not be hardcoded -Daan
     let figureWidth = 800; //changed this because it was too big for the current fieldsize, but ultimately this should not be hardcoded -Daan
-    let diameter = 300  ;
+    let diameter = 360;
     let radius = diameter / 2;
     let innerRadius = radius / 10;
 
@@ -143,13 +143,13 @@ function makeHEB(dataPath, fieldName) {
         let div = d3.select("#" + fieldName).select("#HEBFigure")
             .append("div")
             .attr("id", "HEBdiagram")
-            .attr("width", figureWidth)
-            .attr("height", figureHeight);
+            .attr("Fakewidth", figureWidth)
+            .attr("Fakeheight", figureHeight);
 
         //retrieve width and height:
-        var height_HEB = parseFloat(div.attr("height")) -20  ;
-        var width_HEB = parseFloat(div.attr("width")) - 20;
-
+        var height_HEB = parseFloat(div.attr("Fakeheight")) -20  ;
+        var width_HEB = parseFloat(div.attr("Fakewidth")) - 20;
+        console.log(div.attr("Fakeheight"));
         let svg = div.append("svg")
         .attr("preserveAspectRatio", "xMinYMid meet")
         .attr("viewBox", "-5 0 " + width_HEB +" "+height_HEB)
@@ -275,7 +275,7 @@ function makeHEB(dataPath, fieldName) {
                     var angle = angleStep * i * 180 / Math.PI;
                 }
                 //Translate it on the circle with small increase in radius as to not overlap node circles, rotate in the same "transform"
-                return "translate(" + (350 + (radius + 6) * (Math.cos(((2 * Math.PI) / usableData.length) * i))) + ", " + (170 + (radius + 6) * (Math.sin(((2 * Math.PI) / usableData.length) * i))) + ") rotate(" + angle + ")"
+                return "translate(" + (350 + (radius + 6) * (Math.cos(((2 * Math.PI) / usableData.length) * i))) + ", " + (205 + (radius + 6) * (Math.sin(((2 * Math.PI) / usableData.length) * i))) + ") rotate(" + angle + ")"
             })
             .attr("text-anchor", function (d, i) {
                 //Check if achor needs to be left or right depending on if the text has been flipped
@@ -759,7 +759,7 @@ function circ_x(radius, index) {
 
 //Function for placement on HEB (Y)
 function circ_y(radius, index) {
-    return 170 + radius * (Math.sin(((2 * Math.PI) / usableData.length) * index));
+    return 205 + radius * (Math.sin(((2 * Math.PI) / usableData.length) * index));
 }
 
 //Function that finds the index of the first or last job that has the searched for jobtitle depending on the direction selected
