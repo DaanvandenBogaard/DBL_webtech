@@ -8,6 +8,14 @@ var tooltip;
 var outOfBounds = false;
 var dateRange;
 
+function MakeSankeyMenu(dataPath , fieldName) {
+  //Read the data:
+  d3.csv(dataPath).then(function(data) {
+  //gather 
+
+  });
+}
+
 function makeSankey(dataPath , fieldName) {
   //Initialise dateRange
   dateRange = findDateRange();

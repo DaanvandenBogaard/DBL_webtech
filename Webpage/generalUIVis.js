@@ -137,7 +137,7 @@ function OnChangeSelect(fieldName){
     //Now add new visualisation:	
     selectValue = d3.select("#" + fieldName).select('select').property('value');
     if (selectValue == "Sankey") {
-        makeSankey(localStorage.getItem('CurDataSet') , fieldName);
+      MakeSankeyMenu(localStorage.getItem('CurDataSet') , fieldName);
     } 
     else if (selectValue == "HEB") {
         /*TO THOMAS&BAS: hier zetten wij jullie UI weg, wil je deze later weghalen uit het bestand, aanpassen, of iets aan toevoegen? Doe dat hier!
