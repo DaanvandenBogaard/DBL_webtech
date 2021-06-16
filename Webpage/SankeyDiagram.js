@@ -21,11 +21,55 @@ function MakeSankeyMenu(dataPath , fieldName) {
     //Now, construct the outside of the Sankey menu (its shell so to speak).
     //Retrieve a list of all professions:
     let SankeyMenuDiv = d3.select("#" + fieldName).append("div").attr("id" , "SankeyMenu").attr("class" , "SankeyMenu");
+    //Append empty input field:
     let Jobs = collectJobs(data);
+    let selectedIDS = new Array();
     Jobs.forEach(function(d){
       SankeyMenuDiv.append("button").attr("type", "button").attr("class" , "collapsible").html("<h3>" + d + "</h3>");
-      SankeyMenuDiv.append("div").attr("class" , "SankeyMenuContent").html("test`1");
+      let curDiv = SankeyMenuDiv.append("div").attr("class" , "SankeyMenuContent");
+      //Now, for each user, draw the appropriate button:
+      userData.forEach(function(userElement){
+        //Only draw if the user has the right job
+        if (d == userElement['Job']) {
+          //Make an SVG for the user:
+          let userSVG = curDiv.append("svg")
+                              .attr("width" , 100)
+                              .attr("height", 100);
+          let userSelector = userSVG.append("g").attr("id" , "userSelector");
+
+          //Append visual elements:
+          userSelector.append("circle")
+                      .attr("cx" , 50)
+                      .attr("cy" , 50)
+                      .attr("r" , 42)
+                      .attr("fill" , getColor(userElement["ID"]));
+          let userText = userSelector.append("text")
+                      .attr("y" , 50)
+                      .attr("x", 50)
+                      .attr("fill", "white")
+                      .attr("font-size", 50)
+                      .attr('text-anchor', 'middle')
+                      .attr('alignment-baseline', 'central')
+                      .text(userElement['ID']);
+          //Add events: 
+          userSelector.on("click" , function(event){
+            if (selectedIDS.includes(userElement['ID'])) {
+              //delete element
+              selectedIDS.splice(selectedIDS.indexOf(userElement['ID']),1)
+              userText.attr("fill" , "white");
+            }
+            else {
+              //add element:
+              selectedIDS.push(userElement['ID']);
+              userText.attr("fill" , "black");
+            }
+            console.log(selectedIDS);
+
+          });
+        }
+      });
     });
+    //Make "StartSankey" button
 
 
     //"activate" collapsability:
@@ -82,6 +126,10 @@ function collectIDSInfo(data) {
       }
     } 
   );
+
+  userInfo.sort(function(a,b) {
+    return a.ID - b.ID
+  });
   return userInfo; 
 }
 
