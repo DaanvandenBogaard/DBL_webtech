@@ -11,9 +11,50 @@ var dateRange;
 function MakeSankeyMenu(dataPath , fieldName) {
   //Read the data:
   d3.csv(dataPath).then(function(data) {
-  //gather 
-
+    //convert to numbers:
+    data.forEach(function(d) {
+      d.fromId = +d.fromId; 
+      d.sentiment = +d.sentiment;
+      d.toId = +d.toId; 
+    });
+    let userData = collectIDSInfo(data);
+    console.log(userData);
   });
+}
+
+//A function to collect all IDs and information about people.
+function collectIDSInfo(data) {
+  /*
+  //All fromIDS:
+  let fromIDS = data.map(function(d) {
+      return d.fromId
+  });
+  //All toIDS:
+  let toIDS = data.map(function(d) {
+    return d.toId
+  });
+  
+  //Concatenation of all IDS:
+  let IDSraw = fromIDS.concat(toIDS);
+  //distinct IDs:
+  let IDS = [... new Set(IDSraw)];
+  //Now, we must retrieve the data from all of these points.
+  */
+  var userList = new Array();
+  var userInfo = new Array();
+  data.forEach( 
+    function(d){
+      if (!userList.includes(d.fromId) && d.fromId != d.toId) {
+        userList.push(d.fromId);
+        userInfo.push({"ID" : d.fromId , "Email" : d.fromEmail , "Job" : d.fromJobtitle});
+      }
+      if (!userList.includes(d.toId)) {
+        userList.push(d.toId);
+        userInfo.push({"ID" : d.toId , "Email" : d.toEmail , "Job" : d.toJobtitle});
+      }
+    } 
+  );
+  return userInfo; 
 }
 
 function makeSankey(dataPath , fieldName) {
