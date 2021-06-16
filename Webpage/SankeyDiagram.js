@@ -70,6 +70,13 @@ function MakeSankeyMenu(dataPath , fieldName) {
       });
     });
     //Make "StartSankey" button
+    let toSankeyButton = d3.select("#" + fieldName).select("#upperbar").append("button");
+    toSankeyButton.on("click" , function(d){
+
+      makeSankey(dataPath , fieldName , selectedIDS);
+      SankeyMenuDiv.remove();
+      toSankeyButton.remove();
+    });
 
 
     //"activate" collapsability:
@@ -133,12 +140,20 @@ function collectIDSInfo(data) {
   return userInfo; 
 }
 
-function makeSankey(dataPath , fieldName) {
+function makeSankey(dataPath , fieldName , idNums) {
+  //Make the "GoBackButton"
+   let menuButton = d3.select("#" + fieldName).select("#upperbar").append("button");
+   menuButton.on("click" , function(d){
+    MakeSankeyMenu(dataPath , fieldName);
+    menuButton.remove();
+    d3.select("#" + fieldName).selectAll("svg").remove();
+    d3.select("#" + fieldName).selectAll(".tooltip").remove();	
+    d3.select("#" + fieldName).selectAll("#sankeyID").remove();
+   });
+
+
   //Initialise dateRange
   dateRange = findDateRange();
-  //Ask the user for the desired ID numbers:
-  var idInput = window.prompt("Enter ID-numbers (seperated by commas):")
-  let idNums = JSON.parse("[" + idInput + "]");
   //We start by making the SVG element.
   let margin = {top : 15, right : 10, bottom: 15, left: 10} //For now, hardcoded margins 
   //var width = 1500; //for now, hardcoded width
