@@ -133,6 +133,7 @@ function OnChangeSelect(fieldName){
     d3.select("#" + fieldName).selectAll("#sankeyID").remove();
     d3.select("#" + fieldName).selectAll("#hebUIBox").remove();
     d3.select("#" + fieldName).selectAll("#MSVID").remove();
+    d3.select("#" + fieldName).selectAll("#SankeyMenu").remove();
 
     //Now add new visualisation:	
     selectValue = d3.select("#" + fieldName).select('select').property('value');

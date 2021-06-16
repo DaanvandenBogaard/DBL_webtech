@@ -18,28 +18,56 @@ function MakeSankeyMenu(dataPath , fieldName) {
       d.toId = +d.toId; 
     });
     let userData = collectIDSInfo(data);
-    console.log(userData);
+    //Now, construct the outside of the Sankey menu (its shell so to speak).
+    //Retrieve a list of all professions:
+    let SankeyMenuDiv = d3.select("#" + fieldName).append("div").attr("id" , "SankeyMenu").attr("class" , "SankeyMenu");
+    let Jobs = collectJobs(data);
+    Jobs.forEach(function(d){
+      SankeyMenuDiv.append("button").attr("type", "button").attr("class" , "collapsible").html("<h3>" + d + "</h3>");
+      SankeyMenuDiv.append("div").attr("class" , "SankeyMenuContent").html("test`1");
+    });
+
+
+    //"activate" collapsability:
+    var coll = document.getElementById(fieldName).getElementsByClassName("collapsible");
+    let randomI;
+
+    for (randomI = 0; randomI < coll.length; randomI++) {
+      coll[randomI].addEventListener("click", function() {
+        this.classList.toggle("active");
+        var content = this.nextElementSibling;
+        if (content.style.display === "block") {
+         content.style.display = "none";
+        }
+        else {
+          content.style.display = "block";
+        }
+      });
+    }
+
+
   });
+}
+
+//A function to collect all professtions
+function collectJobs(data) {
+  //All fromIDS:
+  let fromJobs = data.map(function(d) {
+      return d.fromJobtitle
+  });
+  //All toIDS:
+  let toJobs = data.map(function(d) {
+    return d.toJobtitle
+  });
+  
+  //Concatenation of all IDS:
+  let jobsRaw = fromJobs.concat(toJobs);
+  //distinct IDs:
+  return Jobs = [... new Set(jobsRaw)];
 }
 
 //A function to collect all IDs and information about people.
 function collectIDSInfo(data) {
-  /*
-  //All fromIDS:
-  let fromIDS = data.map(function(d) {
-      return d.fromId
-  });
-  //All toIDS:
-  let toIDS = data.map(function(d) {
-    return d.toId
-  });
-  
-  //Concatenation of all IDS:
-  let IDSraw = fromIDS.concat(toIDS);
-  //distinct IDs:
-  let IDS = [... new Set(IDSraw)];
-  //Now, we must retrieve the data from all of these points.
-  */
   var userList = new Array();
   var userInfo = new Array();
   data.forEach( 
