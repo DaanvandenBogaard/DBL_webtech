@@ -90,7 +90,8 @@ function makeHEB(dataPath, fieldName) {
         startDate = parseInt(startYear + startMonth + startDay);
         endDate = parseInt(endYear + endMonth + endDay);
         var curYear = parseInt(startYear);
-        var curDate = startDate;
+        var curDate = parseInt(startYear + startMonth);
+        console.log(startDate +"sdisdiasnasd")
         console.log(startDate);
         //Construct array with data in a usable order 
         data.forEach(function (d) {
@@ -340,7 +341,7 @@ function makeHEB(dataPath, fieldName) {
 
                         //If animation is not selected check for mails between dates, if animation is selected check for mails in specific month
                         if ((!doAnimate && (d.mails[k]["date"] >= startDate && d.mails[k]["date"] <= endDate)) ||
-                            (doAnimate && d.mails[k]["date"] == curDate)) {
+                            (doAnimate && String(d.mails[k]["date"]).substr(0, 6) == curDate)) {
                             var fromId = d.mails[k]["from"];
                             var toId = d["id"];
                             var senti = d.mails[k]["sent"];
@@ -469,7 +470,7 @@ function makeHEB(dataPath, fieldName) {
         var curMonthText = curMonthDisplay.append("text")
             .attr("font-size", "11pt")
             .attr("x", 280)
-            .attr("y", 12)
+            .attr("y", 10)
             .text("Current month: " + String(curDate).substr(0, 4) + "-" + String(curDate).substr(4, 6));
 
         //Make array for legend content
@@ -711,7 +712,7 @@ function makeHEB(dataPath, fieldName) {
         function nextFrame() {
 
             //If animation has not reached the endDate, go to next month
-            if (curDate != endDate && !isPaused) {
+            if (curDate != String(endDate).substr(0, 6) && !isPaused) {
                 if (curDate % 100 < 12) {
                     curDate++;
                 } else {
