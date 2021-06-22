@@ -85,7 +85,6 @@ function makeMSV(dataPath, fieldName) {
 
         //Draw edges and create buttons etc
         drawEdges(data, IDS,  colouring, fieldName, minMaxDates[0]);
-        (currentColouring, fieldName, false);
     }); 
 }
 
@@ -261,7 +260,7 @@ function updateType(selected, selectedColouring, data, IDS, colouring, currentID
 
     //draw new MSV
     drawEdges(data, currentIDS, currentColouring, fieldName, firstDate);
-    createLegend(currentColouring, fieldName);
+    createLegend(currentColouring, fieldName, currentIDS);
 }
 
 
@@ -508,7 +507,7 @@ function createBlockBox( data, currentIDS, currentColouring, val, fieldName){
             
             //draw new edges 
             drawEdges(data, currentIDS, currentColouring, fieldName);
-            createLegend(currentColouring, fieldName);
+            createLegend(currentColouring, fieldName, currentIDS);
         })
         .on("keyup", function(d){
             //Handle min max on display
@@ -583,21 +582,21 @@ Parameters:
 Returns:
     None
 */
-function createLegend(currentColouring, fieldName){
+function createLegend(currentColouring, fieldName, ids){
     //Get the type of the colouring
     let type = d3.select(fieldName).select('#MSVID').select(".selectColor").property("value");
     //make the legend corresponding to the type
     if(type === "From-To"){
-        standardLegend(type, fieldName);
+        standardLegend(type, fieldName, ids);
     }
     else if(type === "Length"){
-        standardLegend(type, fieldName);
+        standardLegend(type, fieldName, ids);
     }
     else if(type === "Sentiment"){
-        standardLegend(type, fieldName);
+        standardLegend(type, fieldName, ids);
     }
     else if(type === "Blocks"){
-        blockLegend(currentColouring, fieldName);
+        blockLegend(currentColouring, fieldName, ids);
     } 
 
 }
@@ -608,7 +607,7 @@ Parameters:
 Returns:
     None
 */
-function standardLegend(type, fieldName){
+function standardLegend(type, fieldName, ids){
     let legendSVG = d3.select(fieldName).select("#MSVID").select("#visualisation");
     //create SVG that shall contain everything of the legend
 
@@ -629,14 +628,15 @@ function standardLegend(type, fieldName){
         
     //create the bar of the legend and apply the gradient. Also add the text corresponding to the type
     legendSVG.append("g").append("rect")
-        .attr("x", 0.4 * parseInt(legendSVG.style("width")))
-        .attr("width",  0.2 * parseInt(legendSVG.style("width")))
-        .attr("height",10)
+        .attr("x", 0.4 * parseInt(d3.select(fieldName).select("#MSVID").style("width")))
+        .attr("y", ids.length * 1.2)
+        .attr("width",  0.2 * parseInt(d3.select(fieldName).select("#MSVID").style("width")))
+        .attr("height", 10)
         .style("fill", "url(#myGradient)") 
         .attr("class", "legend")
     legendSVG.append("text")
-        .attr('x', 0.4 * parseInt(legendSVG.style("width")))
-        .attr('y', 20)
+        .attr('x', 0.4 * parseInt(d3.select(fieldName).select("#MSVID").style("width")))
+        .attr('y', 20 +  ids.length * 1.2)
         .attr("font-size", 12)  
         .text(function(d){
             if(type == "Length"){return "Shortest"}
@@ -646,8 +646,8 @@ function standardLegend(type, fieldName){
         .attr("class", "legend")
     legendSVG.append("text")
         .attr("text-anchor", "end")
-        .attr('x', 0.6 * parseInt(legendSVG.style("width")))
-        .attr('y', 20)
+        .attr('x', 0.6 *parseInt(d3.select(fieldName).select("#MSVID").style("width")))
+        .attr('y', 20 + ids.length * 1.2)
         .attr("font-size", 12)  
         .text(function(d){
             if(type == "Length"){return "Longest"}
