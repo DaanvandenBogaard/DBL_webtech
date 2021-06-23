@@ -115,6 +115,9 @@ function drawEdges(data, IDS, colouring, fieldName, firstDate){
     else if(selectedColouring === "Blocks"){
         blockEdges(data, IDS, colouring, lines, firstDate, tooltip);
     }
+    else if(selectedColouring === "Sentiment"){
+        sentimentEdges(data, IDS, colouring, lines, firstDate, tooltip);
+    }
     else {
         normalEdges(data, IDS, colouring, lines, firstDate, tooltip);
     }
@@ -311,7 +314,7 @@ function gradientEdges(data, IDS, fieldName, firstDate, tooltip) {
                 .on("mouseover", function(event, d) {	
                     tooltip.style("opacity", .9);	
                     tooltip.style("display","inline");	
-                    tooltip.html("Mail from " + data[i].fromEmail + " to " + data[i].toEmail + " on " + addDays(firstDate, data[i].time - 1) + ".")	
+                    tooltip.html("Mail from " + "&#10;" +  data[i].fromEmail + "&#10;" + "to" + "&#10;" + data[i].toEmail + ". &#10;" + "On " + addDays(firstDate, data[i].time - 1) + ".")
                         .style("left",  (event.x + 10) + "px")		
                         .style("top", (event.y - 28) + "px")
                         .style("fill", "black");
@@ -354,7 +357,7 @@ function gradientEdges(data, IDS, fieldName, firstDate, tooltip) {
                 .on("mouseover", function(event, d) {	
                     tooltip.style("opacity", .9);	
                     tooltip.style("display","inline");	
-                    tooltip.html("Mail from " + data[i].fromEmail + " to " + data[i].toEmail + " on " + addDays(firstDate, data[i].time - 1) + ".")	
+                    tooltip.html("Mail from " + "&#10;" +  data[i].fromEmail + "&#10;" + "to" + "&#10;" + data[i].toEmail + ". &#10;" + "On " + addDays(firstDate, data[i].time - 1) + ".")
                         .style("left",  (event.x + 10) + "px")		
                         .style("top", (event.y - 28) + "px")
                         .style("fill", "black");
@@ -437,7 +440,7 @@ function normalEdges(data, IDS, colouring, lines, firstDate, tooltip){
             .on("mouseover", function(event, d) {	
                 tooltip.style("opacity", .9);	
                 tooltip.style("display","inline");	
-                tooltip.html("Mail from " + data[i].fromEmail + " to " + data[i].toEmail + " on " + addDays(firstDate, data[i].time - 1) + ".")	
+                tooltip.html("Mail from " + "&#10;" +  data[i].fromEmail + "&#10;" + "to" + "&#10;" + data[i].toEmail + ". &#10;" + "On " + addDays(firstDate, data[i].time - 1) + ".")
                     .style("left",  (event.x + 10) + "px")		
                     .style("top", (event.y - 28) + "px")
                     .style("fill", "black");
@@ -530,19 +533,19 @@ function blockEdges(data, IDS, colouring, lines, firstDate, tooltip){
 
 function sentimentEdges(data, IDS, colouring, lines, firstDate, tooltip){
     let sentColour = new Array();
-   // meanDev 
+    meanDev = calcMeandev(data); 
     //draw edges, with animation if dataset < 3500, otherwise without
        
     for(let i = 0; i < data.length; i++) {
 
         //make an array of all indices that have a non #D4D4D4 colouring
-        if(colouring[i] != "#D4D4D4"){
+        if(Math.abs(data[i].sentiment) > meanDev){
             sentColour[sentColour.length] = i;
         }
         
         //draw unimportant edges
         lines.append('line')
-            .style("stroke",  "#D4D4D4")
+            .style("stroke",  colouring[i])
             .style("stroke-width", 1)
             .attr("id", "line" + i)
             .attr("x1", data[i].time )
@@ -552,7 +555,7 @@ function sentimentEdges(data, IDS, colouring, lines, firstDate, tooltip){
             .on("mouseover", function(event, d) {	
                 tooltip.style("opacity", .9);	
                 tooltip.style("display","inline");	
-                tooltip.html("Mail from " + data[i].fromEmail + " to " + data[i].toEmail + " on " + addDays(firstDate, data[i].time - 1) + ".")	
+                tooltip.html("Mail from " + "&#10;" +  data[i].fromEmail + "&#10;" + "to" + "&#10;" + data[i].toEmail + ". &#10;" + "On " + addDays(firstDate, data[i].time - 1) + "." + "&#10;" + "Sentiment: " +  data[i].sentiment.toFixed(2))
                     .style("left",  (event.x + 10) + "px")		
                     .style("top", (event.y - 28) + "px")
                     .style("fill", "black");
@@ -566,21 +569,21 @@ function sentimentEdges(data, IDS, colouring, lines, firstDate, tooltip){
             });
     }
     //draw important edges so they will be on top
-    for(let i = 0; i < blockColours.length; i++){
+    for(let i = 0; i < sentColour.length; i++){
         //remove the edges so they wont be drawn twice
-        lines.select("#line" + blockColours[i]).remove();
+        lines.select("#line" + sentColour[i]).remove();
         //draw the coloured edges 
         lines.append('line')
-            .style("stroke",  colouring[blockColours[i]])
+            .style("stroke",  colouring[sentColour[i]])
             .style("stroke-width", 1)
-            .attr("x1", data[blockColours[i]].time)
-            .attr("y1", IDS[data[blockColours[i]].fromId])
-            .attr("x2", data[blockColours[i]].time)
-            .attr("y2", IDS[data[blockColours[i]].toId])
+            .attr("x1", data[sentColour[i]].time)
+            .attr("y1", IDS[data[sentColour[i]].fromId])
+            .attr("x2", data[sentColour[i]].time)
+            .attr("y2", IDS[data[sentColour[i]].toId])
             .on("mouseover", function(event, d) {	
                 tooltip.style("opacity", .9);	
                 tooltip.style("display","inline");	
-                tooltip.html("Mail from " + data[blockColours[i]].fromEmail + " to " + data[blockColours[i]].toEmail + " on " + addDays(firstDate, data[blockColours[i]].time - 1) + ".")	
+                tooltip.html("Mail from " + "&#10;" +  data[sentColour[i]].fromEmail + "&#10;" + "to" + "&#10;" + data[sentColour[i]].toEmail + ". &#10;" + "On " + addDays(firstDate, data[sentColour[i]].time - 1) + "." + "&#10;" + "Sentiment: " +  data[sentColour[i]].sentiment.toFixed(2))	
                     .style("left",  (event.x + 10) + "px")		
                     .style("top", (event.y - 28) + "px")
                     .style("fill", "black");
@@ -590,7 +593,7 @@ function sentimentEdges(data, IDS, colouring, lines, firstDate, tooltip){
             .on("mouseout", function(d) {		
                 tooltip.style("opacity", 0.2)
                 .style("display","none");
-                d3.select(this).style("stroke", colouring[blockColours[i]])
+                d3.select(this).style("stroke", colouring[sentColour[i]])
             });
     }
 }
@@ -994,4 +997,12 @@ function addDays(date, days){
     //returnDate = returnDate.substring(0, returnDate.indexOf("00:00:00"));
     console.log(returnDate)
     return returnDate;
+}
+
+function calcMeandev(data){
+    let sum =  0;
+    for(let i = 0; i < data.length; i++){
+        sum += Math.abs(data[i].sentiment);
+    }
+    return sum / data.length;
 }
