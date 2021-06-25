@@ -30,7 +30,13 @@ function MakeDataSetSelector(dataSets) {
             newOption.text = d;
             selector.add(newOption);
         }
-    }); 
+    });
+
+        //dont mind me :)
+        d3.select("#toolbar").append("input")
+        .attr('type', 'color')
+        .attr('value', 'black')
+        .attr('id', 'msvColor')   
 }
 
 //ActionListener for DataSetSelector:
@@ -289,13 +295,14 @@ function MakeGeneralTimeManager(dataset){
 }
 
 //A function which will alert all visualisations on a change of date.
-function AlertVisualisationsDate() {
+function AlertVisualisationsDate(dataset) {
   //First, gather a list of all visualisations.
   var visblocks = d3.selectAll(".visField"); //D3 equivalent of document.getElementsByClassName("visField");
   //Now, per visualisation, integrate the correct call:
   //Sankey:
     //The sankey has a hidden input box with an onchange event listener.
     d3.selectAll("#sankeyTrigger").dispatch("input");
+    d3.selectAll("#MSVtrigger").dispatch("input");
 }
 
 //ASYNCHRONOUS!!!

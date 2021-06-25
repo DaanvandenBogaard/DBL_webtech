@@ -16,6 +16,7 @@ function makeMSV(dataPath, fieldName) {
     let textpadding = 10;
     var nodeWidthMSV = 80;
     var monthToTime = [0, 31, 59, 90, 120, 151, 181, 212, 243, 273, 304, 334];
+
     let zoom = d3.zoom()
         .on('zoom', (event) => {
             svg.attr('transform', event.transform);
@@ -40,20 +41,56 @@ function makeMSV(dataPath, fieldName) {
                .attr("height", height)
                .attr("transform" , "translate(" + margin.left  + "," + margin.top +")")
                
-    
+    d3.select(fieldName).select("#MSVID").append("input")
+        .style("display", "none")
+        .attr("id", "MSVtrigger")
+        .on("input", function(){
+            d3.select(fieldName).selectAll("#MSVID").remove();
+            console.log("WREEEEEEEEEEEEEEEE")
+            makeMSV(dataPath, fieldName.substring(1, fieldName.length));
+        })
+
+
     //This loads the data, make sure to only use the data in this section:
     d3.csv(dataPath).then(function(data) {
         //Since d3.csv is asynchronous (it is not loaded immediatly, but it is a request to the webserver) we need all our code from the data in here. 
-        //convert to numbers:
 
         //As well as turning date into a number
         data.forEach(function(d) {
           d.fromId = +d.fromId; 
           d.sentiment = +d.sentiment;
           d.toId = +d.toId;
+
+        //Add the d.time to get a representative variable for slicing:
+        let timeData = d.date.split("-");
+        d.year = +timeData[0];
+        d.month = +timeData[1];
+        d.day = +timeData[2];
+
           d.time = (d.date.replace('-','')).replace('-','');
+          
         })
 
+        //filter data
+        let dateRange = findDateRange();
+        let startDate = (dateRange['fromYear'] + dateRange['fromMonth'] + dateRange['fromDay']);
+        let endDate = (dateRange['toYear'] + dateRange['toMonth'] + dateRange['toDay']);
+        data = data.filter(function(d){
+           //Check wether or not the data tuple is in our dateRange. 
+           let isInRange = false;
+           let date = 10000 * d.year + 100 * d.month + d.day;
+           if(Math.random() > 0.95){
+           console.log(startDate + " " + date + " " + endDate)
+           console.log(dateRange['fromDay'])
+           }
+           //Check whether it is on the correct year:
+           if (startDate <=  date && date <= endDate) {
+             isInRange = true;
+           }
+
+           return isInRange;
+         }); 
+        
         //Create an array of unique ids and a subset array that reassigns values to ids ranging from 0 to n
         let idList = collectIDS(data);
         idList = subsetList(idList);
@@ -311,6 +348,8 @@ function gradientEdges(data, IDS, fieldName, firstDate, tooltip) {
                 .attr("y1", IDS[data[i].fromId] )
                 .attr("x2", data[i].time )
                 .attr("y2", IDS[data[i].toId])
+                .attr('value', "url(#grad" + i + ")")
+                .attr("id", "i" + data[i].fromId + data[i].toId + data[i].time)
                 .on("mouseover", function(event, d) {	
                     tooltip.style("opacity", .9);	
                     tooltip.style("display","inline");	
@@ -318,13 +357,17 @@ function gradientEdges(data, IDS, fieldName, firstDate, tooltip) {
                         .style("left",  (event.x + 10) + "px")		
                         .style("top", (event.y - 28) + "px")
                         .style("fill", "black");
+                    d3.selectAll("#" + this.id).each(function(d){
                     d3.select(this).style("stroke", "black")
-                    d3.select(this).raise()
+                    .raise()
+                })
                     })					
                 .on("mouseout", function(d) {		
                     tooltip.style("opacity", 0.2)
                     .style("display","none");
-                    d3.select(this).style("stroke", colouring[i])
+                    d3.selectAll("#" + this.id).each(function(d){
+                        d3.select(this).style("stroke", "" + this.getAttribute('value'))
+                    })  
                 });
         } 
         else {
@@ -354,6 +397,8 @@ function gradientEdges(data, IDS, fieldName, firstDate, tooltip) {
                 .attr("y1", IDS[data[i].toId] )
                 .attr("x2", data[i].time )
                 .attr("y2", IDS[data[i].fromId])
+                .attr('value', "url(#grad" + i + ")")
+                .attr("id", "i" + data[i].fromId + data[i].toId + data[i].time)
                 .on("mouseover", function(event, d) {	
                     tooltip.style("opacity", .9);	
                     tooltip.style("display","inline");	
@@ -361,62 +406,21 @@ function gradientEdges(data, IDS, fieldName, firstDate, tooltip) {
                         .style("left",  (event.x + 10) + "px")		
                         .style("top", (event.y - 28) + "px")
                         .style("fill", "black");
+                    d3.selectAll("#" + this.id).each(function(d){
                     d3.select(this).style("stroke", "black")
-                    d3.select(this).raise()
+                    .raise()
+                })
                     })					
                 .on("mouseout", function(d) {		
                     tooltip.style("opacity", 0.2)
                     .style("display","none");
-                    d3.select(this).style("stroke", colouring[i])
+                    d3.selectAll("#" + this.id).each(function(d){
+                        d3.select(this).style("stroke", "" + this.getAttribute('value'))
+                    })  
                 });
         }
     }
 }
-
-/*blockEdges: Draws and colours the edges corresponding to the blockcolouring and makes sure the coloured edges get drawn on top
-Parameters:
-   data: data object of the edges
-   IDS: sequential list of node appearance
-   colouring: Array containing the colour of the edge corresponding to the index of the data
-   lines: element in which the lines should be drawn
-Returns:
-    None
-*/
-/*function blockEdges(data, IDS, colouring, lines){
-    let blockColours = new Array();
-    //draw edges, with animation if dataset < 3500, otherwise without
-    if(data.length < 3500){              
-        for(let i = 0; i < data.length; i++) {
-            //make an array of all indices that have a non #D4D4D4 colouring
-            if(colouring[i] != "#D4D4D4"){
-                blockColours[blockColours.length] = i;
-            }
-
-            //draw unimportant edges
-            lines.append('line')
-                .style("stroke",  "#D4D4D4")
-                .style("stroke-width", 1)
-                .attr("id", "line" + i)
-                .attr("x1", data[i].time )
-                .attr("y1", IDS[data[i].fromId] )
-                .attr("x2", data[i].time )
-                .attr("y2", IDS[data[i].toId])
-        }
-        //draw important edges so they will be on top
-        for(let i = 0; i < blockColours.length; i++){
-            //remove the edges so they wont be drawn twice
-            lines.select("#line" + blockColours[i]).remove();
-            //draw the coloured edges 
-            lines.append('line')
-                .style("stroke",  colouring[blockColours[i]])
-                .style("stroke-width", 1)
-                .attr("x1", data[blockColours[i]].time)
-                .attr("y1", IDS[data[blockColours[i]].fromId])
-                .attr("x2", data[blockColours[i]].time)
-                .attr("y2", IDS[data[blockColours[i]].toId])
-        }
-    }
-} */
 
 /*normalEdges: Draws and colours the edges corresponding to the indicated colouring, works for any other colouring than fromTo and Block
 Parameters:
@@ -437,6 +441,8 @@ function normalEdges(data, IDS, colouring, lines, firstDate, tooltip){
             .attr("y1", IDS[data[i].fromId])
             .attr("x2", data[i].time )
             .attr("y2", IDS[data[i].toId])
+            .attr('value', colouring[i])
+            .attr("id", "i" + data[i].fromId + data[i].toId + data[i].time)
             .on("mouseover", function(event, d) {	
                 tooltip.style("opacity", .9);	
                 tooltip.style("display","inline");	
@@ -444,13 +450,17 @@ function normalEdges(data, IDS, colouring, lines, firstDate, tooltip){
                     .style("left",  (event.x + 10) + "px")		
                     .style("top", (event.y - 28) + "px")
                     .style("fill", "black");
-                d3.select(this).style("stroke", "black")
-                d3.select(this).raise()
+                d3.selectAll("#" + this.id).each(function(d){
+                    d3.select(this).style("stroke", "" + d3.select("#msvColor").property('value'))
+                    .raise()
+                })    
                 })					
             .on("mouseout", function(d) {		
                 tooltip.style("opacity", 0.2)
-                .style("display","none");
-                d3.select(this).style("stroke", colouring[i])
+                .style("display","none");  
+                d3.selectAll("#" + this.id).each(function(d){
+                    d3.select(this).style("stroke", "" + this.getAttribute('value'))
+                })    
             });
         }
 }
@@ -485,6 +495,8 @@ function blockEdges(data, IDS, colouring, lines, firstDate, tooltip){
             .attr("y1", IDS[data[i].fromId] )
             .attr("x2", data[i].time )
             .attr("y2", IDS[data[i].toId])
+            .attr('value', colouring[i])
+            .attr("id", "i" + data[i].fromId + data[i].toId + data[i].time)
             .on("mouseover", function(event, d) {	
                 tooltip.style("opacity", .9);	
                 tooltip.style("display","inline");	
@@ -492,13 +504,17 @@ function blockEdges(data, IDS, colouring, lines, firstDate, tooltip){
                     .style("left",  (event.x + 10) + "px")		
                     .style("top", (event.y - 28) + "px")
                     .style("fill", "black");
-                d3.select(this).style("stroke", "black")
-                d3.select(this).raise()
+                d3.selectAll("#" + this.id).each(function(d){
+                    d3.select(this).style("stroke", "black")
+                    .raise()
+                })
                 })					
             .on("mouseout", function(d) {		
                 tooltip.style("opacity", 0.2)
                 .style("display","none");
-                d3.select(this).style("stroke", colouring[i])
+                d3.selectAll("#" + this.id).each(function(d){
+                    d3.select(this).style("stroke", "" + this.getAttribute('value'))
+                })
             });
     }
     //draw important edges so they will be on top
@@ -513,6 +529,8 @@ function blockEdges(data, IDS, colouring, lines, firstDate, tooltip){
             .attr("y1", IDS[data[blockColours[i]].fromId])
             .attr("x2", data[blockColours[i]].time)
             .attr("y2", IDS[data[blockColours[i]].toId])
+            .attr('value', colouring[blockColours[i]])
+            .attr("id", "i" + data[blockColours[i]].fromId + data[blockColours[i]].toId + data[blockColours[i]].time)
             .on("mouseover", function(event, d) {	
                 tooltip.style("opacity", .9);	
                 tooltip.style("display","inline");	
@@ -520,13 +538,17 @@ function blockEdges(data, IDS, colouring, lines, firstDate, tooltip){
                     .style("left",  (event.x + 10) + "px")		
                     .style("top", (event.y - 28) + "px")
                     .style("fill", "black");
-                d3.select(this).style("stroke", "black")
-                d3.select(this).raise()
+                d3.selectAll("#" + this.id).each(function(d){
+                    d3.select(this).style("stroke", "black")
+                    .raise()
+                })
                 })					
             .on("mouseout", function(d) {		
                 tooltip.style("opacity", 0.2)
                 .style("display","none");
-                d3.select(this).style("stroke", colouring[blockColours[i]])
+                d3.selectAll("#" + this.id).each(function(d){
+                    d3.select(this).style("stroke", "" + this.getAttribute('value'))
+                })    
             });
     }
 }
@@ -552,6 +574,8 @@ function sentimentEdges(data, IDS, colouring, lines, firstDate, tooltip){
             .attr("y1", IDS[data[i].fromId] )
             .attr("x2", data[i].time )
             .attr("y2", IDS[data[i].toId])
+            .attr('value', colouring[i])
+            .attr("id", "i" + data[i].fromId + data[i].toId + data[i].time)
             .on("mouseover", function(event, d) {	
                 tooltip.style("opacity", .9);	
                 tooltip.style("display","inline");	
@@ -559,13 +583,17 @@ function sentimentEdges(data, IDS, colouring, lines, firstDate, tooltip){
                     .style("left",  (event.x + 10) + "px")		
                     .style("top", (event.y - 28) + "px")
                     .style("fill", "black");
-                d3.select(this).style("stroke", "black")
-                d3.select(this).raise()
+                d3.selectAll("#" + this.id).each(function(d){
+                    d3.select(this).style("stroke", "black")
+                    .raise()
+                })
                 })					
             .on("mouseout", function(d) {		
                 tooltip.style("opacity", 0.2)
                 .style("display","none");
-                d3.select(this).style("stroke", colouring[i])
+                d3.selectAll("#" + this.id).each(function(d){
+                    d3.select(this).style("stroke", "" + this.getAttribute('value'))
+                })  
             });
     }
     //draw important edges so they will be on top
@@ -580,6 +608,8 @@ function sentimentEdges(data, IDS, colouring, lines, firstDate, tooltip){
             .attr("y1", IDS[data[sentColour[i]].fromId])
             .attr("x2", data[sentColour[i]].time)
             .attr("y2", IDS[data[sentColour[i]].toId])
+            .attr('value', colouring[i])
+            .attr("id", "i" + data[sentColour[i]].fromId + data[sentColour[i]].toId + data[sentColour[i]].time)
             .on("mouseover", function(event, d) {	
                 tooltip.style("opacity", .9);	
                 tooltip.style("display","inline");	
@@ -587,13 +617,17 @@ function sentimentEdges(data, IDS, colouring, lines, firstDate, tooltip){
                     .style("left",  (event.x + 10) + "px")		
                     .style("top", (event.y - 28) + "px")
                     .style("fill", "black");
-                d3.select(this).style("stroke", "black")
-                d3.select(this).raise()
+                d3.selectAll("#" + this.id).each(function(d){
+                    d3.select(this).style("stroke", "black")
+                    .raise()
+                })
                 })					
             .on("mouseout", function(d) {		
                 tooltip.style("opacity", 0.2)
                 .style("display","none");
-                d3.select(this).style("stroke", colouring[sentColour[i]])
+                d3.selectAll("#" + this.id).each(function(d){
+                    d3.select(this).style("stroke", "" + this.getAttribute('value'))
+                })   
             });
     }
 }
@@ -993,9 +1027,7 @@ function addDays(date, days){
     var result = new Date(date);
     result.setDate(result.getDate() + days);
     var returnDate = result.toDateString();
-    console.log(returnDate)
     //returnDate = returnDate.substring(0, returnDate.indexOf("00:00:00"));
-    console.log(returnDate)
     return returnDate;
 }
 
@@ -1004,5 +1036,6 @@ function calcMeandev(data){
     for(let i = 0; i < data.length; i++){
         sum += Math.abs(data[i].sentiment);
     }
+    console.log(sum / data.length)
     return sum / data.length;
 }
