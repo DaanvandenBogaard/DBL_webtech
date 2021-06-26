@@ -16,6 +16,7 @@ function makeMSV(dataPath, fieldName) {
     let textpadding = 10;
     var nodeWidthMSV = 80;
     var monthToTime = [0, 31, 59, 90, 120, 151, 181, 212, 243, 273, 304, 334];
+
     let zoom = d3.zoom()
         .on('zoom', (event) => {
             svg.attr('transform', event.transform);
@@ -40,19 +41,56 @@ function makeMSV(dataPath, fieldName) {
                .attr("height", height)
                .attr("transform" , "translate(" + margin.left  + "," + margin.top +")")
                
-    
+    d3.select(fieldName).select("#MSVID").append("input")
+        .style("display", "none")
+        .attr("id", "MSVtrigger")
+        .on("input", function(){
+            d3.select(fieldName).selectAll("#MSVID").remove();
+            console.log("WREEEEEEEEEEEEEEEE")
+            makeMSV(dataPath, fieldName.substring(1, fieldName.length));
+        })
+
+
     //This loads the data, make sure to only use the data in this section:
     d3.csv(dataPath).then(function(data) {
         //Since d3.csv is asynchronous (it is not loaded immediatly, but it is a request to the webserver) we need all our code from the data in here. 
-        //convert to numbers:
+
         //As well as turning date into a number
         data.forEach(function(d) {
           d.fromId = +d.fromId; 
           d.sentiment = +d.sentiment;
           d.toId = +d.toId;
+
+        //Add the d.time to get a representative variable for slicing:
+        let timeData = d.date.split("-");
+        d.year = +timeData[0];
+        d.month = +timeData[1];
+        d.day = +timeData[2];
+
           d.time = (d.date.replace('-','')).replace('-','');
+          
         })
 
+        //filter data
+        let dateRange = findDateRange();
+        let startDate = (dateRange['fromYear'] + dateRange['fromMonth'] + dateRange['fromDay']);
+        let endDate = (dateRange['toYear'] + dateRange['toMonth'] + dateRange['toDay']);
+        data = data.filter(function(d){
+           //Check wether or not the data tuple is in our dateRange. 
+           let isInRange = false;
+           let date = 10000 * d.year + 100 * d.month + d.day;
+           if(Math.random() > 0.95){
+           console.log(startDate + " " + date + " " + endDate)
+           console.log(dateRange['fromDay'])
+           }
+           //Check whether it is on the correct year:
+           if (startDate <=  date && date <= endDate) {
+             isInRange = true;
+           }
+
+           return isInRange;
+         }); 
+        
         //Create an array of unique ids and a subset array that reassigns values to ids ranging from 0 to n
         let idList = collectIDS(data);
         idList = subsetList(idList);
@@ -85,7 +123,6 @@ function makeMSV(dataPath, fieldName) {
 
         //Draw edges and create buttons etc
         drawEdges(data, IDS,  colouring, fieldName, minMaxDates[0]);
-        (currentColouring, fieldName, false);
     }); 
 }
 
@@ -114,6 +151,9 @@ function drawEdges(data, IDS, colouring, fieldName, firstDate){
     }
     else if(selectedColouring === "Blocks"){
         blockEdges(data, IDS, colouring, lines, firstDate, tooltip);
+    }
+    else if(selectedColouring === "Sentiment"){
+        sentimentEdges(data, IDS, colouring, lines, firstDate, tooltip);
     }
     else {
         normalEdges(data, IDS, colouring, lines, firstDate, tooltip);
@@ -244,7 +284,7 @@ function updateType(selected, selectedColouring, data, IDS, colouring, currentID
     }
     else if(selectedColouring === "Blocks"){
         //create new input
-        createBlockBox(data, currentIDS, currentColouring, val, fieldName);
+        createBlockBox(data, currentIDS, currentColouring, val, fieldName, firstDate);
         currentColouring = blockColouring(data, currentIDS, d3.select(fieldName).select("#MSVID").select(".blockInput").property("value"));
     } 
     else {
@@ -261,7 +301,7 @@ function updateType(selected, selectedColouring, data, IDS, colouring, currentID
 
     //draw new MSV
     drawEdges(data, currentIDS, currentColouring, fieldName, firstDate);
-    createLegend(currentColouring, fieldName);
+    createLegend(currentColouring, fieldName, currentIDS);
 }
 
 
@@ -273,7 +313,7 @@ Parameters:
 Returns:
     None
 */
-function gradientEdges(data, IDS, fieldName) {
+function gradientEdges(data, IDS, fieldName, firstDate, tooltip) {
     let svg = d3.select(fieldName).select("#MSVID").select("svg");
     let svgHeight = parseInt(d3.select(fieldName).select("#MSVID").select("svg").style("height"));
     //draw the edges with gradient, add animation if datasetis small enough        
@@ -308,6 +348,27 @@ function gradientEdges(data, IDS, fieldName) {
                 .attr("y1", IDS[data[i].fromId] )
                 .attr("x2", data[i].time )
                 .attr("y2", IDS[data[i].toId])
+                .attr('value', "url(#grad" + i + ")")
+                .attr("id", "i" + data[i].fromId + data[i].toId + data[i].time)
+                .on("mouseover", function(event, d) {	
+                    tooltip.style("opacity", .9);	
+                    tooltip.style("display","inline");	
+                    tooltip.html("Mail from " + "&#10;" +  data[i].fromEmail + "&#10;" + "to" + "&#10;" + data[i].toEmail + ". &#10;" + "On " + addDays(firstDate, data[i].time - 1) + ".")
+                        .style("left",  (event.x + 10) + "px")		
+                        .style("top", (event.y - 28) + "px")
+                        .style("fill", "black");
+                    d3.selectAll("#" + this.id).each(function(d){
+                    d3.select(this).style("stroke", "black")
+                    .raise()
+                })
+                    })					
+                .on("mouseout", function(d) {		
+                    tooltip.style("opacity", 0.2)
+                    .style("display","none");
+                    d3.selectAll("#" + this.id).each(function(d){
+                        d3.select(this).style("stroke", "" + this.getAttribute('value'))
+                    })  
+                });
         } 
         else {
             let line =  svg
@@ -336,51 +397,27 @@ function gradientEdges(data, IDS, fieldName) {
                 .attr("y1", IDS[data[i].toId] )
                 .attr("x2", data[i].time )
                 .attr("y2", IDS[data[i].fromId])
-        }
-    }
-}
-
-/*blockEdges: Draws and colours the edges corresponding to the blockcolouring and makes sure the coloured edges get drawn on top
-Parameters:
-   data: data object of the edges
-   IDS: sequential list of node appearance
-   colouring: Array containing the colour of the edge corresponding to the index of the data
-   lines: element in which the lines should be drawn
-Returns:
-    None
-*/
-function blockEdges(data, IDS, colouring, lines){
-    let blockColours = new Array();
-    //draw edges, with animation if dataset < 3500, otherwise without
-    if(data.length < 3500){              
-        for(let i = 0; i < data.length; i++) {
-            //make an array of all indices that have a non #D4D4D4 colouring
-            if(colouring[i] != "#D4D4D4"){
-                blockColours[blockColours.length] = i;
-            }
-
-            //draw unimportant edges
-            lines.append('line')
-                .style("stroke",  "#D4D4D4")
-                .style("stroke-width", 1)
-                .attr("id", "line" + i)
-                .attr("x1", data[i].time )
-                .attr("y1", IDS[data[i].fromId] )
-                .attr("x2", data[i].time )
-                .attr("y2", IDS[data[i].toId])
-        }
-        //draw important edges so they will be on top
-        for(let i = 0; i < blockColours.length; i++){
-            //remove the edges so they wont be drawn twice
-            lines.select("#line" + blockColours[i]).remove();
-            //draw the coloured edges 
-            lines.append('line')
-                .style("stroke",  colouring[blockColours[i]])
-                .style("stroke-width", 1)
-                .attr("x1", data[blockColours[i]].time)
-                .attr("y1", IDS[data[blockColours[i]].fromId])
-                .attr("x2", data[blockColours[i]].time)
-                .attr("y2", IDS[data[blockColours[i]].toId])
+                .attr('value', "url(#grad" + i + ")")
+                .attr("id", "i" + data[i].fromId + data[i].toId + data[i].time)
+                .on("mouseover", function(event, d) {	
+                    tooltip.style("opacity", .9);	
+                    tooltip.style("display","inline");	
+                    tooltip.html("Mail from " + "&#10;" +  data[i].fromEmail + "&#10;" + "to" + "&#10;" + data[i].toEmail + ". &#10;" + "On " + addDays(firstDate, data[i].time - 1) + ".")
+                        .style("left",  (event.x + 10) + "px")		
+                        .style("top", (event.y - 28) + "px")
+                        .style("fill", "black");
+                    d3.selectAll("#" + this.id).each(function(d){
+                    d3.select(this).style("stroke", "black")
+                    .raise()
+                })
+                    })					
+                .on("mouseout", function(d) {		
+                    tooltip.style("opacity", 0.2)
+                    .style("display","none");
+                    d3.selectAll("#" + this.id).each(function(d){
+                        d3.select(this).style("stroke", "" + this.getAttribute('value'))
+                    })  
+                });
         }
     }
 }
@@ -404,20 +441,26 @@ function normalEdges(data, IDS, colouring, lines, firstDate, tooltip){
             .attr("y1", IDS[data[i].fromId])
             .attr("x2", data[i].time )
             .attr("y2", IDS[data[i].toId])
+            .attr('value', colouring[i])
+            .attr("id", "i" + data[i].fromId + data[i].toId + data[i].time)
             .on("mouseover", function(event, d) {	
                 tooltip.style("opacity", .9);	
                 tooltip.style("display","inline");	
-                tooltip.html("Mail from employee " + data[i].fromId + " to employee " + data[i].toId + " on " + addDays(firstDate, data[i].time - 1) + ".")	
-                    .style("left",  (event.x + 5) + "px")		
+                tooltip.html("Mail from " + "&#10;" +  data[i].fromEmail + "&#10;" + "to" + "&#10;" + data[i].toEmail + ". &#10;" + "On " + addDays(firstDate, data[i].time - 1) + ".")
+                    .style("left",  (event.x + 10) + "px")		
                     .style("top", (event.y - 28) + "px")
                     .style("fill", "black");
-                d3.select(this).style("stroke", "black")
-                d3.select(this).raise()
+                d3.selectAll("#" + this.id).each(function(d){
+                    d3.select(this).style("stroke", "" + d3.select("#msvColor").property('value'))
+                    .raise()
+                })    
                 })					
             .on("mouseout", function(d) {		
                 tooltip.style("opacity", 0.2)
-                .style("display","none");
-                d3.select(this).style("stroke", colouring[i])
+                .style("display","none");  
+                d3.selectAll("#" + this.id).each(function(d){
+                    d3.select(this).style("stroke", "" + this.getAttribute('value'))
+                })    
             });
         }
 }
@@ -431,7 +474,7 @@ Parameters:
 Returns:
     None
 */
-function blockEdges(data, IDS, colouring, lines){
+function blockEdges(data, IDS, colouring, lines, firstDate, tooltip){
     let blockColours = new Array();
 
     //draw edges, with animation if dataset < 3500, otherwise without
@@ -452,6 +495,27 @@ function blockEdges(data, IDS, colouring, lines){
             .attr("y1", IDS[data[i].fromId] )
             .attr("x2", data[i].time )
             .attr("y2", IDS[data[i].toId])
+            .attr('value', colouring[i])
+            .attr("id", "i" + data[i].fromId + data[i].toId + data[i].time)
+            .on("mouseover", function(event, d) {	
+                tooltip.style("opacity", .9);	
+                tooltip.style("display","inline");	
+                tooltip.html("Mail from " + data[i].fromEmail + " to " + data[i].toEmail + " on " + addDays(firstDate, data[i].time - 1) + ".")	
+                    .style("left",  (event.x + 10) + "px")		
+                    .style("top", (event.y - 28) + "px")
+                    .style("fill", "black");
+                d3.selectAll("#" + this.id).each(function(d){
+                    d3.select(this).style("stroke", "black")
+                    .raise()
+                })
+                })					
+            .on("mouseout", function(d) {		
+                tooltip.style("opacity", 0.2)
+                .style("display","none");
+                d3.selectAll("#" + this.id).each(function(d){
+                    d3.select(this).style("stroke", "" + this.getAttribute('value'))
+                })
+            });
     }
     //draw important edges so they will be on top
     for(let i = 0; i < blockColours.length; i++){
@@ -465,6 +529,106 @@ function blockEdges(data, IDS, colouring, lines){
             .attr("y1", IDS[data[blockColours[i]].fromId])
             .attr("x2", data[blockColours[i]].time)
             .attr("y2", IDS[data[blockColours[i]].toId])
+            .attr('value', colouring[blockColours[i]])
+            .attr("id", "i" + data[blockColours[i]].fromId + data[blockColours[i]].toId + data[blockColours[i]].time)
+            .on("mouseover", function(event, d) {	
+                tooltip.style("opacity", .9);	
+                tooltip.style("display","inline");	
+                tooltip.html("Mail from " + data[blockColours[i]].fromEmail + " to " + data[blockColours[i]].toEmail + " on " + addDays(firstDate, data[blockColours[i]].time - 1) + ".")	
+                    .style("left",  (event.x + 10) + "px")		
+                    .style("top", (event.y - 28) + "px")
+                    .style("fill", "black");
+                d3.selectAll("#" + this.id).each(function(d){
+                    d3.select(this).style("stroke", "black")
+                    .raise()
+                })
+                })					
+            .on("mouseout", function(d) {		
+                tooltip.style("opacity", 0.2)
+                .style("display","none");
+                d3.selectAll("#" + this.id).each(function(d){
+                    d3.select(this).style("stroke", "" + this.getAttribute('value'))
+                })    
+            });
+    }
+}
+
+function sentimentEdges(data, IDS, colouring, lines, firstDate, tooltip){
+    let sentColour = new Array();
+    meanDev = calcMeandev(data); 
+    //draw edges, with animation if dataset < 3500, otherwise without
+       
+    for(let i = 0; i < data.length; i++) {
+
+        //make an array of all indices that have a non #D4D4D4 colouring
+        if(Math.abs(data[i].sentiment) > meanDev){
+            sentColour[sentColour.length] = i;
+        }
+        
+        //draw unimportant edges
+        lines.append('line')
+            .style("stroke",  colouring[i])
+            .style("stroke-width", 1)
+            .attr("id", "line" + i)
+            .attr("x1", data[i].time )
+            .attr("y1", IDS[data[i].fromId] )
+            .attr("x2", data[i].time )
+            .attr("y2", IDS[data[i].toId])
+            .attr('value', colouring[i])
+            .attr("id", "i" + data[i].fromId + data[i].toId + data[i].time)
+            .on("mouseover", function(event, d) {	
+                tooltip.style("opacity", .9);	
+                tooltip.style("display","inline");	
+                tooltip.html("Mail from " + "&#10;" +  data[i].fromEmail + "&#10;" + "to" + "&#10;" + data[i].toEmail + ". &#10;" + "On " + addDays(firstDate, data[i].time - 1) + "." + "&#10;" + "Sentiment: " +  data[i].sentiment.toFixed(2))
+                    .style("left",  (event.x + 10) + "px")		
+                    .style("top", (event.y - 28) + "px")
+                    .style("fill", "black");
+                d3.selectAll("#" + this.id).each(function(d){
+                    d3.select(this).style("stroke", "black")
+                    .raise()
+                })
+                })					
+            .on("mouseout", function(d) {		
+                tooltip.style("opacity", 0.2)
+                .style("display","none");
+                d3.selectAll("#" + this.id).each(function(d){
+                    d3.select(this).style("stroke", "" + this.getAttribute('value'))
+                })  
+            });
+    }
+    //draw important edges so they will be on top
+    for(let i = 0; i < sentColour.length; i++){
+        //remove the edges so they wont be drawn twice
+        lines.select("#line" + sentColour[i]).remove();
+        //draw the coloured edges 
+        lines.append('line')
+            .style("stroke",  colouring[sentColour[i]])
+            .style("stroke-width", 1)
+            .attr("x1", data[sentColour[i]].time)
+            .attr("y1", IDS[data[sentColour[i]].fromId])
+            .attr("x2", data[sentColour[i]].time)
+            .attr("y2", IDS[data[sentColour[i]].toId])
+            .attr('value', colouring[i])
+            .attr("id", "i" + data[sentColour[i]].fromId + data[sentColour[i]].toId + data[sentColour[i]].time)
+            .on("mouseover", function(event, d) {	
+                tooltip.style("opacity", .9);	
+                tooltip.style("display","inline");	
+                tooltip.html("Mail from " + "&#10;" +  data[sentColour[i]].fromEmail + "&#10;" + "to" + "&#10;" + data[sentColour[i]].toEmail + ". &#10;" + "On " + addDays(firstDate, data[sentColour[i]].time - 1) + "." + "&#10;" + "Sentiment: " +  data[sentColour[i]].sentiment.toFixed(2))	
+                    .style("left",  (event.x + 10) + "px")		
+                    .style("top", (event.y - 28) + "px")
+                    .style("fill", "black");
+                d3.selectAll("#" + this.id).each(function(d){
+                    d3.select(this).style("stroke", "black")
+                    .raise()
+                })
+                })					
+            .on("mouseout", function(d) {		
+                tooltip.style("opacity", 0.2)
+                .style("display","none");
+                d3.selectAll("#" + this.id).each(function(d){
+                    d3.select(this).style("stroke", "" + this.getAttribute('value'))
+                })   
+            });
     }
 }
 
@@ -478,7 +642,7 @@ Parameters:
 Returns:
    None
 */
-function createBlockBox( data, currentIDS, currentColouring, val, fieldName){
+function createBlockBox( data, currentIDS, currentColouring, val, fieldName, firstDate){
     d3.select(fieldName).select("#MSVID").select("#upperVisBox")
         .append("input")
         .attr('type', 'number')
@@ -507,8 +671,8 @@ function createBlockBox( data, currentIDS, currentColouring, val, fieldName){
             d3.select(fieldName).select("#MSVID").select(".legend").remove();
             
             //draw new edges 
-            drawEdges(data, currentIDS, currentColouring, fieldName);
-            createLegend(currentColouring, fieldName);
+            drawEdges(data, currentIDS, currentColouring, fieldName, firstDate);
+            createLegend(currentColouring, fieldName, currentIDS);
         })
         .on("keyup", function(d){
             //Handle min max on display
@@ -583,21 +747,21 @@ Parameters:
 Returns:
     None
 */
-function createLegend(currentColouring, fieldName){
+function createLegend(currentColouring, fieldName, ids){
     //Get the type of the colouring
     let type = d3.select(fieldName).select('#MSVID').select(".selectColor").property("value");
     //make the legend corresponding to the type
     if(type === "From-To"){
-        standardLegend(type, fieldName);
+        standardLegend(type, fieldName, ids);
     }
     else if(type === "Length"){
-        standardLegend(type, fieldName);
+        standardLegend(type, fieldName, ids);
     }
     else if(type === "Sentiment"){
-        standardLegend(type, fieldName);
+        standardLegend(type, fieldName, ids);
     }
     else if(type === "Blocks"){
-        blockLegend(currentColouring, fieldName);
+        blockLegend(currentColouring, fieldName, ids);
     } 
 
 }
@@ -608,7 +772,7 @@ Parameters:
 Returns:
     None
 */
-function standardLegend(type, fieldName){
+function standardLegend(type, fieldName, ids){
     let legendSVG = d3.select(fieldName).select("#MSVID").select("#visualisation");
     //create SVG that shall contain everything of the legend
 
@@ -629,14 +793,15 @@ function standardLegend(type, fieldName){
         
     //create the bar of the legend and apply the gradient. Also add the text corresponding to the type
     legendSVG.append("g").append("rect")
-        .attr("x", 0.4 * parseInt(legendSVG.style("width")))
-        .attr("width",  0.2 * parseInt(legendSVG.style("width")))
-        .attr("height",10)
+        .attr("x", 0.4 * parseInt(d3.select(fieldName).select("#MSVID").style("width")))
+        .attr("y", ids.length * 1.2)
+        .attr("width",  0.2 * parseInt(d3.select(fieldName).select("#MSVID").style("width")))
+        .attr("height", 10)
         .style("fill", "url(#myGradient)") 
         .attr("class", "legend")
     legendSVG.append("text")
-        .attr('x', 0.4 * parseInt(legendSVG.style("width")))
-        .attr('y', 20)
+        .attr('x', 0.4 * parseInt(d3.select(fieldName).select("#MSVID").style("width")))
+        .attr('y', 20 +  ids.length * 1.2)
         .attr("font-size", 12)  
         .text(function(d){
             if(type == "Length"){return "Shortest"}
@@ -646,8 +811,8 @@ function standardLegend(type, fieldName){
         .attr("class", "legend")
     legendSVG.append("text")
         .attr("text-anchor", "end")
-        .attr('x', 0.6 * parseInt(legendSVG.style("width")))
-        .attr('y', 20)
+        .attr('x', 0.6 *parseInt(d3.select(fieldName).select("#MSVID").style("width")))
+        .attr('y', 20 + ids.length * 1.2)
         .attr("font-size", 12)  
         .text(function(d){
             if(type == "Length"){return "Longest"}
@@ -663,11 +828,9 @@ Parameters:
 Returns:
     None
 */
-function blockLegend(currentColouring, fieldName){
-    let mainSVG = d3.select(fieldName).select("#MSVID");
-    let legendSVG = mainSVG.append("svg")
-        .attr("width", parseInt(mainSVG.style("width")))
-        .attr("id", "legend")
+function blockLegend(currentColouring, fieldName, ids){
+    let legendSVG = d3.select(fieldName).select("#MSVID").select("#visualisation");
+
     //sorts the colours based on fequency, which will decide the order in which the rects are drawn
     let rects = sortRects(currentColouring);
     //width of the rects calculated based on the usual size of the legend
@@ -678,10 +841,11 @@ function blockLegend(currentColouring, fieldName){
         if(rects[i][0] != "#D4D4D4"){
             legendSVG.append("rect")
                 .attr("x", 0.4 * parseInt(legendSVG.style("width")) + cIndex * width)
+                .attr('y', ids.length * 1.2)
                 .attr("height", 10)
                 .attr("width", width)
                 .attr("fill", rects[i][0])
-
+                .attr("class", "legend")
             cIndex++;
         } 
     }
@@ -689,21 +853,25 @@ function blockLegend(currentColouring, fieldName){
     //draw the noise in the legend
     legendSVG.append("rect")
             .attr('x', 0.4 * parseInt(legendSVG.style("width")) + (rects.length - 1) * width)
+            .attr('y', ids.length * 1.2)
             .attr("height", 10)
             .attr("width", 0.25 * 0.2 * parseInt(legendSVG.style("width")))
             .attr("fill", "#D4D4D4")
+            .attr("class", "legend")
     
     legendSVG.append("text")
         .attr('x', 0.4 * parseInt(legendSVG.style("width")))
-        .attr('y', 20)
+        .attr('y', 20 + ids.length * 1.2)
         .attr("font-size", 12)  
         .text("Largest")
+        .attr("class", "legend")
     legendSVG.append("text")
         .attr("text-anchor", "end")
         .attr('x', 0.6 * parseInt(legendSVG.style("width")))
-        .attr('y', 20)
+        .attr('y', 20 + ids.length * 1.2)
         .attr("font-size", 12)  
         .text("Noise")
+        .attr("class", "legend")
 }
 
 /*blockLegend: Sorts the colours of the to be drawn rects based on frequency
@@ -859,8 +1027,15 @@ function addDays(date, days){
     var result = new Date(date);
     result.setDate(result.getDate() + days);
     var returnDate = result.toDateString();
-    console.log(returnDate)
     //returnDate = returnDate.substring(0, returnDate.indexOf("00:00:00"));
-    console.log(returnDate)
     return returnDate;
+}
+
+function calcMeandev(data){
+    let sum =  0;
+    for(let i = 0; i < data.length; i++){
+        sum += Math.abs(data[i].sentiment);
+    }
+    console.log(sum / data.length)
+    return sum / data.length;
 }
