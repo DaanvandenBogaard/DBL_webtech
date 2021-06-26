@@ -87,8 +87,8 @@ function makeHEB(dataPath, fieldName) {
         var endDay = dateRange_HEB['toDay'];
 
         //Set dates to right format and set curDate to startDate for start of animation
-        startDate = parseInt(startYear + startMonth + startDay);
-        endDate = parseInt(endYear + endMonth + endDay);
+        startDate = parseInt(startYear + startMonth);
+        endDate = parseInt(endYear + endMonth);
         var curYear = parseInt(startYear);
         var curDate = startDate;
         console.log(startDate);
@@ -467,7 +467,7 @@ function makeHEB(dataPath, fieldName) {
 
         //Text for current month display
         var curMonthText = curMonthDisplay.append("text")
-            .attr("font-size", "11pt")
+            .attr("font-size", "9pt")
             .attr("x", 280)
             .attr("y", 12)
             .text("Current month: " + String(curDate).substr(0, 4) + "-" + String(curDate).substr(4, 6));
@@ -603,11 +603,11 @@ function makeHEB(dataPath, fieldName) {
         //Set first color of gradient
         linearGradient.append("stop")
             .attr("offset", "0%")
-            .attr("stop-color", gradientPicker(1));
+            .attr("stop-color", gradientPicker(2));
         //Set last color of gradient
         linearGradient.append("stop")
             .attr("offset", "100%")
-            .attr("stop-color", gradientPicker(2));
+            .attr("stop-color", gradientPicker(1));
 
         //Make sentiment legend gradient
         var sentGradient = svg.append("defs")
@@ -634,8 +634,21 @@ function makeHEB(dataPath, fieldName) {
                 }
             });
 
+        var colorLegendRect = colorLegend.append("rect")
+            .attr("width", 300)
+            .attr("height", 15)
+            .attr("y", height_HEB - 21)
+            .attr("x", 200)
+            .attr("fill", function () {
+                if (colorSelected == "gradient") {
+                    return "url(#linearGradient)";
+                } else if (colorSelected == "sentiment") {
+                    return "url(#sentGradient)";
+                }
+            });
+
         var colorLegendTextF = colorLegend.append("text")
-            .attr("y", height_HEB - 4)
+            .attr("y", height_HEB - 10)
             .attr("x", function () {
                 if (colorSelected == "gradient") {
                     return 163;
@@ -651,21 +664,8 @@ function makeHEB(dataPath, fieldName) {
                 }
             });
 
-        var colorLegendRect = colorLegend.append("rect")
-            .attr("y", height_HEB - 15)
-            .attr("x", 200)
-            .attr("width", 300)
-            .attr("height", 15)
-            .attr("fill", function () {
-                if (colorSelected == "gradient") {
-                    return "url(#linearGradient)";
-                } else if (colorSelected == "sentiment") {
-                    return "url(#sentGradient)";
-                }
-            });
-
         var colorLegendTextB = colorLegend.append("text")
-            .attr("y", height_HEB - 4)
+            .attr("y", height_HEB - 10)
             .attr("x", 505)
             .text(function () {
                 if (colorSelected == "gradient") {
@@ -747,9 +747,8 @@ function notInMails(curFromId, curToId, date) {
 
 //Function for getting the date in the right format (yyyymmdd)
 function dateFormat(date) {
-    u_date = date.split("-")
-
-    return yearMonth = parseInt(u_date[0] + u_date[1] + u_date[2]);
+    u_date = date.split("-");
+    return yearMonth = parseInt(u_date[0] + u_date[1]);
 }
 
 //Function for placement on HEB (X)

@@ -94,11 +94,12 @@ function CreateVisField(fieldName){
 
     //Add close button to upperbar:
     var closeButton = upperbar.append("button")
-                              .attr("id", "closeButton")
-                              .attr("onclick" , "changeListenerFunction("+ "'"+fieldName + "'"+ ")");
+                              .attr("class", "closeButton")
+                              .attr("id", "close_" + fieldName)
+                              .attr("onclick" , "changeListenerFunction("+ "'"+ fieldName + "'"+ ")");
 
     var closeLabel = upperbar.append("label")
-                             .attr("for", "closeButton")
+                             .attr("for", "close_" + fieldName)
                              .attr("class", "fa fa-times closeLabel")
                              .attr("style", "font-size: 20px;");
 
@@ -153,8 +154,8 @@ function OnChangeSelect(fieldName){
                       '<div>' +
                         '<input id="animateToggle" class="animToggle" type="checkbox">' +
                         '<label for="animateToggle"> animation </label>' +
-                        '<button id="startHEB" type="button" name="HEB" onclick="makeHEB(localStorage.getItem(' + "'CurDataSet'" + ') ,' + "'" + fieldName + "'"   + ' )"> Start </button>' +
-                        '<label for="startHEB" class="startButton HEBButtons"> Start </label>' + 
+                        '<button class="startHEB" id="HEB_' + fieldName + '" type="button" name="HEB" onclick="makeHEB(localStorage.getItem(' + "'CurDataSet'" + ') ,' + "'" + fieldName + "'"   + ' )"> Start </button>' +
+                        '<label for="HEB_' + fieldName + '" class="startButton HEBButtons"> Start </label>' + 
                       '</div>' + 
                       '<button id="togglePause" type="button" name="togglePause"> Play </button>' +
                       '<label for="togglePause" class="pauseButton HEBButtons"> Play </label>' + 

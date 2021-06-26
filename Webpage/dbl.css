@@ -158,6 +158,36 @@ a:hover {
 	transition: var(--transition);
 }
 
+/* Toolbar content */
+#DataSetSelector {
+	background-color: var(--grey);
+	color: var(--white);
+	border-radius: 4px;
+	margin: 5px 0 0 5px;
+	padding: 5px;
+	font-size: 12px;
+	cursor: pointer;
+}
+
+.smallButton {
+	margin-left: 5px;
+	padding: 7px;
+	background-color: var(--accent);
+	color: var(--white);
+	font-size: 12px;
+	border-radius: 4px;
+	border: none;
+	display: inline-flex;
+	justify-content: center;
+	align-items: center;
+	outline: none;
+	cursor: pointer;
+}
+
+.smallButton:hover {
+	background-color: var(--active);
+}
+
 /* Scrollbar */
 
 ::-webkit-scrollbar {
@@ -276,7 +306,7 @@ button#linkAbout {
 	display: none;
 }
 
-button#startHEB {
+button.startHEB {
 	display: none;
 }
 
@@ -284,7 +314,19 @@ button#togglePause {
 	display: none;
 }
 
-button#closeButton{
+button.closeButton {
+	display: none;
+}
+
+button#addBlock {
+	display: none;
+}
+
+button#toSankey {
+	display: none;
+}
+
+button#menuButton {
 	display: none;
 }
 
@@ -363,7 +405,7 @@ button#closeButton{
 	word-wrap: break-word;
 	display: inline-block;
 	position: relative;
-	top: -120px;
+	top: -170px;
 }
 
 .methodDescMSV {
@@ -579,3 +621,4 @@ input[type=number] {
 	font-size: 10pt;
 	overflow: auto;
   }
+  

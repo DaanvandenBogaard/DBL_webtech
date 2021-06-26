@@ -98,7 +98,8 @@
 		<!--Toolbox-->
 		<div id="toolbar" class="toolbar">
 			<!--Function definition in generalUIVis.js: -->
-			<button onclick="AddVisualisationBlock()"> Add visualisation block </button>
+			<button id="addBlock" onclick="AddVisualisationBlock()"> Add visualisation block </button>
+			<label for="addBlock" class="smallButton"> Add visualisation block </label>
 			<!-- General time selector: -->
 			<!-- <input type="text" id="from" name="from"> -->
 			<!-- <input type="text" id="to" name="to"> -->
