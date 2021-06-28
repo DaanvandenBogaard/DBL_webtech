@@ -280,29 +280,20 @@ function constrDataSet(data, idNums , dateRange){
   });
 
   //Get proper slice:
+  let startDate = (dateRange['fromYear'] + dateRange['fromMonth'] + dateRange['fromDay']);
+  let endDate = (dateRange['toYear'] + dateRange['toMonth'] + dateRange['toDay']);
   linksDataDupRaw = linksDataDupRaw.filter(function(d){
-    //Check wether or not the data tuple is in our dateRange. 
-    let isInRange = false;
-    //Check whether it is on the correct year:
-    if (dateRange['fromYear'] < d.year && d.year < dateRange["toYear"]) {
-      isInRange = true;
-    }
-    //If it's on the edge we must check months (and possibly days):
-    else if (d.year == dateRange["fromYear"] || d.year == dateRange["toYear"]) {
-      if (dateRange["fromMonth"] < d.month && d.month < dateRange['toMonth']) {
-        isInRange = true;
-      }
-      //if it's on the edge we must check days
-      else if (d.month == dateRange["fromMonth"] || d.month == dateRange["toMonth"]) {
-        if (dateRange["fromDay"] <= d.day && d.day <= dateRange["toDay"]) {
-          isInRange = true;
-        }
-      }
-    }
+     //Check wether or not the data tuple is in our dateRange. 
+     let isInRange = false;
+     let date = 10000 * d.year + 100 * d.month + d.day;
 
+     //Check whether it is on the correct year:
+     if (startDate <=  date && date <= endDate) {
+       isInRange = true;
+     }
 
-    return isInRange;
-  });
+     return isInRange;
+   });
 
   let linksDataDup = linksDataDupRaw.map(function(d){
     return {
