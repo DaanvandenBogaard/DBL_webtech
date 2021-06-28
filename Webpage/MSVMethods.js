@@ -97,7 +97,7 @@ function activitySort(data, IDS){
     for (let i = 0; i < IDS.length; i++) {
         xPosArray[i] = [IDS[i], 0];
     }
-    console.log(xPosArray)
+
     //calculate the average xPos for every node
     for (let i = 0; i < xPosArray.length; i++) {
         xPosArray[i][1] = calcAverageXPos(IDS[i], data);

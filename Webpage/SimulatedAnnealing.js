@@ -31,12 +31,10 @@ function optimizeLayout(data, IDS, costFunction) {
     let currentEdges = getEdges(data, currentIDS);
     let currentCost = calculateCost(currentEdges, costFunction);
 
-    console.log(meanEdgeLength(currentEdges));
-
     let smallestCost = currentCost;
     let smallestSol = currentIDS.slice();
     let smallestEdges = currentEdges;
-    console.log(currentIDS)
+
     let one = 0;
     let two = 0;
     while (t > tMin) {
@@ -52,7 +50,7 @@ function optimizeLayout(data, IDS, costFunction) {
                 currentIDS = newIDS.slice();
                 currentCost = calculateCost(newEdges, costFunction);
                 currentEdges = newEdges.slice();
-              //  console.log(currentIDS == newIDS)
+
                 //We store the absolute smallest in case the SA process doesnt get to the global minimum, we take the smallest local minimum
                 if(newCost < smallestCost){
                     smallestCost = newCost;   
@@ -75,8 +73,6 @@ function optimizeLayout(data, IDS, costFunction) {
         //Decreases temperature
         t *= decrease;
     }
-    console.log(one + " " + two)
-    console.log(smallestCost)
   
     return smallestSol;
 }
