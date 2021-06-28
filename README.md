@@ -11,10 +11,9 @@ We provide a quick overview on how to use this tool.
 	* Thomas Broers
 
 # Provided link
-Click [here](http://86.88.232.235:8080/Webpage/dbl_home.html) to directly visit the web page! 
+Click [here](https://hebsjankeymsv.herokuapp.com/) to directly visit the web page! 
 
-We provide you with a link to our running webserver: "http://86.88.232.235:8080/Webpage/dbl_home.html".
-This links leads to the server hosted on the personal network of one of our team members. We cannot guarantee at this point that the server will always be accessible (as this pc might not always be running). 
+We provide you with a link to our running webserver: "https://hebsjankeymsv.herokuapp.com/".
 
 Should this link not be accessible, then we refer to the "Webserver setup" paragraph. 
 
