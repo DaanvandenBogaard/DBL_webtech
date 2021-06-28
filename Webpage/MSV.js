@@ -46,7 +46,6 @@ function makeMSV(dataPath, fieldName) {
         .attr("id", "MSVtrigger")
         .on("input", function(){
             d3.select(fieldName).selectAll("#MSVID").remove();
-            console.log("WREEEEEEEEEEEEEEEE")
             makeMSV(dataPath, fieldName.substring(1, fieldName.length));
         })
 
@@ -79,10 +78,7 @@ function makeMSV(dataPath, fieldName) {
            //Check wether or not the data tuple is in our dateRange. 
            let isInRange = false;
            let date = 10000 * d.year + 100 * d.month + d.day;
-           if(Math.random() > 0.95){
-           console.log(startDate + " " + date + " " + endDate)
-           console.log(dateRange['fromDay'])
-           }
+
            //Check whether it is on the correct year:
            if (startDate <=  date && date <= endDate) {
              isInRange = true;
@@ -1036,6 +1032,6 @@ function calcMeandev(data){
     for(let i = 0; i < data.length; i++){
         sum += Math.abs(data[i].sentiment);
     }
-    console.log(sum / data.length)
+ 
     return sum / data.length;
 }
