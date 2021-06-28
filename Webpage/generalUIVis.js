@@ -1,5 +1,5 @@
 //All global hardcoded variables:
-var visualisations = ["Sankey" , "HEB" , "MSV" , "Gestalt"];
+var visualisations = ["Sankey" , "HEB" , "MSV"];
 var index = 0;
 
 //A function to handle the choosing of uploaded datasets:
