@@ -7,6 +7,8 @@ var dataSet;
 var tooltip;
 var outOfBounds = false;
 var dateRange;
+var userDataLoad;
+
 
 function MakeSankeyMenu(dataPath , fieldName) {
   //Read the data:
@@ -18,6 +20,8 @@ function MakeSankeyMenu(dataPath , fieldName) {
       d.toId = +d.toId; 
     });
     let userData = collectIDSInfo(data);
+    userDataLoad = userData; //Make into global for later use.
+    console.log(userData);
     //Now, construct the outside of the Sankey menu (its shell so to speak).
     //Retrieve a list of all professions:
     let SankeyMenuDiv = d3.select("#" + fieldName).append("div").attr("id" , "SankeyMenu").attr("class" , "SankeyMenu");
@@ -33,24 +37,24 @@ function MakeSankeyMenu(dataPath , fieldName) {
         if (d == userElement['Job']) {
           //Make an SVG for the user:
           let userSVG = curDiv.append("svg")
-                              .attr("width" , 100)
-                              .attr("height", 100);
+                              .attr("width" , 150)
+                              .attr("height", 150);
           let userSelector = userSVG.append("g").attr("id" , "userSelector");
 
           //Append visual elements:
           userSelector.append("circle")
-                      .attr("cx" , 50)
-                      .attr("cy" , 50)
-                      .attr("r" , 42)
+                      .attr("cx" , 75)
+                      .attr("cy" , 75)
+                      .attr("r" , 74)
                       .attr("fill" , getColor(userElement["ID"]));
           let userText = userSelector.append("text")
-                      .attr("y" , 50)
-                      .attr("x", 50)
+                      .attr("y" , 75)
+                      .attr("x", 75)
                       .attr("fill", "white")
-                      .attr("font-size", 50)
+                      .attr("font-size", 20)
                       .attr('text-anchor', 'middle')
                       .attr('alignment-baseline', 'central')
-                      .text(userElement['ID']);
+                      .text(userElement['Email'].split("@")[0]);
           //Add events: 
           userSelector.on("click" , function(event){
             if (selectedIDS.includes(userElement['ID'])) {
@@ -97,8 +101,6 @@ function MakeSankeyMenu(dataPath , fieldName) {
         }
       });
     }
-
-
   });
 }
 
@@ -117,6 +119,19 @@ function collectJobs(data) {
   let jobsRaw = fromJobs.concat(toJobs);
   //distinct IDs:
   return Jobs = [... new Set(jobsRaw)];
+}
+
+function findCorrespondingName(idNum){
+  //Find the name to the corresponding idNum in userDataLoad
+  let toolTipString;
+  userDataLoad.forEach(function (d) {
+    if (idNum == d['ID']) {
+      console.log("Succes!" , d["Email"]);
+      toolTipString = d["Email"];
+    }
+  });
+  //if none found, return null:
+  return toolTipString
 }
 
 //A function to collect all IDs and information about people.
@@ -392,7 +407,7 @@ function MakeD3(dataSet , sankey , svg , fieldName){
     d3.select(this).attr("stroke", d => d3.color(d.color) || "#BBBBBB");
   }
   var mousemove = function(event , d) {
-    tooltip.html("The number of emails between " + d.source['name'] + " and " + d.target['name'] + " is "  + d.value + ".")
+    tooltip.html("The number of emails between " + findCorrespondingName(d.source['name']) + " (id number "+  d.source['name'] +") and " + d.target['name'] + " is "  + d.value + ".")
            .style("left", (event.x + 70) + "px")
            .style("top", (event.y) + "px");
   }
@@ -411,7 +426,7 @@ function MakeD3(dataSet , sankey , svg , fieldName){
     
     //Determine type of variable:
     if (typeof d.name === "number") {  
-      tooltip.html(d.name + " has sent " + sum + " emails.")        
+      tooltip.html(findCorrespondingName(d.name) + " (id number " + d.name + ") has sent " + sum + " emails.")        
     } 
     else{
       tooltip.html(d.name + " has received " + sum + " emails.")
