@@ -54,7 +54,7 @@ function MakeSankeyMenu(dataPath , fieldName) {
                       .attr("font-size", 20)
                       .attr('text-anchor', 'middle')
                       .attr('alignment-baseline', 'central')
-                      .text(userElement['Email'].split("@")[0]);
+                      .text(userElement['Email'].split("@")[0].replace(/\./g , " "));
           //Add events: 
           userSelector.on("click" , function(event){
             if (selectedIDS.includes(userElement['ID'])) {
