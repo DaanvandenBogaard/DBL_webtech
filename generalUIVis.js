@@ -39,6 +39,12 @@ function MakeDataSetSelector(dataSets) {
         .attr('id', 'msvColor')   
 }
 
+function DeleteDatasets() {
+  localStorage.setItem('CurDataSet',null);
+  localStorage.setItem('DataSet',null);
+  location.href='dbl_vis.php';
+}
+
 //ActionListener for DataSetSelector:
 function OnChangeDataSetSelector() {
     //Call function in main file to change this value as we are not allowed to edit this form this file!

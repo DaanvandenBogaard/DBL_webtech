@@ -100,10 +100,8 @@
 			<!--Function definition in generalUIVis.js: -->
 			<button id="addBlock" onclick="AddVisualisationBlock()"> Add visualisation block </button>
 			<label for="addBlock" class="smallButton"> Add visualisation block </label>
-			<!-- General time selector: -->
-			<!-- <input type="text" id="from" name="from"> -->
-			<!-- <input type="text" id="to" name="to"> -->
-			<!-- End of general time selector -->
+			<button id="Cumtainer" onclick="DeleteDatasets()"> Delete datasets </button>
+			<label for="Cumtainer" class="smallButton"> Delete datasets </label>
 		</div>
 		<div class="fa fa-angle-down" id="tooltoggle" onclick="toggleToolbar()"> <span class="tooltext"> Toolbar </span> </div>	
 

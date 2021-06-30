@@ -330,6 +330,10 @@ button.menuButton {
 	display: none;
 }
 
+button#Cumtainer {
+	display: none;
+}
+
 /* Home content */
 
 .homeContent {
@@ -621,4 +625,5 @@ input[type=number] {
 	font-size: 10pt;
 	overflow: auto;
   }
+  
   
