@@ -11,7 +11,7 @@ function makeMSV(dataPath, fieldName) {
     //We start by making the SVG element.
     fieldName = '#' + fieldName;
     let margin = {top : 15, right : 10, bottom: 15, left: 10} //For now, hardcoded margins 
-    let width = d3.select(fieldName).style("width"); //for now, hardcoded width
+    let width = 2500;//d3.select(fieldName).style("width"); //for now, hardcoded width
     let height = d3.select(fieldName).style("height"); //for now, hardcoded height
     let textpadding = 10;
     var nodeWidthMSV = 80;
