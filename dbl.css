@@ -310,7 +310,7 @@ button.startHEB {
 	display: none;
 }
 
-button#togglePause {
+button.togglePause {
 	display: none;
 }
 
@@ -497,7 +497,7 @@ div[class^='visField'], div[class*=' visField'] {
 	font-family: var(--font);
 }
 
-#animateToggle {
+.animateToggle {
 	margin: 10px 0 10px 0;
 	cursor: pointer;
 }

@@ -160,13 +160,13 @@ function OnChangeSelect(fieldName){
 
         hebUIBox.html(
                       '<div>' +
-                        '<input id="animateToggle" class="animToggle" type="checkbox">' +
-                        '<label for="animateToggle"> animation </label>' +
+                        '<input id="animateToggle' + fieldName + '" class="animToggle" type="checkbox">' +
+                        '<label for="animateToggle' + fieldName + '"> animation </label>' +
                         '<button class="startHEB" id="HEB_' + fieldName + '" type="button" name="HEB" onclick="makeHEB(localStorage.getItem(' + "'CurDataSet'" + ') ,' + "'" + fieldName + "'"   + ' )"> Start </button>' +
                         '<label for="HEB_' + fieldName + '" class="startButton HEBButtons"> Start </label>' + 
                       '</div>' + 
-                      '<button id="togglePause" type="button" name="togglePause"> Play </button>' +
-                      '<label for="togglePause" class="pauseButton HEBButtons"> Play </label>' + 
+                      '<button id="togglePause' + fieldName + '" class="togglePause" type="button" name="togglePause"> Play </button>' +
+                      '<label for="togglePause' + fieldName + '" class="pauseButton HEBButtons"> Play </label>' + 
                       '<label for="togglePause" id="pauseIcon" class="fa fa-play"></label>' + 
                       '<label for="strengthSlider" class="inputLabel"> Bundle strength </label>' + 
                       '<input id="strengthSlider" class="strengthSlider" type="range" name="strengthSlider" min="0.00" max="1.00" value="0.85" step="0.05">' + 

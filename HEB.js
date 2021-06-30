@@ -23,10 +23,10 @@ function makeHEB(dataPath, fieldName) {
     //Variables
     var dateRange_HEB;
     //Link elements in dbl_vis.php to variables
-    var animToggle = d3.select("#" + fieldName).select("#animateToggle");
+    var animToggle = d3.select("#" + fieldName).select("#animateToggle" + fieldName);
     var pauseIcon = d3.select("#" + fieldName).select("#pauseIcon");
     var pauseText = d3.select("#" + fieldName).select(".pauseButton");
-    var togglePause = d3.select("#" + fieldName).select("#togglePause");
+    var togglePause = d3.select("#" + fieldName).select("#togglePause" + fieldName);
     var strengthSlider = d3.select("#" + fieldName).select("#strengthSlider");
     var edgeColor = d3.select("#" + fieldName).select("#edgeColor");
 
@@ -96,7 +96,7 @@ function makeHEB(dataPath, fieldName) {
         data.forEach(function (d) {
             //Check wheter the toId is already an object, if not create object with first found fromId
             if (!usableData.some(code => code.id == d.toId)) {
-                usableData.push({ "id": d.toId, "jobtitle": d.toJobtitle, "mails": [{ "from": d.fromId, "date": dateFormat(d.date), "sent": d.sentiment }] });
+                usableData.push({ "id": d.toId, "jobtitle": d.toJobtitle, "email": d.toEmail, "mails": [{ "from": d.fromId, "date": dateFormat(d.date), "sent": d.sentiment }] });
                 userIndex.push(d.toId);
             }
             //Check wheter fromId is already in mails array, if not add it
@@ -174,7 +174,15 @@ function makeHEB(dataPath, fieldName) {
                     //Set incoming and outcoming class
                     incoming = ".to" + d.id;
                     outgoing = ".from" + d.id;
-                    tooltip_string = d.id + " is a(n) " + d.jobtitle + "\n Recieved mails from " + d3.selectAll(incoming).size() + " people \n Sent mails to " + d3.selectAll(outgoing).size() + " people";
+                    plural1 = "people";
+                    if(d3.selectAll(incoming).size() == 1) {
+                        plural1 = "person";
+                    }
+                    plural2 = "people";
+                    if(d3.selectAll(outgoing).size() == 1) {
+                        plural2 = "person";
+                    }
+                    tooltip_string = d.email + "\n" + d.id + " is a(n) " + d.jobtitle + "\n Recieved mails from " + d3.selectAll(incoming).size() + " " + plural1 + " \n Sent mails to " + d3.selectAll(outgoing).size() + " " + plural2;
                 });
             tooltip.html(tooltip_string)
                 .style("left", (event.x + 5) + "px")
@@ -473,24 +481,17 @@ function makeHEB(dataPath, fieldName) {
             .text("Current month: " + String(curDate).substr(0, 4) + "-" + String(curDate).substr(4, 6));
 
         //Navigation buttons for month display
-        var monthNavBack = curMonthDisplay.append("button")
-            .attr("id", "monthBack" + HEB_nr)
-            .attr("class", "monthBack")
-            .attr("x", 260)
+        var monthNavBack = curMonthDisplay.append("text")
+            .attr("class", "smallButton")
+            .attr("font-size", "11pt")
+            .attr("x", 265)
             .attr("y", 12)
             .html("<")
-            .attr("disabled", function() {
-                if (doAnimate) {
-                    return false;
-                } else {
-                    return true;
-                }
-            })
             .on("click", function () {
                 //If not the first month, go back one month
                 if (curDate != startDate) {
                     if (curDate % 100 != 0) {
-                        curDat--;
+                        curDate--;
                     } else {
                         curYear--;
                         curDate = parseInt(curYear.toString() + "12", 10);
@@ -500,24 +501,17 @@ function makeHEB(dataPath, fieldName) {
                 }
             });
 
-        var monthNavForward = curMonthDisplay.append("button")
-            .attr("id", "monthForward" + HEB_nr)
-            .attr("class", "monthForward")
-            .attr("x", 340)
+        var monthNavForward = curMonthDisplay.append("text")
+            .attr("class", "smallButton")
+            .attr("font-size", "11pt")
+            .attr("x", 417)
             .attr("y", 12)
-            .attr(">")
-            .attr("disabled", function() {
-                if (doAnimate) {
-                    return false;
-                } else {
-                    return true;
-                }
-            })
+            .html(">")
             .on("click", function () {
                 //If not the first month, go back one month
                 if (curDate != endDate) {
                     if (curDate % 100 != 12) {
-                        curDat++;
+                        curDate++;
                     } else {
                         curYear++;
                         curDate = parseInt(curYear.toString() + "01", 10);
@@ -526,10 +520,9 @@ function makeHEB(dataPath, fieldName) {
                     generateEdges();
                 }
             });
-
+            
         //Make labels for navigation buttons of month display
-
-
+        
         //Make array for legend content
         let edgeLegendContent = [{ "item": "incoming", "color": "#eb4034" }, { "item": "outgoing", "color": "#40c7d6" }, { "item": "two-way", "color": "#8be667" }];
 
