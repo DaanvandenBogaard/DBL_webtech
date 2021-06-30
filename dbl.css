@@ -322,11 +322,11 @@ button#addBlock {
 	display: none;
 }
 
-button#toSankey {
+button.toSankey {
 	display: none;
 }
 
-button#menuButton {
+button.menuButton {
 	display: none;
 }
 

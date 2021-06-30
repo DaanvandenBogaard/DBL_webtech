@@ -74,8 +74,8 @@ function MakeSankeyMenu(dataPath , fieldName) {
       });
     });
     //Make "StartSankey" button
-    let toSankeyButton = d3.select("#" + fieldName).select("#upperbar").append("button").attr("id", "toSankey");
-    let toSankeyLabel = d3.select("#" + fieldName).select("#upperbar").append("label").attr("for", "toSankey").attr("class", "smallButton").html("To Sankey");
+    let toSankeyButton = d3.select("#" + fieldName).select("#upperbar").append("button").attr("id", "toSankey" + fieldName).attr("class", "toSankey");
+    let toSankeyLabel = d3.select("#" + fieldName).select("#upperbar").append("label").attr("for", "toSankey" + fieldName).attr("class", "smallButton").html("To Sankey");
     toSankeyButton.on("click" , function(d){
 
       makeSankey(dataPath , fieldName , selectedIDS);
@@ -159,8 +159,8 @@ function collectIDSInfo(data) {
 
 function makeSankey(dataPath , fieldName , idNums) {
   //Make the "GoBackButton"
-   let menuButton = d3.select("#" + fieldName).select("#upperbar").append("button").attr("id", "menuButton");
-   let menuLabel = d3.select("#" + fieldName).select("#upperbar").append("Label").attr("for", "menuButton").attr("class", "smallButton").html("To menu");
+   let menuButton = d3.select("#" + fieldName).select("#upperbar").append("button").attr("id", "menuButton" + fieldName).attr("class", "menuButton");
+   let menuLabel = d3.select("#" + fieldName).select("#upperbar").append("Label").attr("for", "menuButton" + fieldName).attr("class", "smallButton").html("To menu");
    menuButton.on("click" , function(d){
     MakeSankeyMenu(dataPath , fieldName);
     menuButton.remove();

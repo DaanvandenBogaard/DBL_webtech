@@ -472,6 +472,64 @@ function makeHEB(dataPath, fieldName) {
             .attr("y", 12)
             .text("Current month: " + String(curDate).substr(0, 4) + "-" + String(curDate).substr(4, 6));
 
+        //Navigation buttons for month display
+        var monthNavBack = curMonthDisplay.append("button")
+            .attr("id", "monthBack" + HEB_nr)
+            .attr("class", "monthBack")
+            .attr("x", 260)
+            .attr("y", 12)
+            .html("<")
+            .attr("disabled", function() {
+                if (doAnimate) {
+                    return false;
+                } else {
+                    return true;
+                }
+            })
+            .on("click", function () {
+                //If not the first month, go back one month
+                if (curDate != startDate) {
+                    if (curDate % 100 != 0) {
+                        curDat--;
+                    } else {
+                        curYear--;
+                        curDate = parseInt(curYear.toString() + "12", 10);
+                    }
+                    d3.select("#" + fieldName).selectAll("path").remove();
+                    generateEdges();
+                }
+            });
+
+        var monthNavForward = curMonthDisplay.append("button")
+            .attr("id", "monthForward" + HEB_nr)
+            .attr("class", "monthForward")
+            .attr("x", 340)
+            .attr("y", 12)
+            .attr(">")
+            .attr("disabled", function() {
+                if (doAnimate) {
+                    return false;
+                } else {
+                    return true;
+                }
+            })
+            .on("click", function () {
+                //If not the first month, go back one month
+                if (curDate != endDate) {
+                    if (curDate % 100 != 12) {
+                        curDat++;
+                    } else {
+                        curYear++;
+                        curDate = parseInt(curYear.toString() + "01", 10);
+                    }
+                    d3.select("#" + fieldName).selectAll("path").remove();
+                    generateEdges();
+                }
+            });
+
+        //Make labels for navigation buttons of month display
+
+
         //Make array for legend content
         let edgeLegendContent = [{ "item": "incoming", "color": "#eb4034" }, { "item": "outgoing", "color": "#40c7d6" }, { "item": "two-way", "color": "#8be667" }];
 
