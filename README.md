@@ -31,17 +31,7 @@ Contact:
 * Email: d.c.l.v.d.bogaard@student.tue.nl
 
 # Uploading datasets
-When you first log into the site, you will be asked to upload a dataset. 
-We do not have a feature to upload a new dataset (yet).
-
-Should you want to upload another dataset, we have the following procedure:
-* First go back to the home-page.
-* Now, go back to the visualisation-page through the menu.
-* Hit "F12" and go to "Console"
-* Type "localStorage.setItem('DataSet', null);". This will remove any reference to the old dataset.
-* Refresh the webpage.
-
-This should make it so that the upload button appears once again!
+When you first log into the site, you will be asked to upload a dataset. In the toolbar at the top, there will be a selector to select different datasets. (Note that on the heroku (online) version of our site, since this is a free hosting site, the datasets do not remain uploaded for very long. If you encounter any bugs please click on the "delete datasets" button in the toolbar and reupload your dataset.)
 
 # General use
 On loading the website, users will find themself on our home-page. 
@@ -50,29 +40,18 @@ The first one (the one selected) leads to the home-page.
 The second one leads to the visualisation-page which is where the actual tool is located.
 The third one leads to the about-page on which you can find more information. 
 
-On loading the visualisation-page, there are 2 "visualisation blocks" already created for you. 
-You can select which visualisation you want to use. Currently there are 4 choices:
+On loading the visualisation-page, there is an empty canvas. You can create new visualisation blocks by pressing the "add visualisation block" button in the toolbar.  
+You can select which visualisation you want to use. There are 3 choices:
     Sankey: see "Sankey"
     HEB: see "HEB (Hierarchical Edge Bundling)"
     MSV: See "MSV (Massive Sequence View)"
-    Gestalt (Not yet implemented)
-If you want more than 2 visualisations active at once, you can add a new "visualisation block".
+
 In order to do this, you must open the toolbar. This is done by clicking the "Toolbar" icon on the topright on the screen.
 After you have opened the toolbar, you can click on the "Add visualisation block" button.
 
 # Sankey 
-Upon selection, the sankey will give you an alert asking you which people you want to display.
-Right now, this is entered manually, but in the final product we will have a menu dedicated to deciding which users you want to display.
-
-You must enter numbers for this to work. Note, that there are a couple of things that will cause bugs. We will not fix these bugs as this entire selection will be deleted in later versions of the tool.
-For example, entering the same number twice will cause issues. 
-
-We list a few possible combinations that we have often used while testing:
-
-* 12,15
-* 1,2,3,4,5,6,7,8,9
-* 96
-* 18,19
+Upon selecting the Sankey as visualisation, the sankey menu will be openned. Here you can select a subset of people of which you want to have their email data analysed. 
+These people are all under tabs of different job groups. You can click on these names to open the selection for that specific occupation. Once you are happy with your selection, click the "to Sankey" button. Of course, if you want to go back to the menu, there is always a "To menu" button!
 
 We will now list a few features of the Sankey visualisation:
 Highlighting: Upon hovering over a link, this link will get a darker colour than the rest of the links. A tooltip is also displayed giving more information on this link. Hovering over the nodes (the coloured blocks) will also give you more information on these nodes.
