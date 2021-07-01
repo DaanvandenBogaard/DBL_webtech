@@ -88,6 +88,12 @@ function makeHEB(dataPath, fieldName) {
         //Set dates to right format and set curDate to startDate for start of animation
         startDate = parseInt(startYear + startMonth);
         endDate = parseInt(endYear + endMonth);
+        
+        //Check if the enddate is set, if not it takes the whole dataset.
+        if(Number.isNaN(endDate)){
+            endDate = 999999
+        }
+
         var curYear = parseInt(startYear);
         var curDate = startDate;
         //Construct array with data in a usable order 
@@ -109,7 +115,6 @@ function makeHEB(dataPath, fieldName) {
 
         //Get unique jobtitles
         let Jobtitles_list = [...new Set(usableData.map(ids => ids.jobtitle))];
-
         //Deleting all incoming mails from jobtitles that arent included.
         for (k = 0; k < usableData.length; k++) {
             for (j = 0; j < usableData[k].mails.length; j++) {
