@@ -434,8 +434,15 @@ function MakeD3(dataSet , sankey , svg , fieldName){
     //Calculate the total number of emails sent by the source (node).
     let sum = 0;
     links.forEach(function(entry){
-      if (entry.source['name'] === d.name) {
-        sum += entry.value;
+      if (typeof(d.name) == "number") {
+        if (entry.source['name'] === d.name) {
+          sum += entry.value;
+        }
+      }
+      else{
+        if (entry.target['name'] == d.name) {
+          sum += entry.value;
+        }
       }
     });
     
