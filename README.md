@@ -106,6 +106,8 @@ namely the MSV type selector:
 - Out-degree: Same as degree but only takes out-degree into account
 - Activity: Orders the nodes in terms of activity, nodes that are more active at the start at the top and nodes that
 	    are more active at the end are placed at the bottom. Nodes that are active throughout are places in the middle.
+- Edge length: This loads the MSV with nodes reordered in such a way that the edge length is minimized. This is done by the simuleated annealing algorighm.
+- Standard deviation: This loads the MSV with nodes reordered in such a way that the edge length is minimized. This is done by the simuleated annealing algorighm.
 
 and the MSV colour selector:
 
@@ -116,5 +118,7 @@ and the MSV colour selector:
 - Sentiment: Colours the edge according to the sentiment of the transaction.
 - Blocks: Colours the n largest edge-sets, where n is the amount the user has as input in the inputbox next to the selector.
 
-Besides the selectors there is also a checkbox, this toggles a legend for the used colouring.
-(Note: there is no legend for the 'None' colouring)
+Besides these there are also other interaction techniques, such as a tooltip that upon hovering over an edge displays the sender, receiver and the date of a message. When applying the 'sentiment' colouring, it will also show the sentiment. 
+Furthermore the MSV has brushing and linking between other MSV's, upon hovering on an edge it will highlight the same edge in other MSV's. The colour of this edge can be selected with the colour selecter in the global toolbar. 
+Another interaction technique the MSV has is zooming by using the scroll wheel and moving it around by dragging the mouse while holding the left mouse button.
+Finally, the time of the MSV can be filtered by using the global time selector.
