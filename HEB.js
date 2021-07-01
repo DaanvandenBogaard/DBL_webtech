@@ -17,7 +17,6 @@ var colorSelected = "black";
 //Datapath is the location of the user's dataset. 
 //FieldName is the name (id) of the visualisationBox the dataset is currently in.
 function makeHEB(dataPath, fieldName) {
-    console.log(fieldName);
     d3.select("#" + fieldName).select("#HEBFigure").select("#HEBdiagram").remove();
 
     //Variables
@@ -91,7 +90,6 @@ function makeHEB(dataPath, fieldName) {
         endDate = parseInt(endYear + endMonth);
         var curYear = parseInt(startYear);
         var curDate = startDate;
-        console.log(startDate);
         //Construct array with data in a usable order 
         data.forEach(function (d) {
             //Check wheter the toId is already an object, if not create object with first found fromId
@@ -149,10 +147,9 @@ function makeHEB(dataPath, fieldName) {
         //retrieve width and height:
         var height_HEB = parseFloat(div.attr("Fakeheight")) -20  ;
         var width_HEB = parseFloat(div.attr("Fakewidth")) - 20;
-        console.log(div.attr("Fakeheight"));
         let svg = div.append("svg")
         .attr("preserveAspectRatio", "xMinYMid meet")
-        .attr("viewBox", "-5 0 " + width_HEB +" "+height_HEB)
+        .attr("viewBox", "-5 0 " + width_HEB + " " + height_HEB)
         .attr("actWidth" , width_HEB)
         .attr("actHeight" , height_HEB)
         .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
@@ -165,7 +162,8 @@ function makeHEB(dataPath, fieldName) {
         var g = svg.selectAll("g")
             .data(usableData)
             .enter()
-            .append("g");
+            .append("g")
+            .attr("id", function(d) {return "id" + d.id});
 
         g.on("mouseover", function () {
             d3.select(this)
@@ -183,6 +181,8 @@ function makeHEB(dataPath, fieldName) {
                         plural2 = "person";
                     }
                     tooltip_string = d.email + "\n" + d.id + " is a(n) " + d.jobtitle + "\n Recieved mails from " + d3.selectAll(incoming).size() + " " + plural1 + " \n Sent mails to " + d3.selectAll(outgoing).size() + " " + plural2;
+                    //Trigger brush linking
+                    triggerBrushLinking(d.id);
                 });
             tooltip.html(tooltip_string)
                 .style("left", (event.x + 5) + "px")
@@ -192,7 +192,7 @@ function makeHEB(dataPath, fieldName) {
 
                 tooltip.style("opacity", 1);
                 //Change width color and opacity for incoming selected mails
-                d3.selectAll(incoming)
+                d3.select("#" + fieldName).selectAll(incoming)
                     .style("opacity", 1)
                     .attr("stroke", "#eb4034")
                     .attr("stroke-width", 2)
@@ -232,6 +232,7 @@ function makeHEB(dataPath, fieldName) {
 
                 //Place tooltip above other elements
                 d3.select(tooltip).raise();
+
             })
 
         })
@@ -243,6 +244,7 @@ function makeHEB(dataPath, fieldName) {
                     .attr("", function (d) {
                         incoming = ".to" + d.id;
                         outgoing = ".from" + d.id;
+                        stopBrushLinking(d.id);
                     });
                 //Reset previously selected paths to normal
                 d3.selectAll(incoming)
@@ -252,9 +254,9 @@ function makeHEB(dataPath, fieldName) {
                 //Delete the copies of outgoing and two-way edges
                 d3.selectAll("#outgoing").remove();
                 d3.selectAll("#two-way").remove();
-
                 //Remove the two-way class from all paths
                 d3.selectAll("path").classed("two-way", false);
+                //Stop brush linking
             }
             );
 
@@ -325,14 +327,12 @@ function makeHEB(dataPath, fieldName) {
                         return 0;
                     }
                 });
-                console.log("yes");
                 curMonthText.text("Current month: " + String(curDate).substr(0, 4) + "-" + String(curDate).substr(4, 6));
             }
 
             svg.selectAll("g")
                 .data(usableData)
             allEdges = [];
-            console.log(usableData);
             //Make a path for each node
             var edges = g.selectAll("path")
                 .data(function (d, i) {
@@ -780,6 +780,101 @@ function makeHEB(dataPath, fieldName) {
                 }
             }
         }
+
+        //Brushing and linking start
+        let brushLinkTrigger = svg.append('input')
+                                   .attr("type", "text")
+                                   .attr("id", "brushLinkTrigger")
+                                   .attr('width', 350)
+                                   .attr('height', 100)
+                                   .style("display" , "none")
+                                   .attr("class" , "brushLinkTrigger")
+                                   .attr("value" , "none")
+                                   .attr("vertical-align" , "middle");
+        brushLinkTrigger.on("input", function() {
+            //Retrieve value from input field:
+            let val = d3.select("#" + fieldName).select("#brushLinkTrigger").attr("value");
+            //Highlighed selected element:
+            d3.select("#id" + val).attr("", function () {
+                //Set incoming and outcoming class
+                incoming = ".to" + val;
+                outgoing = ".from" + val;
+                //Change width color and opacity for incoming selected mails
+                d3.select("#" + fieldName).selectAll(incoming)
+                    .style("opacity", 1)
+                    .attr("stroke", "#eb4034")
+                    .attr("stroke-width", 2)
+                    //Find two way edges for all incoming edges
+                    .each(function () {
+                        //get  from and to for current path
+                        var classes = String(d3.select(this).attr("class"));
+                        var from = parseInt(classes.substr(0, classes.indexOf(" ")).replace("from", ""));
+                        var to = parseInt(classes.substr(classes.indexOf(" ") + 1, classes.length - 1).replace("to", ""));
+                        isTwoWay(from, to);
+                    });
+                //Make a copy of all outgoing edges
+                d3.selectAll(outgoing)
+                    .each(function () {
+                        var path = d3.select(this).attr("d");
+                        svg.append("path")
+                            .attr("id", "outgoing")
+                            .attr("d", function () { return path })
+                            .attr("fill", "none")
+                            .attr("stroke", "#40c7d6")
+                            .attr("stroke-width", 2);
+                    })
+
+                //Raise incoming edges above non selected edges
+                d3.select("#id" + val).raise().attr("stroke", "#5c5c5c");
+
+                d3.selectAll(".two-way")
+                    .each(function () {
+                        var path = d3.select(this).attr("d");
+                        svg.append("path")
+                            .attr("id", "two-way")
+                            .attr("d", function () { return path })
+                            .attr("fill", "none")
+                            .attr("stroke", "#8be667")
+                            .attr("stroke-width", 2);
+                    })
+
+                //Place tooltip above other elements
+                d3.select(tooltip).raise();
+    
+            })
+        })
+        //Brushing and linking stop
+        let brushLinkStop = svg.append('input')
+                               .attr("type", "text")
+                               .attr("id", "brushLinkStop")
+                               .attr('width', 350)
+                               .attr('height', 100)
+                               //.style("display" , "none")
+                               .attr("class" , "brushLinkStop")
+                               .attr("value" , "none")
+                               .attr("vertical-align" , "middle");
+        brushLinkStop.on("input", function() {
+            //Retrieve value from input field:
+            let val = d3.select("#" + fieldName).select("#brushLinkStop").attr("value");
+            //Remove tooltip
+            tooltip.style("opacity", 0);
+            d3.select("#id" + val).attr("stroke", null)
+                //Return selected lines to normal
+                .attr("", function () {
+                    incoming = ".to" + val;
+                    outgoing = ".from" + val;
+                });
+            //Reset previously selected paths to normal
+            d3.selectAll(incoming)
+                .style("opacity", lineOpacity)
+                .attr("stroke", function (d) { return getStroke(d); })
+                .attr("stroke-width", 1);
+            //Delete the copies of outgoing and two-way edges
+            d3.selectAll("#outgoing").remove();
+            d3.selectAll("#two-way").remove();
+            //Remove the two-way class from all paths
+            d3.selectAll("path").classed("two-way", false);
+        })
     });
 }
 
@@ -847,6 +942,15 @@ function findJobtitle(id) {
     }
 }
 
+//Finds the jobtitle for the selected id
+function findEmail(id) {
+    for (i = 0; i < usableData.length; i++) {
+        if (usableData[i]["id"] == id) {
+            return usableData[i]["email"];
+        }
+    }
+}
+
 //Function to check if the fromId, toId combination has already been drawn
 function notDrawn(from, to) {
     for (i = 0; i < drawnEdges.length; i++) {
@@ -894,3 +998,16 @@ function getStroke(d) {
     }
 }
 
+//Input: selection of elements
+//Output: updates all elements at every visblock and triggers 
+//The function handling the brushing and linking selection.
+function triggerBrushLinking(selected){
+    d3.selectAll("#brushLinkTrigger").attr("value" , selected);
+    d3.selectAll("#brushLinkTrigger").dispatch("input");
+}
+    
+function stopBrushLinking(selected){
+    d3.selectAll("#brushLinkStop").attr("value" , selected);
+    d3.selectAll("#brushLinkStop").dispatch("input");
+    d3.selectAll("#sankeyID").selectAll("#id" + selected).attr("stroke" , null);
+}

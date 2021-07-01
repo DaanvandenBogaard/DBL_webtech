@@ -265,12 +265,25 @@ function makeSankey(dataPath , fieldName , idNums) {
     
     brushLinkTrigger.on("input", function() {
       //Retrieve value from input field:
-      console.log("triggered brush link!" + fieldName);
       let val = d3.select("#" + fieldName).select("#brushLinkTrigger").attr("value");
       //Highlighed selected element:
       d3.selectAll("#id" + val).raise().attr("stroke", "black");
     })
-      
+    //Brushing and linking stop
+    let brushLinkStop = upperBar.append('input')
+        .attr("type", "text")
+        .attr("id", "brushLinkStop")
+        .attr('width', 350)
+        .attr('height', 100)
+        .style("display" , "none")
+        .attr("class" , "brushLinkStop")
+        .attr("value" , "none")
+        .attr("vertical-align" , "middle");
+    brushLinkStop.on("input", function() {
+      //Retrieve value from input field:
+      let val = d3.select("#" + fieldName).select("#brushLinkStop").attr("value");
+      d3.select("#id" + val).attr("stroke", null);
+    })
     //Define sankey data by sankey.js
     dataSet = constrDataSet(data , idNums , dateRange);
     MakeD3(dataSet , sankey , d3.select("#" + fieldName).select("#sankeyID").select('#visualisation') , fieldName);
@@ -281,11 +294,13 @@ function makeSankey(dataPath , fieldName , idNums) {
 //Output: updates all elements at every visblock and triggers 
 //The function handling the brushing and linking selection.
 function triggerBrushLinking(selected){
-d3.selectAll("#brushLinkTrigger").attr("value" , selected);
-d3.selectAll("#brushLinkTrigger").dispatch("input");
+  d3.selectAll("#brushLinkTrigger").attr("value" , selected);
+  d3.selectAll("#brushLinkTrigger").dispatch("input");
 }
 
 function stopBrushLinking(selected){
+  d3.selectAll("#brushLinkStop").attr("value" , selected);
+  d3.selectAll("#brushLinkStop").dispatch("input");
   d3.selectAll("#id" + selected).attr("stroke" , null);
 }
 
